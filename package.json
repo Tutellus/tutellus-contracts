@@ -35,15 +35,9 @@
     "chai": "^4.3.0",
     "ethers": "^5.0.31",
     "hardhat": "^2.5.0",
-    "husky": "^4.3.8",
     "snazzy": "^9.0.0",
     "solhint": "^3.3.2",
     "standard": "^16.0.3"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run \"lint\""
-    }
   },
   "standard": {
     "ignore": [
