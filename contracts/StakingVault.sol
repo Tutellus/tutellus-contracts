@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./utils/AccessControlPausableUpgradeable.sol";
 import "./interfaces/IDistributionVault.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/IRedPillERC20.sol";
 
 contract StakingVault is AccessControlPausableUpgradeable {
 
@@ -119,7 +119,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
       user.amount += amount;
       balance += amount;
 
-      IERC20 tokenInterface = IERC20(token);
+      IRedPillERC20 tokenInterface = IRedPillERC20(token);
 
       require(tokenInterface.balanceOf(account) >= amount, "StakingVault: user has not enough balance");
       require(tokenInterface.allowance(account, address(this)) >= amount, "StakingVault: amount exceeds allowance");
@@ -155,7 +155,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
         stakers -= 1;
       }
 
-      IERC20 tokenInterface = IERC20(token);
+      IRedPillERC20 tokenInterface = IRedPillERC20(token);
 
       uint256 burned = amount * getFee(account) / 1e20;
       amount -= burned;
@@ -258,7 +258,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
 
     // Synchronizes balance, transfering the gap to an external account
     function syncBalance(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      IERC20 tokenInterface = IERC20(token);
+      IRedPillERC20 tokenInterface = IRedPillERC20(token);
       uint256 gap = getTokenGap();
       require(gap > 0, "StakingVault: there is no gap");
       tokenInterface.transfer(account, gap);
@@ -267,7 +267,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
 
     // Gets token gap
     function getTokenGap() public view returns (uint256) {
-      IERC20 tokenInterface = IERC20(token);
+      IRedPillERC20 tokenInterface = IRedPillERC20(token);
       uint256 tokenBalance = tokenInterface.balanceOf(address(this));
       return tokenBalance - balance;
     }
