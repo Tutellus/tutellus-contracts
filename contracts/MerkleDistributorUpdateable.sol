@@ -1,12 +1,11 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 import "./utils/AccessControlPausableUpgradeable.sol";
 import "./interfaces/IDistributionVault.sol";
 
-contract MerkleDistributorUpdateable is AccessControlPausableUpgradeable{
+contract MerkleDistributorUpdateable is AccessControlPausableUpgradeable {
 
     address public vault;
     address public token;
