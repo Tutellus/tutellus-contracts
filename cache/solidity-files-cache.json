@@ -1,12 +1,49 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/IERC20.sol": {
-      "lastModificationDate": 1632997912526,
-      "contentHash": "0eac3e1a83ee62326ca007811285b274",
-      "sourceName": "contracts/interfaces/IERC20.sol",
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\DistributionVault.sol": {
+      "lastModificationDate": 1633347922689,
+      "contentHash": "90c9c77d4fa338571909cd98d2a19f84",
+      "sourceName": "contracts/DistributionVault.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IRedPillERC20.sol",
+        "./utils/AccessControlPausableUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "DistributionVault"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\interfaces\\IRedPillERC20.sol": {
+      "lastModificationDate": 1633347922695,
+      "contentHash": "5536ac2c8dff93bd8e7e5fb39bf8685a",
+      "sourceName": "contracts/interfaces/IRedPillERC20.sol",
+      "solcConfig": {
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -32,375 +69,15 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "IERC20"
+        "IRedPillERC20"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/mock/PancakeRouterMock.sol": {
-      "lastModificationDate": 1632997912527,
-      "contentHash": "a06a75b4047d4e51bbe187fb3d580ec9",
-      "sourceName": "contracts/mock/PancakeRouterMock.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../interfaces/IERC20.sol",
-        "../interfaces/IPancakeFactory.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "PancakeFactoryMock",
-        "PancakePairMock",
-        "PancakeRouterMock"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/IPancakeFactory.sol": {
-      "lastModificationDate": 1632997912527,
-      "contentHash": "0f98101ea74093c8f4b5a814f2688924",
-      "sourceName": "contracts/interfaces/IPancakeFactory.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IPancakeFactory"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/mock/AggregatorMock.sol": {
-      "lastModificationDate": 1632997912527,
-      "contentHash": "db441e634581144c6dae2672b7ec806f",
-      "sourceName": "contracts/mock/AggregatorMock.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "AggregatorMock"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
-      "lastModificationDate": 1632996666754,
-      "contentHash": "b9be3f7aa79153708acdc3be6bd1cb35",
-      "sourceName": "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "AggregatorV3Interface"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
-      "lastModificationDate": 1632996665696,
-      "contentHash": "cbb8386f0120d46d66ff42dffbbc16c1",
-      "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Initializable"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol": {
-      "lastModificationDate": 1632996665385,
-      "contentHash": "faa705d36c5df2f4972b44506b2bd682",
-      "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./IERC20Upgradeable.sol",
-        "./extensions/IERC20MetadataUpgradeable.sol",
-        "../../utils/ContextUpgradeable.sol",
-        "../../proxy/utils/Initializable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ERC20Upgradeable"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol": {
-      "lastModificationDate": 1632996665626,
-      "contentHash": "3a5432b9dfef2ff5c8f58fcc0b1452b2",
-      "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC20Upgradeable"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol": {
-      "lastModificationDate": 1632996665617,
-      "contentHash": "751ef4b010fddf04a9e90de13fe1ffe7",
-      "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../IERC20Upgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC20MetadataUpgradeable"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
-      "lastModificationDate": 1632996665138,
-      "contentHash": "3eaa562e66c40d85f919cc6ee5059ebe",
-      "sourceName": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../proxy/utils/Initializable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ContextUpgradeable"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol": {
-      "lastModificationDate": 1632996665720,
-      "contentHash": "12a1ac4f7ef141dcf92f6dba57890d16",
-      "sourceName": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../utils/ContextUpgradeable.sol",
-        "../proxy/utils/Initializable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "PausableUpgradeable"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/AccessControlPausableUpgradeable.sol": {
-      "lastModificationDate": 1632997912528,
-      "contentHash": "514e9226891941e7ded5fc698dc38cda",
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\utils\\AccessControlPausableUpgradeable.sol": {
+      "lastModificationDate": 1633347922696,
+      "contentHash": "355d1851a99c6b18b8b550438505d34b",
       "sourceName": "contracts/utils/AccessControlPausableUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -432,12 +109,12 @@
         "AccessControlPausableUpgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol": {
-      "lastModificationDate": 1632996665109,
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol": {
+      "lastModificationDate": 1633353917522,
       "contentHash": "d512f0f42dd210288ac9843654910074",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -472,12 +149,49 @@
         "AccessControlUpgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol": {
-      "lastModificationDate": 1632996665570,
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol": {
+      "lastModificationDate": 1633353965354,
+      "contentHash": "12a1ac4f7ef141dcf92f6dba57890d16",
+      "sourceName": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/ContextUpgradeable.sol",
+        "../proxy/utils/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "PausableUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol": {
+      "lastModificationDate": 1633353945679,
       "contentHash": "1712dd281e6d713718f5f08fbb020589",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -506,12 +220,48 @@
         "IAccessControlUpgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol": {
-      "lastModificationDate": 1632996665801,
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol": {
+      "lastModificationDate": 1633353919190,
+      "contentHash": "3eaa562e66c40d85f919cc6ee5059ebe",
+      "sourceName": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../proxy/utils/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ContextUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol": {
+      "lastModificationDate": 1633353970036,
       "contentHash": "80d3ad01fbd728e8a0dcde979c610377",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -540,12 +290,12 @@
         "StringsUpgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol": {
-      "lastModificationDate": 1632996665292,
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol": {
+      "lastModificationDate": 1633353927246,
       "contentHash": "3649e7528117ffc7d8a3ccf199b0c6d8",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -577,12 +327,46 @@
         "ERC165Upgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol": {
-      "lastModificationDate": 1632996665601,
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol": {
+      "lastModificationDate": 1633353963079,
+      "contentHash": "cbb8386f0120d46d66ff42dffbbc16c1",
+      "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Initializable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol": {
+      "lastModificationDate": 1633353951245,
       "contentHash": "4db71815975139b4bcedb3b615131302",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -611,12 +395,85 @@
         "IERC165Upgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/RedPillERC20.sol": {
-      "lastModificationDate": 1632997912528,
-      "contentHash": "b28f546284a326c647ce871fab3a8bf0",
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusToken.sol": {
+      "lastModificationDate": 1633347922693,
+      "contentHash": "045f05d3fd18b4da53dd3a09ea3c5f21",
+      "sourceName": "contracts/TutellusToken.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utils/Token.sol",
+        "./DistributionVault.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusToken"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\utils\\Token.sol": {
+      "lastModificationDate": 1633347922699,
+      "contentHash": "977f3c69710ced0293ec6a9b5ee23484",
+      "sourceName": "contracts/utils/Token.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./RedPillERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Token"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\utils\\RedPillERC20.sol": {
+      "lastModificationDate": 1633347922698,
+      "contentHash": "608c1a155d1d26ef3bfcd122fa4f7632",
       "sourceName": "contracts/utils/RedPillERC20.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -648,12 +505,12 @@
         "RedPillERC20"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol": {
-      "lastModificationDate": 1632996665323,
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\token\\ERC20\\extensions\\ERC20CappedUpgradeable.sol": {
+      "lastModificationDate": 1633353928845,
       "contentHash": "d89884689902d03b74e6ec3da6ef3106",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -685,12 +542,12 @@
         "ERC20CappedUpgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/Token.sol": {
-      "lastModificationDate": 1632997912528,
-      "contentHash": "2b3b0a9ef23f82a28e7e50d4c0508773",
-      "sourceName": "contracts/utils/Token.sol",
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\token\\ERC20\\ERC20Upgradeable.sol": {
+      "lastModificationDate": 1633353931583,
+      "contentHash": "faa705d36c5df2f4972b44506b2bd682",
+      "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -712,13 +569,1018 @@
         }
       },
       "imports": [
-        "./RedPillERC20.sol"
+        "./IERC20Upgradeable.sol",
+        "./extensions/IERC20MetadataUpgradeable.sol",
+        "../../utils/ContextUpgradeable.sol",
+        "../../proxy/utils/Initializable.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
       ],
       "artifacts": [
-        "Token"
+        "ERC20Upgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\token\\ERC20\\IERC20Upgradeable.sol": {
+      "lastModificationDate": 1633353954248,
+      "contentHash": "3a5432b9dfef2ff5c8f58fcc0b1452b2",
+      "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20Upgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\token\\ERC20\\extensions\\IERC20MetadataUpgradeable.sol": {
+      "lastModificationDate": 1633353953476,
+      "contentHash": "751ef4b010fddf04a9e90de13fe1ffe7",
+      "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC20Upgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20MetadataUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\StakingVault.sol": {
+      "lastModificationDate": 1633347922692,
+      "contentHash": "4ac79f4a34c979ed7a7433d2793709ef",
+      "sourceName": "contracts/StakingVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utils/AccessControlPausableUpgradeable.sol",
+        "./interfaces/IDistributionVault.sol",
+        "./interfaces/IRedPillERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "StakingVault"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\interfaces\\IDistributionVault.sol": {
+      "lastModificationDate": 1633347922694,
+      "contentHash": "f9f51a888d0dd70d78df907a1b19759e",
+      "sourceName": "contracts/interfaces/IDistributionVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IDistributionVault"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\MerkleDistributorUpdateable.sol": {
+      "lastModificationDate": 1633347922690,
+      "contentHash": "9ee9e3c1228ea2a9f3029de3965e65a1",
+      "sourceName": "contracts/MerkleDistributorUpdateable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol",
+        "./utils/AccessControlPausableUpgradeable.sol",
+        "./interfaces/IDistributionVault.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MerkleDistributorUpdateable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\cryptography\\MerkleProofUpgradeable.sol": {
+      "lastModificationDate": 1633353963899,
+      "contentHash": "ad5a8183ec7a73b6375476279d9c2b7b",
+      "sourceName": "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MerkleProofUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusDID.sol": {
+      "lastModificationDate": 1633357364702,
+      "contentHash": "e65eacf69463b06ebce9206ec22fc207",
+      "sourceName": "contracts/TutellusDID.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "TutellusDID"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\proxy\\utils\\UUPSUpgradeable.sol": {
+      "lastModificationDate": 1633353971639,
+      "contentHash": "15b6a36d8d42626557f8bc23db5e00a9",
+      "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../ERC1967/ERC1967UpgradeUpgradeable.sol",
+        "./Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "UUPSUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\proxy\\ERC1967\\ERC1967UpgradeUpgradeable.sol": {
+      "lastModificationDate": 1633353928159,
+      "contentHash": "430950c379ec78aff91b5e8fa04c8aba",
+      "sourceName": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../beacon/IBeaconUpgradeable.sol",
+        "../../utils/AddressUpgradeable.sol",
+        "../../utils/StorageSlotUpgradeable.sol",
+        "../utils/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "ERC1967UpgradeUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\proxy\\beacon\\IBeaconUpgradeable.sol": {
+      "lastModificationDate": 1633353946368,
+      "contentHash": "02d4784b119cc80015bef24a5e6bb0ea",
+      "sourceName": "@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IBeaconUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\AddressUpgradeable.sol": {
+      "lastModificationDate": 1633353917781,
+      "contentHash": "25dd93dd672c3114a782e2a4424201b3",
+      "sourceName": "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "AddressUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\StorageSlotUpgradeable.sol": {
+      "lastModificationDate": 1633353969563,
+      "contentHash": "92db084d1a7fc35176205dae79fa7da0",
+      "sourceName": "@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "StorageSlotUpgradeable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusDIDFactory.sol": {
+      "lastModificationDate": 1633364732162,
+      "contentHash": "1137333c7f8a8345fef92c8c2ffbc2c4",
+      "sourceName": "contracts/TutellusDIDFactory.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
+        "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol",
+        "./TutellusDID.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "TutellusDIDFactory"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol": {
+      "lastModificationDate": 1633353974569,
+      "contentHash": "ce8ae93e65f6e34105b9abc9d1be67ee",
+      "sourceName": "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IBeacon.sol",
+        "../../access/Ownable.sol",
+        "../../utils/Address.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "UpgradeableBeacon"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol": {
+      "lastModificationDate": 1633353920092,
+      "contentHash": "7217d9a0b6e1cf9842df0915c87081ad",
+      "sourceName": "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IBeacon.sol",
+        "../Proxy.sol",
+        "../ERC1967/ERC1967Upgrade.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "BeaconProxy"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol": {
+      "lastModificationDate": 1633353948350,
+      "contentHash": "e1e6df7276b048c6b544c757c6e179ec",
+      "sourceName": "@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IBeacon"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
+      "lastModificationDate": 1633353966402,
+      "contentHash": "4fe56b59ced59d87df6b796758f62895",
+      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\Address.sol": {
+      "lastModificationDate": 1633353919311,
+      "contentHash": "c5f6c4e4df069c789e7d84b4c3011913",
+      "sourceName": "@openzeppelin/contracts/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
+      "lastModificationDate": 1633353921337,
+      "contentHash": "851485d5b925529b1a2f34a0be077891",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\proxy\\Proxy.sol": {
+      "lastModificationDate": 1633353967938,
+      "contentHash": "39dead889de1329620d1634e0b499e30",
+      "sourceName": "@openzeppelin/contracts/proxy/Proxy.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Proxy"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol": {
+      "lastModificationDate": 1633353931030,
+      "contentHash": "0a0f799e1bf1527d28cfe1bd43fbab7f",
+      "sourceName": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../beacon/IBeacon.sol",
+        "../../utils/Address.sol",
+        "../../utils/StorageSlot.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "ERC1967Upgrade"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\StorageSlot.sol": {
+      "lastModificationDate": 1633353972496,
+      "contentHash": "dcfdd37663042ccb99d67060a9eaebec",
+      "sourceName": "@openzeppelin/contracts/utils/StorageSlot.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "StorageSlot"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\mock\\AggregatorMock.sol": {
+      "lastModificationDate": 1633078331626,
+      "contentHash": "c67cba89d8da988ec1bbe00a5323ac99",
+      "sourceName": "contracts/mock/AggregatorMock.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "AggregatorMock"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@chainlink\\contracts\\src\\v0.8\\interfaces\\AggregatorV3Interface.sol": {
+      "lastModificationDate": 1633354054815,
+      "contentHash": "b9be3f7aa79153708acdc3be6bd1cb35",
+      "sourceName": "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "AggregatorV3Interface"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\interfaces\\IERC20.sol": {
+      "lastModificationDate": 1633078331624,
+      "contentHash": "253946142a7b9fc25637686fb06794e2",
+      "sourceName": "contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\mock\\PancakeRouterMock.sol": {
+      "lastModificationDate": 1633078331627,
+      "contentHash": "ada0ebc2c20fd05d002beb1009c33890",
+      "sourceName": "contracts/mock/PancakeRouterMock.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IERC20.sol",
+        "../interfaces/IPancakeFactory.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "PancakeFactoryMock",
+        "PancakePairMock",
+        "PancakeRouterMock"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\interfaces\\IPancakeFactory.sol": {
+      "lastModificationDate": 1633078331624,
+      "contentHash": "d874a36e5b5d25694f08e94adcf3d349",
+      "sourceName": "contracts/interfaces/IPancakeFactory.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IPancakeFactory"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\utils\\TutellusDIDV2.sol": {
+      "lastModificationDate": 1633364148678,
+      "contentHash": "eb6b53c71c2dd26ed5533128ce226287",
+      "sourceName": "contracts/utils/TutellusDIDV2.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "TutellusDIDV2"
       ]
     }
   }
