@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./interfaces/IRedPillERC20.sol";
 import "./utils/AccessControlPausableUpgradeable.sol";
 
-contract DistributionVault is AccessControlPausableUpgradeable{
+contract DistributionVault is AccessControlPausableUpgradeable {
 
     address public token;
 

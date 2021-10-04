@@ -8,6 +8,9 @@ abstract contract RedPillERC20 is AccessControlPausableUpgradeable, ERC20CappedU
 
     uint256 private burned_;
 
+    event Mint(address account, uint256 amount);
+    event Burn(address account, uint256 amount);
+
     function __RedPillERC20_init(string memory name, string memory symbol, uint256 cap) internal initializer {
         __AccessControlPausableUpgradeable_init();
         __ERC20_init(name, symbol);
@@ -21,19 +24,21 @@ abstract contract RedPillERC20 is AccessControlPausableUpgradeable, ERC20CappedU
     function _mint(address account, uint256 amount) virtual internal override {
         require(totalSupply() + burned_ + amount <= cap(), "RedPillERC20: mint amount exceeds cap");
         super._mint(account, amount);
+        emit Mint(account, amount);
     }
 
     function _burn(address account, uint256 amount) virtual internal override {
         require(totalSupply() - burned_ >= amount, "RedPillERC20: burn amount exceeds supply");
         burned_ += amount;
         super._burn(account, amount);
+        emit Burn(account, amount);
     }
 
     function burned() public view returns (uint256) {
         return burned_;
     }
 
-    function mint(address account, uint256 amount) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function mint(address account, uint256 amount) public onlyRole(keccak256('MINTER_ROLE')) {
         _mint(account, amount);
     }
 
