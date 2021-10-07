@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "./utils/AccessControlPausableUpgradeable.sol";
+import "./utils/AccessControlProxyPausable.sol";
 import "./interfaces/ITutellusERC20.sol";
 import "./interfaces/IDistributionVault.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract TutellusStakingLogic is AccessControlPausableUpgradeable, UUPSUpgradeable {
+contract TutellusStakingLogic is AccessControlProxyPausable {
 
     address public vault;
     address public token;
@@ -240,10 +239,10 @@ contract TutellusStakingLogic is AccessControlPausableUpgradeable, UUPSUpgradeab
     }
 
     // Updates vault address
-    function updateVault(address vault_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      IDistributionVault vaultInterface = IDistributionVault(vault_);
+    function updateVault(address proxy) public onlyRole(DEFAULT_ADMIN_ROLE) {
+      IDistributionVault vaultInterface = IDistributionVault(proxy);
       require(vaultInterface.isStakeholder(address(this)), "TutellusStakingLogic: this contract is not a stakeholder");
-      vault = vault_;
+      vault = proxy;
       token = address(vaultInterface.token());
       rewardPerBlock = vaultInterface.releasePerBlock(address(this));
       updateEndBlock(vaultInterface.endBlock(address(this)));
@@ -274,27 +273,21 @@ contract TutellusStakingLogic is AccessControlPausableUpgradeable, UUPSUpgradeab
     }
 
     // Initializes the contract
-    function initialize(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) public {
-      __TutellusStakingLogic_init(vault_, burning_, minFee_, maxFee_, feeInterval_);
+    function initialize(address rolemanager, address proxy, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) public {
+      __TutellusStakingLogic_init(rolemanager, proxy, burning_, minFee_, maxFee_, feeInterval_);
     }
 
-    function __TutellusStakingLogic_init(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
-      __AccessControlPausableUpgradeable_init();
-      __TutellusStakingLogic_init_unchained(vault_, burning_, minFee_, maxFee_, feeInterval_);
+    function __TutellusStakingLogic_init(address rolemanager, address proxy, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+      __AccessControlProxyPausable_init(rolemanager);
+      __TutellusStakingLogic_init_unchained(proxy, burning_, minFee_, maxFee_, feeInterval_);
     }
 
-    function __TutellusStakingLogic_init_unchained(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
-      updateVault(vault_);
+    function __TutellusStakingLogic_init_unchained(address proxy, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+      updateVault(proxy);
       setFees(minFee_, maxFee_);
       setFeeInterval(feeInterval_);
       autoreward = true;
       lastUpdate = block.number;
       burning = burning_;
     }
-
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        onlyRole(UPGRADER_ROLE)
-        override
-    {}
 }

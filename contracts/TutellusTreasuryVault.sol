@@ -1,32 +1,20 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "./utils/AccessControlProxyPausable.sol";
 import "./TutellusStakingProxy.sol";
 import "./interfaces/ITutellusERC20.sol";
 
 contract TutellusYieldRewardsVault is AccessControlProxyPausable {
 
-    uint256 private _allocationStaking;
-    uint256 private _allocationFarming;
-    uint256 private _lastUpdate;
-    uint256 private _releasedStaking;
-    uint256 private _releasedFarming;
+    address public token;
+    address public treasury;
+
+    uint256 private _released;
     uint private _startBlock;
     uint private _endBlock;
     uint private _increment;
-
-    address public token;
-    address public stakingProxy;
-    address public farmingProxy;
-
-    function updateAllocation(uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _releasedStaking = releasedStaking();
-        _releasedFarming = releasedFarming();
-        _allocationStaking = allocation[0];
-        _allocationFarming = allocation[1];
-        _lastUpdate = block.number;
-    }
 
     function released() public view returns (uint256) {
       return releasedRange(block.number, _startBlock);
@@ -41,34 +29,31 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       return comp0 - comp1;
     }
 
-    function releasedStaking() public view returns (uint256) {
-      return _releasedStaking + releasedRange(block.number, _lastUpdate) * _allocationStaking / 1e20;
-    }
-    
-    function releasedFarming() public view returns (uint256) {
-       return _releasedFarming + releasedRange(block.number, _lastUpdate) * _allocationFarming / 1e20;
+    function updateTreasury(address treasury_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+      treasury = treasury_;
     }
 
-    function distributeTokens(address account, uint256 amount) public onlyRole("PROXY_ROLE") {
-      // Limitar distribución a releasing
-        ITutellusERC20 tokenInterface = ITutellusERC20(token);
-        tokenInterface.transfer(account, amount);
+    function claim() public onlyRole(DEFAULT_ADMIN_ROLE) {
+      uint256 amount = released() - _released;
+      require(amount > 0, "TutellusTreasuryVault: nothing to claim");
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
+      tokenInterface.transfer(treasury, amount);
     }
 
     // Initializes the contract
     function initialize(
       address rolemanager,
-      address token_, 
-      uint256[] memory allocation, 
+      address treasury_,
+      address token_,
       uint256 amount, 
       uint blocks
-    ) 
+) 
       public 
     {
       __TutellusYieldRewardsVault_init(
         rolemanager,
-        token_, 
-        allocation, 
+        treasury_,
+        token_,
         amount, 
         blocks
       );
@@ -76,8 +61,8 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
 
     function __TutellusYieldRewardsVault_init(
       address rolemanager,
-      address token_, 
-      uint256[] memory allocation, 
+      address treasury_,
+      address token_,
       uint256 amount, 
       uint blocks
     ) 
@@ -86,18 +71,16 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
     {
       __AccessControlProxyPausable_init(rolemanager);
       __TutellusYieldRewardsVault_init_unchained(
-        rolemanager,
-        token_, 
-        allocation, 
+        treasury_,
+        token_,
         amount, 
         blocks
       );
     }
 
     function __TutellusYieldRewardsVault_init_unchained(
-      address rolemanager,
-      address token_, 
-      uint256[] memory allocation, 
+      address treasury_,
+      address token_,
       uint256 amount, 
       uint blocks
     ) 
@@ -105,19 +88,10 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       initializer 
     {
         token = token_;
+        treasury = treasury_;
         ITutellusERC20 tokenInterface = ITutellusERC20(token);
         tokenInterface.mint(address(this), amount);
 
-        TutellusStakingProxy stakingInstance = new TutellusStakingProxy();
-        TutellusStakingProxy farmingInstance = new TutellusStakingProxy();
-
-        stakingInstance.initialize(rolemanager);
-        farmingInstance.initialize(rolemanager);
-
-        stakingProxy = address(stakingInstance);
-        farmingProxy = address(farmingInstance);
-
-        updateAllocation(allocation);
         _startBlock = block.number;
         _endBlock = block.number + blocks;
         _increment = (2 * amount) / (blocks ** 2);
