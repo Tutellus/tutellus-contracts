@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/ITutellusERC20.sol";
-import "./utils/AccessControlPausableUpgradeable.sol";
+import "./utils/AccessControlProxyPausable.sol";
 
-contract TutellusDistributionVault is AccessControlPausableUpgradeable {
+contract TutellusDistributionVault is AccessControlProxyPausable {
 
     address public token;
 
@@ -22,8 +22,8 @@ contract TutellusDistributionVault is AccessControlPausableUpgradeable {
 
     mapping (address=>Stakeholder) public stakeholders;
 
-    function __TutellusDistributionVault_init(address token_, uint256 amount) internal initializer {
-      __AccessControlPausableUpgradeable_init();
+    function __TutellusDistributionVault_init(address rolemanager, address token_, uint256 amount) internal initializer {
+      __AccessControlProxyPausable_init(rolemanager);
       __TutellusDistributionVault_init_unchained(token_, amount);
     }
 
@@ -116,7 +116,7 @@ contract TutellusDistributionVault is AccessControlPausableUpgradeable {
       emit MigrateStakeholder(from, to);
     }
 
-    function initialize(address token_, uint256 amount) public {
-      __TutellusDistributionVault_init(token_, amount);
+    function initialize(address rolemanager, address token_, uint256 amount) public {
+      __TutellusDistributionVault_init(rolemanager, token_, amount);
     }
 }

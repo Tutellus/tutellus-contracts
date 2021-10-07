@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
-import "./utils/AccessControlPausableUpgradeable.sol";
+import "./utils/AccessControlProxyPausable.sol";
 import "./interfaces/ITutellusERC20.sol";
 
-contract TutellusMerkleDistributorUpdateable is AccessControlPausableUpgradeable {
+contract TutellusMerkleDistributorUpdateable is AccessControlProxyPausable {
 
     address public token;
     bytes32 public merkleRoot;
@@ -47,12 +47,12 @@ contract TutellusMerkleDistributorUpdateable is AccessControlPausableUpgradeable
     }
 
 
-    function initialize(address token_, uint256 amount) public {
-      __MerkleDistributorUpdateable_init(token_, amount);
+    function initialize(address rolemanager, address token_, uint256 amount) public {
+      __MerkleDistributorUpdateable_init(rolemanager, token_, amount);
     }
 
-    function __MerkleDistributorUpdateable_init(address token_, uint256 amount) internal initializer {
-      __AccessControlPausableUpgradeable_init();
+    function __MerkleDistributorUpdateable_init(address rolemanager, address token_, uint256 amount) internal initializer {
+      __AccessControlProxyPausable_init(rolemanager);
       __MerkleDistributorUpdateable_init_unchained(token_, amount);
     }
 
