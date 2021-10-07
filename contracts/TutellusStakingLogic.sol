@@ -2,8 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "./utils/AccessControlPausableUpgradeable.sol";
+import "./interfaces/ITutellusERC20.sol";
+import "./interfaces/IDistributionVault.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract TutellusStakingLogic is AccessControlPausableUpgradeable {
+contract TutellusStakingLogic is AccessControlPausableUpgradeable, UUPSUpgradeable {
 
     address public vault;
     address public token;
@@ -117,7 +120,7 @@ contract TutellusStakingLogic is AccessControlPausableUpgradeable {
       user.amount += amount;
       balance += amount;
 
-      IRedPillERC20 tokenInterface = IRedPillERC20(token);
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
 
       require(tokenInterface.balanceOf(account) >= amount, "TutellusStakingLogic: user has not enough balance");
       require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusStakingLogic: amount exceeds allowance");
@@ -153,7 +156,7 @@ contract TutellusStakingLogic is AccessControlPausableUpgradeable {
         stakers -= 1;
       }
 
-      IRedPillERC20 tokenInterface = IRedPillERC20(token);
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
 
       uint256 burned = amount * getFee(account) / 1e20;
       amount -= burned;
@@ -256,7 +259,7 @@ contract TutellusStakingLogic is AccessControlPausableUpgradeable {
 
     // Synchronizes balance, transfering the gap to an external account
     function syncBalance(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      IRedPillERC20 tokenInterface = IRedPillERC20(token);
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
       uint256 gap = getTokenGap();
       require(gap > 0, "TutellusStakingLogic: there is no gap");
       tokenInterface.transfer(account, gap);
@@ -265,7 +268,7 @@ contract TutellusStakingLogic is AccessControlPausableUpgradeable {
 
     // Gets token gap
     function getTokenGap() public view returns (uint256) {
-      IRedPillERC20 tokenInterface = IRedPillERC20(token);
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
       uint256 tokenBalance = tokenInterface.balanceOf(address(this));
       return tokenBalance - balance;
     }
@@ -288,4 +291,10 @@ contract TutellusStakingLogic is AccessControlPausableUpgradeable {
       lastUpdate = block.number;
       burning = burning_;
     }
+
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        onlyRole(UPGRADER_ROLE)
+        override
+    {}
 }

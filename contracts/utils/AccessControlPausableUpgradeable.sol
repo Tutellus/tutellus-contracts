@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 abstract contract AccessControlPausableUpgradeable is AccessControlUpgradeable, PausableUpgradeable {
 
     bytes32 internal PAUSER_ROLE = keccak256('PAUSER_ROLE');
+    bytes32 internal UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
     /**
      * @dev Initialized the contract.
      *
@@ -24,6 +25,7 @@ abstract contract AccessControlPausableUpgradeable is AccessControlUpgradeable, 
     function __AccessControlPausableUpgradeable_init_unchained() internal initializer {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(PAUSER_ROLE, _msgSender());
+        _setupRole(UPGRADER_ROLE, _msgSender());
     }
 
     function grantPauserRole(address account) public onlyRole(DEFAULT_ADMIN_ROLE){
