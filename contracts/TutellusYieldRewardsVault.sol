@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "./utils/AccessControlPausableUpgradeable.sol";
-import "./TutellusStakingProxy.sol";
+import "./TutellusStakingLogic.sol";
 import "./interfaces/ITutellusERC20.sol";
 
 contract TutellusYieldRewardsVault is AccessControlPausableUpgradeable {
@@ -56,23 +57,102 @@ contract TutellusYieldRewardsVault is AccessControlPausableUpgradeable {
     }
 
     // Initializes the contract
-    function initialize(address token_, uint256[] memory allocation, uint256 amount, uint blocks) public {
-      __TutellusYieldRewardsVault_init(token_, allocation, amount, blocks);
+    function initialize(
+      address token_, 
+      uint256[] memory allocation, 
+      uint256 amount, 
+      uint blocks, 
+      address implementation,
+      address burning_, 
+      uint256 minFee_, 
+      uint256 maxFee_, 
+      uint feeInterval_
+    ) 
+      public 
+    {
+      __TutellusYieldRewardsVault_init(
+        token_, 
+        allocation, 
+        amount, 
+        blocks, 
+        implementation,
+        burning_,
+        minFee_,
+        maxFee_,
+        feeInterval_
+      );
     }
 
-    function __TutellusYieldRewardsVault_init(address token_, uint256[] memory allocation, uint256 amount, uint blocks) internal initializer {
+    function __TutellusYieldRewardsVault_init(
+      address token_, 
+      uint256[] memory allocation, 
+      uint256 amount, 
+      uint blocks, 
+      address implementation,
+      address burning_, 
+      uint256 minFee_, 
+      uint256 maxFee_, 
+      uint feeInterval_
+    ) 
+      internal 
+      initializer 
+    {
       __AccessControlPausableUpgradeable_init();
-      __TutellusYieldRewardsVault_init_unchained(token_, allocation, amount, blocks);
+      __TutellusYieldRewardsVault_init_unchained(
+        token_, 
+        allocation, 
+        amount, 
+        blocks, 
+        implementation,
+        burning_,
+        minFee_,
+        maxFee_,
+        feeInterval_
+      );
     }
 
-    function __TutellusYieldRewardsVault_init_unchained(address token_, uint256[] memory allocation, uint256 amount, uint blocks) internal initializer {
+    function __TutellusYieldRewardsVault_init_unchained(
+      address token_, 
+      uint256[] memory allocation, 
+      uint256 amount, 
+      uint blocks, 
+      address implementation,
+      address burning_, 
+      uint256 minFee_, 
+      uint256 maxFee_, 
+      uint feeInterval_
+    ) 
+      internal 
+      initializer 
+    {
         token = token_;
         ITutellusERC20 tokenInterface = ITutellusERC20(token);
         tokenInterface.mint(address(this), amount);
 
-        // TO DO PROXY
-        stakingProxy = address(new TutellusStakingProxy());
-        farmingProxy = address(new TutellusStakingProxy());
+        // Deploy outside: Warning: Contract code size exceeds 24576 bytes
+        //address implementation = address(new TutellusStakingLogic());
+
+        ERC1967Proxy stakingProxyAddress = new ERC1967Proxy(
+            implementation,
+            abi.encodeWithSelector(TutellusStakingLogic(address(0)).initialize.selector, _msgSender())
+        );
+
+        stakingProxy = address(stakingProxyAddress);
+
+        ERC1967Proxy farmingProxyAddress = new ERC1967Proxy(
+            implementation,
+            abi.encodeWithSelector(
+              TutellusStakingLogic(address(0)).initialize.selector, 
+              address(this),
+              burning_,
+              minFee_,
+              maxFee_,
+              feeInterval_
+            )
+        );
+
+        farmingProxy = address(farmingProxyAddress);
+
         grantRole("PROXY_ROLE", stakingProxy);
         grantRole("PROXY_ROLE", farmingProxy);
 
