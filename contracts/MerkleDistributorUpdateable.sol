@@ -3,11 +3,10 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 import "./utils/AccessControlPausableUpgradeable.sol";
-import "./interfaces/IDistributionVault.sol";
+import "./interfaces/ITutellusERC20.sol";
 
-contract MerkleDistributorUpdateable is AccessControlPausableUpgradeable {
+contract TutellusMerkleDistributorUpdateable is AccessControlPausableUpgradeable {
 
-    address public vault;
     address public token;
     bytes32 public merkleRoot;
     string public uri;
@@ -42,25 +41,24 @@ contract MerkleDistributorUpdateable is AccessControlPausableUpgradeable {
         uint256 claimed = leftToClaim(index, account, amount, merkleProof);
         require(claimed > 0,"MerkleDistributorUpdateable: Nothing to claim.");
         _alreadyClaimed[account] += claimed;
-        IDistributionVault vaultInterface = IDistributionVault(vault);
-        vaultInterface.distributeTokens(account, claimed);
+        ITutellusERC20 tokenInterface = ITutellusERC20(token);
+        tokenInterface.transfer(account, amount);
         emit Claimed(index, account, claimed);
     }
 
 
-    function initialize(address vault_) public {
-      __MerkleDistributorUpdateable_init(vault_);
+    function initialize(address token_, uint256 amount) public {
+      __MerkleDistributorUpdateable_init(token_, amount);
     }
 
-    function __MerkleDistributorUpdateable_init(address vault_) internal initializer {
+    function __MerkleDistributorUpdateable_init(address token_, uint256 amount) internal initializer {
       __AccessControlPausableUpgradeable_init();
-      __MerkleDistributorUpdateable_init_unchained(vault_);
+      __MerkleDistributorUpdateable_init_unchained(token_, amount);
     }
 
-    function __MerkleDistributorUpdateable_init_unchained(address vault_) internal initializer {
-        IDistributionVault vaultInterface = IDistributionVault(vault_);
-        require(vaultInterface.isStakeholder(address(this)), "MerkleDistributorUpdateable: this address is not a valid vault stakeholder");
-        vault = vault_;
-        token = vaultInterface.token();
+    function __MerkleDistributorUpdateable_init_unchained(address token_, uint256 amount) internal initializer {
+      token = token_;
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
+      tokenInterface.mint(address(this), amount);
     }
 }
