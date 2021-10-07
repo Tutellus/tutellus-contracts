@@ -2,10 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "./utils/AccessControlPausableUpgradeable.sol";
-import "./interfaces/IDistributionVault.sol";
-import "./interfaces/IRedPillERC20.sol";
 
-contract StakingVault is AccessControlPausableUpgradeable {
+contract TutellusStakingLogic is AccessControlPausableUpgradeable {
 
     address public vault;
     address public token;
@@ -76,8 +74,8 @@ contract StakingVault is AccessControlPausableUpgradeable {
 
     // Sets maximum and minimum fees
     function setFees(uint256 minFee_, uint256 maxFee_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      require(minFee_ < maxFee_, "StakingVault: mininum fee must be greater than maximum fee");
-      require(minFee_ <= 1e20 && maxFee_ <= 1e20, "StakingVault: fees must be less than 100e18");
+      require(minFee_ < maxFee_, "TutellusStakingLogic: mininum fee must be greater than maximum fee");
+      require(minFee_ <= 1e20 && maxFee_ <= 1e20, "TutellusStakingLogic: fees must be less than 100e18");
       minFee = minFee_;
       maxFee = maxFee_;
       emit UpdateFees(minFee, maxFee, feeInterval);
@@ -99,8 +97,8 @@ contract StakingVault is AccessControlPausableUpgradeable {
 
     // Deposits tokens for staking
     function deposit(uint256 amount) public whenNotPaused {
-      require(block.number < endBlock, "StakingVault: staking contract has finished");
-      require(amount > 0, "StakingVault: amount must be over zero");
+      require(block.number < endBlock, "TutellusStakingLogic: staking contract has finished");
+      require(amount > 0, "TutellusStakingLogic: amount must be over zero");
 
       address account = msg.sender;
       UserInfo storage user = _userInfo[account];
@@ -121,14 +119,14 @@ contract StakingVault is AccessControlPausableUpgradeable {
 
       IRedPillERC20 tokenInterface = IRedPillERC20(token);
 
-      require(tokenInterface.balanceOf(account) >= amount, "StakingVault: user has not enough balance");
-      require(tokenInterface.allowance(account, address(this)) >= amount, "StakingVault: amount exceeds allowance");
+      require(tokenInterface.balanceOf(account) >= amount, "TutellusStakingLogic: user has not enough balance");
+      require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusStakingLogic: amount exceeds allowance");
 
       if(autoreward) {
         _reward(account);
       }
 
-      require(tokenInterface.transferFrom(account, address(this), amount), "StakingVault: deposit transfer failed");
+      require(tokenInterface.transferFrom(account, address(this), amount), "TutellusStakingLogic: deposit transfer failed");
 
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -137,12 +135,12 @@ contract StakingVault is AccessControlPausableUpgradeable {
 
     // Withdraws tokens from staking
     function withdraw(uint256 amount) public whenNotPaused {
-      require(amount > 0, "StakingVault: amount must be over zero");
+      require(amount > 0, "TutellusStakingLogic: amount must be over zero");
 
       address account = msg.sender;
       UserInfo storage user = _userInfo[account];
 
-      require(amount <= user.amount, "StakingVault: user has not enough staking balance");
+      require(amount <= user.amount, "TutellusStakingLogic: user has not enough staking balance");
 
       _update();
       _updateRewards(account);
@@ -164,8 +162,8 @@ contract StakingVault is AccessControlPausableUpgradeable {
         _reward(account);
       }
 
-      require(tokenInterface.transfer(burning, burned), "StakingVault: burning transfer failed");
-      require(tokenInterface.transfer(account, amount), "StakingVault: withdraw transfer failed");
+      require(tokenInterface.transfer(burning, burned), "TutellusStakingLogic: burning transfer failed");
+      require(tokenInterface.transfer(account, amount), "TutellusStakingLogic: withdraw transfer failed");
 
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -180,7 +178,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
       _update();
       _updateRewards(account);
 
-      require(user.notClaimed > 0, "StakingVault: nothing to claim");
+      require(user.notClaimed > 0, "TutellusStakingLogic: nothing to claim");
 
       _reward(account);
 
@@ -241,7 +239,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
     // Updates vault address
     function updateVault(address vault_) public onlyRole(DEFAULT_ADMIN_ROLE) {
       IDistributionVault vaultInterface = IDistributionVault(vault_);
-      require(vaultInterface.isStakeholder(address(this)), "StakingVault: this contract is not a stakeholder");
+      require(vaultInterface.isStakeholder(address(this)), "TutellusStakingLogic: this contract is not a stakeholder");
       vault = vault_;
       token = address(vaultInterface.token());
       rewardPerBlock = vaultInterface.releasePerBlock(address(this));
@@ -251,7 +249,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
     // Updates endblock
     function updateEndBlock(uint endBlock_) public onlyRole(DEFAULT_ADMIN_ROLE) {
       IDistributionVault vaultInterface = IDistributionVault(vault);
-      require(endBlock_ <= vaultInterface.endBlock(address(this)), "StakingVault: endblock must be less than or equal to vault endblock");
+      require(endBlock_ <= vaultInterface.endBlock(address(this)), "TutellusStakingLogic: endblock must be less than or equal to vault endblock");
       endBlock = endBlock_;
       emit UpdateEndBlock(endBlock);
     }
@@ -260,7 +258,7 @@ contract StakingVault is AccessControlPausableUpgradeable {
     function syncBalance(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
       IRedPillERC20 tokenInterface = IRedPillERC20(token);
       uint256 gap = getTokenGap();
-      require(gap > 0, "StakingVault: there is no gap");
+      require(gap > 0, "TutellusStakingLogic: there is no gap");
       tokenInterface.transfer(account, gap);
       emit SyncBalance(account, gap);
     }
@@ -274,15 +272,15 @@ contract StakingVault is AccessControlPausableUpgradeable {
 
     // Initializes the contract
     function initialize(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) public {
-      __StakingVault_init(vault_, burning_, minFee_, maxFee_, feeInterval_);
+      __TutellusStakingLogic_init(vault_, burning_, minFee_, maxFee_, feeInterval_);
     }
 
-    function __StakingVault_init(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+    function __TutellusStakingLogic_init(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
       __AccessControlPausableUpgradeable_init();
-      __StakingVault_init_unchained(vault_, burning_, minFee_, maxFee_, feeInterval_);
+      __TutellusStakingLogic_init_unchained(vault_, burning_, minFee_, maxFee_, feeInterval_);
     }
 
-    function __StakingVault_init_unchained(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+    function __TutellusStakingLogic_init_unchained(address vault_, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
       updateVault(vault_);
       setFees(minFee_, maxFee_);
       setFeeInterval(feeInterval_);
