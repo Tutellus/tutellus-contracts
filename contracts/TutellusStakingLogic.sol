@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "./utils/AccessControlProxyPausable.sol";
 import "./interfaces/ITutellusERC20.sol";
-import "./interfaces/IDistributionVault.sol";
 
 contract TutellusStakingLogic is AccessControlProxyPausable {
 

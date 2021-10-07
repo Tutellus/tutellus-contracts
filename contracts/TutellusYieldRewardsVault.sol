@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "./utils/AccessControlProxyPausable.sol";
-import "./TutellusStakingProxy.sol";
+import "./TutellusStakingRouter.sol";
 import "./interfaces/ITutellusERC20.sol";
 
 contract TutellusYieldRewardsVault is AccessControlProxyPausable {
@@ -108,8 +108,8 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
         ITutellusERC20 tokenInterface = ITutellusERC20(token);
         tokenInterface.mint(address(this), amount);
 
-        TutellusStakingProxy stakingInstance = new TutellusStakingProxy();
-        TutellusStakingProxy farmingInstance = new TutellusStakingProxy();
+        TutellusStakingRouter stakingInstance = new TutellusStakingRouter();
+        TutellusStakingRouter farmingInstance = new TutellusStakingRouter();
 
         stakingInstance.initialize(rolemanager);
         farmingInstance.initialize(rolemanager);
