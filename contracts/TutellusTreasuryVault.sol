@@ -2,10 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "./utils/AccessControlProxyPausable.sol";
-import "./TutellusStakingProxy.sol";
 import "./interfaces/ITutellusERC20.sol";
 
-contract TutellusYieldRewardsVault is AccessControlProxyPausable {
+contract TutellusTreasuryVault is AccessControlProxyPausable {
 
     address public token;
     address public treasury;
@@ -14,6 +13,22 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
     uint private _startBlock;
     uint private _endBlock;
     uint private _increment;
+
+    constructor (address rolemanager,
+      address treasury_,
+      address token_,
+      uint256 amount, 
+      uint blocks
+    )
+    {
+      __TutellusTreasuryVault_init(
+        rolemanager,
+        treasury_,
+        token_,
+        amount, 
+        blocks
+      );
+    }
 
     function released() public view returns (uint256) {
       return releasedRange(block.number, _startBlock);
@@ -39,26 +54,7 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       tokenInterface.transfer(treasury, amount);
     }
 
-    // Initializes the contract
-    function initialize(
-      address rolemanager,
-      address treasury_,
-      address token_,
-      uint256 amount, 
-      uint blocks
-) 
-      public 
-    {
-      __TutellusYieldRewardsVault_init(
-        rolemanager,
-        treasury_,
-        token_,
-        amount, 
-        blocks
-      );
-    }
-
-    function __TutellusYieldRewardsVault_init(
+    function __TutellusTreasuryVault_init(
       address rolemanager,
       address treasury_,
       address token_,
@@ -69,7 +65,7 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       initializer 
     {
       __AccessControlProxyPausable_init(rolemanager);
-      __TutellusYieldRewardsVault_init_unchained(
+      __TutellusTreasuryVault_init_unchained(
         treasury_,
         token_,
         amount, 
@@ -77,10 +73,10 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       );
     }
 
-    function __TutellusYieldRewardsVault_init_unchained(
+    function __TutellusTreasuryVault_init_unchained(
       address treasury_,
       address token_,
-      uint256 amount, 
+      uint256 amount,
       uint blocks
     ) 
       internal 
@@ -88,8 +84,6 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
     {
         token = token_;
         treasury = treasury_;
-        ITutellusERC20 tokenInterface = ITutellusERC20(token);
-        tokenInterface.mint(address(this), amount);
 
         _startBlock = block.number;
         _endBlock = block.number + blocks;

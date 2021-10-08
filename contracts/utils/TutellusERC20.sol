@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "./AccessControlPausableUpgradeable.sol";
+import "./AccessControlProxyPausable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
 
-abstract contract TutellusERC20 is AccessControlPausableUpgradeable, ERC20CappedUpgradeable {
+contract TutellusERC20 is AccessControlProxyPausable, ERC20CappedUpgradeable {
 
     uint256 private burned_;
 
     event Mint(address account, uint256 amount);
     event Burn(address account, uint256 amount);
 
-    function __TutellusERC20_init(string memory name, string memory symbol, uint256 cap) internal initializer {
-        __AccessControlPausableUpgradeable_init();
+    constructor(string memory name, string memory symbol, uint256 cap, address rolemanager) {
+        __TutellusERC20_init(name, symbol, cap, rolemanager);
+    }
+
+    function __TutellusERC20_init(string memory name, string memory symbol, uint256 cap, address rolemanager) internal initializer {
+        __AccessControlProxyPausable_init(rolemanager);
         __ERC20_init(name, symbol);
         __ERC20Capped_init(cap);
         __TutellusERC20_init_unchained();

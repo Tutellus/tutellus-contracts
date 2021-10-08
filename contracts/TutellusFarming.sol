@@ -170,17 +170,17 @@ contract TutellusFarming is AccessControlProxyPausable {
         return rewards;
     }
 
-    // Initializes the contract
-    function initialize(address rolemanager, address vault_) public {
-      __TutellusFarming_init(rolemanager, vault_);
+    constructor (address rolemanager, address token_, address vault_) {
+      __TutellusFarming_init(rolemanager, token_, vault_);
     }
 
-    function __TutellusFarming_init(address rolemanager, address vault_) internal initializer {
+    function __TutellusFarming_init(address rolemanager, address token_, address vault_) internal initializer {
       __AccessControlProxyPausable_init(rolemanager);
-      __TutellusFarming_init_unchained(vault_);
+      __TutellusFarming_init_unchained(token_, vault_);
     }
 
-    function __TutellusFarming_init_unchained(address vault_) internal initializer {
+    function __TutellusFarming_init_unchained(address token_, address vault_) internal initializer {
+      token = token_;
       vault = vault_;
       autoreward = true;
       lastUpdate = block.number;

@@ -6,7 +6,7 @@
       "contentHash": "0eac3e1a83ee62326ca007811285b274",
       "sourceName": "contracts/interfaces/IERC20.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -40,7 +40,7 @@
       "contentHash": "a06a75b4047d4e51bbe187fb3d580ec9",
       "sourceName": "contracts/mock/PancakeRouterMock.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -79,7 +79,7 @@
       "contentHash": "0f98101ea74093c8f4b5a814f2688924",
       "sourceName": "contracts/interfaces/IPancakeFactory.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -113,7 +113,7 @@
       "contentHash": "db441e634581144c6dae2672b7ec806f",
       "sourceName": "contracts/mock/AggregatorMock.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -150,7 +150,7 @@
       "contentHash": "b9be3f7aa79153708acdc3be6bd1cb35",
       "sourceName": "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -184,7 +184,7 @@
       "contentHash": "cbb8386f0120d46d66ff42dffbbc16c1",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -218,7 +218,7 @@
       "contentHash": "faa705d36c5df2f4972b44506b2bd682",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -257,7 +257,7 @@
       "contentHash": "3a5432b9dfef2ff5c8f58fcc0b1452b2",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -291,7 +291,7 @@
       "contentHash": "751ef4b010fddf04a9e90de13fe1ffe7",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -327,7 +327,7 @@
       "contentHash": "3eaa562e66c40d85f919cc6ee5059ebe",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -363,7 +363,7 @@
       "contentHash": "12a1ac4f7ef141dcf92f6dba57890d16",
       "sourceName": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -395,49 +395,12 @@
         "PausableUpgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/AccessControlPausableUpgradeable.sol": {
-      "lastModificationDate": 1632997912528,
-      "contentHash": "514e9226891941e7ded5fc698dc38cda",
-      "sourceName": "contracts/utils/AccessControlPausableUpgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "AccessControlPausableUpgradeable"
-      ]
-    },
     "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol": {
       "lastModificationDate": 1632996665109,
       "contentHash": "d512f0f42dd210288ac9843654910074",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -477,7 +440,7 @@
       "contentHash": "1712dd281e6d713718f5f08fbb020589",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -511,7 +474,7 @@
       "contentHash": "80d3ad01fbd728e8a0dcde979c610377",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -545,7 +508,7 @@
       "contentHash": "3649e7528117ffc7d8a3ccf199b0c6d8",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -582,7 +545,7 @@
       "contentHash": "4db71815975139b4bcedb3b615131302",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -611,49 +574,12 @@
         "IERC165Upgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/RedPillERC20.sol": {
-      "lastModificationDate": 1632997912528,
-      "contentHash": "b28f546284a326c647ce871fab3a8bf0",
-      "sourceName": "contracts/utils/RedPillERC20.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./AccessControlPausableUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "RedPillERC20"
-      ]
-    },
     "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol": {
       "lastModificationDate": 1632996665323,
       "contentHash": "d89884689902d03b74e6ec3da6ef3106",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -685,12 +611,46 @@
         "ERC20CappedUpgradeable"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/Token.sol": {
-      "lastModificationDate": 1632997912528,
-      "contentHash": "2b3b0a9ef23f82a28e7e50d4c0508773",
-      "sourceName": "contracts/utils/Token.sol",
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/IDistributionVault.sol": {
+      "lastModificationDate": 1633022322739,
+      "contentHash": "4fbb0bd5053f69b32ac6c55b54b56619",
+      "sourceName": "contracts/interfaces/IDistributionVault.sol",
       "solcConfig": {
-        "version": "0.8.0",
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IDistributionVault"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusFarming.sol": {
+      "lastModificationDate": 1633704429980,
+      "contentHash": "ab5392b39019859aab499fd9e63834a4",
+      "sourceName": "contracts/TutellusFarming.sol",
+      "solcConfig": {
+        "version": "0.8.2",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -712,13 +672,456 @@
         }
       },
       "imports": [
-        "./RedPillERC20.sol"
+        "./utils/AccessControlProxyPausable.sol",
+        "./interfaces/IERC20.sol",
+        "./interfaces/ITutellusYieldRewardsVault.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
       ],
       "artifacts": [
-        "Token"
+        "TutellusFarming"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/AccessControlProxyPausable.sol": {
+      "lastModificationDate": 1633700578134,
+      "contentHash": "f4656fc01c9d05d715f85e54f3b2efca",
+      "sourceName": "contracts/utils/AccessControlProxyPausable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "AccessControlProxyPausable"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/ITutellusYieldRewardsVault.sol": {
+      "lastModificationDate": 1633680813639,
+      "contentHash": "8f5403a42ba31226af0e0021249de07f",
+      "sourceName": "contracts/interfaces/ITutellusYieldRewardsVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ITutellusYieldRewardsVault"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusStaking.sol": {
+      "lastModificationDate": 1633704305576,
+      "contentHash": "6aa3b39a259405db3659d0beee00ec03",
+      "sourceName": "contracts/TutellusStaking.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utils/AccessControlProxyPausable.sol",
+        "./interfaces/ITutellusERC20.sol",
+        "./interfaces/ITutellusYieldRewardsVault.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusStaking"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/ITutellusERC20.sol": {
+      "lastModificationDate": 1633607884739,
+      "contentHash": "831928375b384c6ae8f4851f1a0bb1b2",
+      "sourceName": "contracts/interfaces/ITutellusERC20.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ITutellusERC20"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusTreasuryVault.sol": {
+      "lastModificationDate": 1633707530981,
+      "contentHash": "676b9cbd509c90588f624eeff8d06a29",
+      "sourceName": "contracts/TutellusTreasuryVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utils/AccessControlProxyPausable.sol",
+        "./interfaces/ITutellusERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusTreasuryVault"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusMerkleDistributorUpdateable.sol": {
+      "lastModificationDate": 1633704781069,
+      "contentHash": "bcbd8ffc57c7291b0ad67544c538f808",
+      "sourceName": "contracts/TutellusMerkleDistributorUpdateable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol",
+        "./utils/AccessControlProxyPausable.sol",
+        "./interfaces/ITutellusERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusMerkleDistributorUpdateable"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol": {
+      "lastModificationDate": 1632996665709,
+      "contentHash": "ad5a8183ec7a73b6375476279d9c2b7b",
+      "sourceName": "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "MerkleProofUpgradeable"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDeployer.sol": {
+      "lastModificationDate": 1633706923621,
+      "contentHash": "84af3974a615331fbb4c651de32a287c",
+      "sourceName": "contracts/TutellusDeployer.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utils/TutellusERC20.sol",
+        "./TutellusRoleManager.sol",
+        "./TutellusDistributionVault.sol",
+        "./TutellusYieldRewardsVault.sol",
+        "./TutellusMerkleDistributorUpdateable.sol",
+        "./TutellusTreasuryVault.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusDeployer"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/TutellusERC20.sol": {
+      "lastModificationDate": 1633700995863,
+      "contentHash": "59b0f86b68d2fb5cec4fce12119e0507",
+      "sourceName": "contracts/utils/TutellusERC20.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./AccessControlProxyPausable.sol",
+        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusERC20"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusRoleManager.sol": {
+      "lastModificationDate": 1633702737994,
+      "contentHash": "78bf323f5f1042f7cc3717b4f34d9725",
+      "sourceName": "contracts/TutellusRoleManager.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusRoleManager"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDistributionVault.sol": {
+      "lastModificationDate": 1633703869403,
+      "contentHash": "506d658deb196a8a20213c7429e7d05e",
+      "sourceName": "contracts/TutellusDistributionVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/ITutellusERC20.sol",
+        "./utils/AccessControlProxyPausable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusDistributionVault"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusYieldRewardsVault.sol": {
+      "lastModificationDate": 1633707507552,
+      "contentHash": "5fbb85532043b729a3d08a0d9c91b27e",
+      "sourceName": "contracts/TutellusYieldRewardsVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utils/AccessControlProxyPausable.sol",
+        "./interfaces/ITutellusERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusYieldRewardsVault"
       ]
     }
   }
