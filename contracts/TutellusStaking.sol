@@ -3,20 +3,20 @@ pragma solidity ^0.8.0;
 
 import "./utils/AccessControlProxyPausable.sol";
 import "./interfaces/ITutellusERC20.sol";
+import "./interfaces/ITutellusYieldRewardsVault.sol";
 
-contract TutellusStakingLogic is AccessControlProxyPausable {
+contract TutellusStaking is AccessControlProxyPausable {
 
-    address public vault;
     address public token;
-    address public burning;
+    address public vault;
 
     bool public autoreward;
 
     uint256 public balance;
     uint256 public minFee;
     uint256 public maxFee;
-    uint256 public rewardPerBlock;
     uint256 public accRewardsPerShare;
+    uint256 private _released;
 
     uint public lastUpdate;
     uint public feeInterval;
@@ -45,9 +45,8 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
     event Update(uint256 balance, uint256 accRewardsPerShare, uint lastUpdate, uint stakers);
     event UpdateUserInfo(address account, uint256 amount, uint256 rewardDebt, uint256 notClaimed, uint endInterval);
     event UpdateFees(uint256 minFee, uint256 maxFee, uint feeInterval);
-    event UpdateVault(address vault);
+    event updatevault(address vault);
     event UpdateEndBlock(uint endBlock);
-
 
     // Updates a level
     function _update() internal {
@@ -55,28 +54,18 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
         return;
       }
       if(balance > 0) {
-        accRewardsPerShare += (_blocks() * rewardPerBlock * 1e18) / balance;
+        ITutellusYieldRewardsVault rewardsInterface = ITutellusYieldRewardsVault(vault);
+        uint256 released = rewardsInterface.releasedId(address(this)) - _released;
+        _released += released;
+        accRewardsPerShare += (released * 1e18 / balance);
       }
       lastUpdate = block.number;
     }
 
-    // Gets blocks from last update to the current block
-    function _blocks() internal view returns(uint256){
-      if (lastUpdate > endBlock) {
-        return 0;
-      } else {
-        if (block.number < endBlock){
-          return block.number - lastUpdate;
-        }else{
-          return endBlock - lastUpdate;
-        }
-      }
-    }
-
     // Sets maximum and minimum fees
     function setFees(uint256 minFee_, uint256 maxFee_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      require(minFee_ < maxFee_, "TutellusStakingLogic: mininum fee must be greater than maximum fee");
-      require(minFee_ <= 1e20 && maxFee_ <= 1e20, "TutellusStakingLogic: fees must be less than 100e18");
+      require(minFee_ < maxFee_, "TutellusStakingVault: mininum fee must be greater than maximum fee");
+      require(minFee_ <= 1e20 && maxFee_ <= 1e20, "TutellusStakingVault: fees must be less than 100e18");
       minFee = minFee_;
       maxFee = maxFee_;
       emit UpdateFees(minFee, maxFee, feeInterval);
@@ -98,8 +87,8 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
 
     // Deposits tokens for staking
     function deposit(uint256 amount) public whenNotPaused {
-      require(block.number < endBlock, "TutellusStakingLogic: staking contract has finished");
-      require(amount > 0, "TutellusStakingLogic: amount must be over zero");
+      require(block.number < endBlock, "TutellusStakingVault: staking contract has finished");
+      require(amount > 0, "TutellusStakingVault: amount must be over zero");
 
       address account = msg.sender;
       UserInfo storage user = _userInfo[account];
@@ -120,14 +109,14 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
 
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
 
-      require(tokenInterface.balanceOf(account) >= amount, "TutellusStakingLogic: user has not enough balance");
-      require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusStakingLogic: amount exceeds allowance");
+      require(tokenInterface.balanceOf(account) >= amount, "TutellusStakingVault: user has not enough balance");
+      require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusStakingVault: amount exceeds allowance");
 
       if(autoreward) {
         _reward(account);
       }
 
-      require(tokenInterface.transferFrom(account, address(this), amount), "TutellusStakingLogic: deposit transfer failed");
+      require(tokenInterface.transferFrom(account, address(this), amount), "TutellusStakingVault: deposit transfer failed");
 
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -136,12 +125,12 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
 
     // Withdraws tokens from staking
     function withdraw(uint256 amount) public whenNotPaused {
-      require(amount > 0, "TutellusStakingLogic: amount must be over zero");
+      require(amount > 0, "TutellusStakingVault: amount must be over zero");
 
       address account = msg.sender;
       UserInfo storage user = _userInfo[account];
 
-      require(amount <= user.amount, "TutellusStakingLogic: user has not enough staking balance");
+      require(amount <= user.amount, "TutellusStakingVault: user has not enough staking balance");
 
       _update();
       _updateRewards(account);
@@ -162,9 +151,10 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
       if(autoreward) {
         _reward(account);
       }
-
-      require(tokenInterface.transfer(burning, burned), "TutellusStakingLogic: burning transfer failed");
-      require(tokenInterface.transfer(account, amount), "TutellusStakingLogic: withdraw transfer failed");
+      if(burned > 0){
+        tokenInterface.burn(burned);
+      }
+      require(tokenInterface.transfer(account, amount), "TutellusStakingVault: withdraw transfer failed");
 
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -179,7 +169,7 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
       _update();
       _updateRewards(account);
 
-      require(user.notClaimed > 0, "TutellusStakingLogic: nothing to claim");
+      require(user.notClaimed > 0, "TutellusStakingVault: nothing to claim");
 
       _reward(account);
 
@@ -195,11 +185,11 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
     }
 
     function _reward(address account) internal {
-      IDistributionVault vaultInterface = IDistributionVault(vault);
+      ITutellusYieldRewardsVault rewardsInterface = ITutellusYieldRewardsVault(vault);
       uint256 amount = _userInfo[account].notClaimed;
       if(amount > 0) {
         _userInfo[account].notClaimed = 0;
-        vaultInterface.distributeTokens(account, amount);
+        rewardsInterface.distributeTokens(account, amount);
         emit Rewards(account, amount);
       }
     }
@@ -225,68 +215,61 @@ contract TutellusStakingLogic is AccessControlProxyPausable {
         UserInfo memory user = _userInfo[user_];
         uint256 rewards = user.notClaimed;
         if(balance > 0){
-          uint256 total = _blocks() * rewardPerBlock * 1e18 / balance;
+          ITutellusYieldRewardsVault rewardsInterface = ITutellusYieldRewardsVault(vault);
+          uint256 released = rewardsInterface.releasedId(address(this)) - _released;
+          uint256 total = (released * 1e18 / balance);
           rewards += (accRewardsPerShare - user.rewardDebt + total) * user.amount / 1e18;
         }
         return rewards;
     }
 
-    // Gets user staking balance
-    function getUserBalance(address user_) public view returns(uint256){
-      UserInfo memory user = _userInfo[user_];
-      return user.amount;
+    // Initializes the contract
+    function initialize(address rolemanager, address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) public {
+      __TutellusStakingVault_init(rolemanager, vault_, minFee_, maxFee_, feeInterval_);
     }
 
-    // Updates vault address
-    function updateVault(address proxy) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      IDistributionVault vaultInterface = IDistributionVault(proxy);
-      require(vaultInterface.isStakeholder(address(this)), "TutellusStakingLogic: this contract is not a stakeholder");
-      vault = proxy;
-      token = address(vaultInterface.token());
-      rewardPerBlock = vaultInterface.releasePerBlock(address(this));
-      updateEndBlock(vaultInterface.endBlock(address(this)));
+    function __TutellusStakingVault_init(address rolemanager, address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+      __AccessControlProxyPausable_init(rolemanager);
+      __TutellusStakingVault_init_unchained(vault_, minFee_, maxFee_, feeInterval_);
     }
 
-    // Updates endblock
-    function updateEndBlock(uint endBlock_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      IDistributionVault vaultInterface = IDistributionVault(vault);
-      require(endBlock_ <= vaultInterface.endBlock(address(this)), "TutellusStakingLogic: endblock must be less than or equal to vault endblock");
-      endBlock = endBlock_;
-      emit UpdateEndBlock(endBlock);
+    function __TutellusStakingVault_init_unchained(address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+      vault = vault_;
+      setFees(minFee_, maxFee_);
+      setFeeInterval(feeInterval_);
+      autoreward = true;
+      lastUpdate = block.number;
     }
 
-    // Synchronizes balance, transfering the gap to an external account
-    function syncBalance(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      ITutellusERC20 tokenInterface = ITutellusERC20(token);
-      uint256 gap = getTokenGap();
-      require(gap > 0, "TutellusStakingLogic: there is no gap");
-      tokenInterface.transfer(account, gap);
-      emit SyncBalance(account, gap);
-    }
-
-    // Gets token gap
+        // Gets token gap
     function getTokenGap() public view returns (uint256) {
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       uint256 tokenBalance = tokenInterface.balanceOf(address(this));
       return tokenBalance - balance;
     }
 
-    // Initializes the contract
-    function initialize(address rolemanager, address proxy, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) public {
-      __TutellusStakingLogic_init(rolemanager, proxy, burning_, minFee_, maxFee_, feeInterval_);
+        // Synchronizes balance, transfering the gap to an external account
+    function syncBalance(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
+      uint256 gap = getTokenGap();
+      require(gap > 0, "TutellusStakingVault: there is no gap");
+      tokenInterface.transfer(account, gap);
+      emit SyncBalance(account, gap);
     }
 
-    function __TutellusStakingLogic_init(address rolemanager, address proxy, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
-      __AccessControlProxyPausable_init(rolemanager);
-      __TutellusStakingLogic_init_unchained(proxy, burning_, minFee_, maxFee_, feeInterval_);
+        // Gets user staking balance
+    function getUserBalance(address user_) public view returns(uint256){
+      UserInfo memory user = _userInfo[user_];
+      return user.amount;
     }
 
-    function __TutellusStakingLogic_init_unchained(address proxy, address burning_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
-      updateVault(proxy);
-      setFees(minFee_, maxFee_);
-      setFeeInterval(feeInterval_);
-      autoreward = true;
-      lastUpdate = block.number;
-      burning = burning_;
+    function migrate(address to) public returns (bytes memory){
+      uint256 amount = _userInfo[msg.sender].amount;
+      withdraw(amount);
+      (bool success, bytes memory data) = to.delegatecall(
+        abi.encodeWithSignature("deposit(uint256)", amount)
+      );
+      require(success, "TutellusStakingVault: migration has failed");
+      return data;
     }
 }

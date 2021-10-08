@@ -2,34 +2,50 @@
 pragma solidity ^0.8.0;
 
 import "./utils/AccessControlProxyPausable.sol";
-import "./TutellusStakingRouter.sol";
 import "./interfaces/ITutellusERC20.sol";
 
 contract TutellusYieldRewardsVault is AccessControlProxyPausable {
 
-    uint256 private _allocationStaking;
-    uint256 private _allocationFarming;
-    uint256 private _lastUpdate;
-    uint256 private _releasedStaking;
-    uint256 private _releasedFarming;
+    mapping(address=>uint256) private _id;
+    mapping(uint256=>address) private _address;
+    mapping(uint256=>uint256) private _allocation;
+    mapping(uint256=>uint256) private _released;
+    mapping(uint256=>uint256) private _distributed;
+    
+    uint private _lastUpdate;
     uint private _startBlock;
     uint private _endBlock;
-    uint private _increment;
+    uint256 private _increment;
+    uint256 private _total;
 
     address public token;
-    address public stakingProxy;
-    address public farmingProxy;
+
+    function add(address account, uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
+      _id[account] = _total;
+      _address[_total] = account;
+      _total+=1;
+      updateAllocation(allocation);
+    }
 
     function updateAllocation(uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _releasedStaking = releasedStaking();
-        _releasedFarming = releasedFarming();
-        _allocationStaking = allocation[0];
-        _allocationFarming = allocation[1];
-        _lastUpdate = block.number;
+      uint256 sum = 0;
+      uint256 length = allocation.length;
+      require(length == _total, "TutellusYieldRewardsVault: allocation array must have same length as number of accounts");
+      for(uint256 i=0; i<length; i++) {
+        _allocation[i] = allocation[i];
+        _released[i] = releasedId(_address[i]);
+        sum+=allocation[i];
+      }
+      _lastUpdate = block.number;
+      require(sum<=1e20, "TutellusYieldRewardsVault: allocation sum must be lower than 1e20");
     }
 
     function released() public view returns (uint256) {
       return releasedRange(block.number, _startBlock);
+    }
+
+    function availableId(address account) public view returns (uint256) {
+      return releasedId(account) - _distributed[_id[account]];
     }
 
     function releasedRange(uint from, uint to) public view returns (uint256) {
@@ -41,18 +57,16 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       return comp0 - comp1;
     }
 
-    function releasedStaking() public view returns (uint256) {
-      return _releasedStaking + releasedRange(block.number, _lastUpdate) * _allocationStaking / 1e20;
-    }
-    
-    function releasedFarming() public view returns (uint256) {
-       return _releasedFarming + releasedRange(block.number, _lastUpdate) * _allocationFarming / 1e20;
+    function releasedId(address account) public view returns (uint256) {
+      uint256 id = _id[account];
+      return _released[id] + releasedRange(block.number, _lastUpdate) * _allocation[id] / 1e20;
     }
 
-    function distributeTokens(address account, uint256 amount) public onlyRole("PROXY_ROLE") {
-      // Limitar distribución a releasing
-        ITutellusERC20 tokenInterface = ITutellusERC20(token);
-        tokenInterface.transfer(account, amount);
+    function distributeTokens(address account, uint256 amount) public {
+      require(amount <= availableId(account), "TutellusYieldRewardsVault: amount exceeds available");
+      _distributed[_id[msg.sender]] += amount;
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
+      tokenInterface.transfer(account, amount);
     }
 
     // Initializes the contract
@@ -86,7 +100,6 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
     {
       __AccessControlProxyPausable_init(rolemanager);
       __TutellusYieldRewardsVault_init_unchained(
-        rolemanager,
         token_, 
         allocation, 
         amount, 
@@ -95,7 +108,6 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
     }
 
     function __TutellusYieldRewardsVault_init_unchained(
-      address rolemanager,
       address token_, 
       uint256[] memory allocation, 
       uint256 amount, 
@@ -107,15 +119,6 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
         token = token_;
         ITutellusERC20 tokenInterface = ITutellusERC20(token);
         tokenInterface.mint(address(this), amount);
-
-        TutellusStakingRouter stakingInstance = new TutellusStakingRouter();
-        TutellusStakingRouter farmingInstance = new TutellusStakingRouter();
-
-        stakingInstance.initialize(rolemanager);
-        farmingInstance.initialize(rolemanager);
-
-        stakingProxy = address(stakingInstance);
-        farmingProxy = address(farmingInstance);
 
         updateAllocation(allocation);
         _startBlock = block.number;
