@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./utils/TutellusERC20.sol";
 import "./TutellusRoleManager.sol";
 import "./TutellusDistributionVault.sol";
-import "./TutellusYieldRewardsVault.sol";
+import "./TutellusYFRewardsVault.sol";
 import "./TutellusMerkleDistributorUpdateable.sol";
 import "./TutellusTreasuryVault.sol";
 
@@ -22,24 +22,25 @@ contract TutellusDeployer {
         treasury = treasury_;
         rolemanager = address(new TutellusRoleManager(msg.sender));
         token = address(new TutellusERC20('Tutellus Token', 'TUT', 2e26, rolemanager));
-        TutellusRoleManager rolemanagerInstance = TutellusRoleManager(rolemanager);
-        TutellusERC20 tokenInstance = TutellusERC20(token);
-        rolemanagerInstance.grantRole(keccak256("MINTER_ROLE"), address(this));
-        rolemanagerInstance.grantRole(keccak256("MINTER_ROLE"), address(this));
         holdersVault = address(new TutellusDistributionVault(rolemanager, token));
-        farmingVault = address(new TutellusYieldRewardsVault(rolemanager, token, 64000000e18, 47336400));
+        farmingVault = address(new TutellusYFRewardsVault(rolemanager, token, 64000000e18, 47336400));
         rewardsVault = address(new TutellusMerkleDistributorUpdateable(rolemanager, token));
-        treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 14600000e18, 78894000));
+        treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 29600000e18, 78894000));
 
+        TutellusRoleManager rolemanagerInstance = TutellusRoleManager(rolemanager);
+        rolemanagerInstance.grantRole(keccak256("MINTER_ROLE"), address(this));
+        rolemanagerInstance.grantRole(keccak256("MINTER_ROLE"), holdersVault);
+        
+        TutellusERC20 tokenInstance = TutellusERC20(token);
         tokenInstance.mint(treasury, 400000e18);
         tokenInstance.mint(farmingVault, 64000000e18);
         tokenInstance.mint(rewardsVault, 90000000e18);
-        tokenInstance.mint(treasuryVault, 14600000e18);
+        tokenInstance.mint(treasuryVault, 29600000e18);
 
         // after deployment:
         //      1. deploy staking and farming
         //      2. add staking and farming to the farmingVault
         //      3. add holders to the holdersVault
-        
+
     }
 }
