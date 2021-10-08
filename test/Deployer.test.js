@@ -2,9 +2,7 @@
 //   ether,
 //   expectEvent
 // } = require('@openzeppelin/test-helpers')
-const { hexlify } = require('@ethersproject/bytes')
-const { keccak256 } = require('@ethersproject/keccak256')
-const { parseBytes32String, formatBytes32String } = require('@ethersproject/strings')
+const { formatBytes32String } = require('@ethersproject/strings')
 const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 // const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
