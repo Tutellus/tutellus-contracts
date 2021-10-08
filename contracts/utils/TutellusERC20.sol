@@ -49,4 +49,8 @@ contract TutellusERC20 is AccessControlProxyPausable, ERC20CappedUpgradeable {
     function burn(uint256 amount) public {
         _burn(_msgSender(), amount);
     }
+
+    function isMinter(address account) public view returns (bool) {
+        return hasRole(keccak256('MINTER_ROLE'), account);
+    }
 }

@@ -10,8 +10,8 @@ contract TutellusRoleManager is AccessControlUpgradeable {
 
     address private _deployer;
 
-    constructor(address deployer) {
-        _deployer = deployer;
+    constructor(address deployer_) {
+        _deployer = deployer_;
         __TutellusRoleManager_init();
         _setupRole(DEFAULT_ADMIN_ROLE, _deployer);
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -23,5 +23,9 @@ contract TutellusRoleManager is AccessControlUpgradeable {
     }
 
     function __TutellusRoleManager_init_unchained() internal initializer {
+    }
+
+    function deployer() public view returns (address) {
+      return _deployer;
     }
 }

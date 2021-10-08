@@ -2,10 +2,16 @@
 //   ether,
 //   expectEvent
 // } = require('@openzeppelin/test-helpers')
+const { hexlify } = require('@ethersproject/bytes')
+const { keccak256 } = require('@ethersproject/keccak256')
+const { parseBytes32String, formatBytes32String } = require('@ethersproject/strings')
+const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 // const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 
 const Deployer = artifacts.require('TutellusDeployer')
+const Token = artifacts.require('TutellusERC20')
+const RoleManager = artifacts.require('IAccessControlUpgradeable')
 
 let myDeployer
 
@@ -18,21 +24,36 @@ describe('Deployer', function () {
     [myDeployer] = await Promise.all([
       Deployer.new(owner)
     ])
-
-    const [token, rolemanager, treasury, treasuryVault, farmingVault, rewardsVault, holdersVault] = await Promise.all([
-      myDeployer.token(),
-      myDeployer.rolemanager(),
-      myDeployer.treasury(),
-      myDeployer.treasuryVault(),
-      myDeployer.farmingVault(),
-      myDeployer.rewardsVault(),
-      myDeployer.holdersVault()
-    ])
-
-    console.log(token, rolemanager, treasury, treasuryVault, farmingVault, rewardsVault, holdersVault)
   })
   // DEPOSIT TESTS
   describe('Deploy completed', () => {
-    it('Check', async () => {})
+    it('Check token', async () => {
+      const tokenAddress = await myDeployer.token()
+      const myToken = await Token.at(tokenAddress)
+      const [name, symbol, cap, totalSupply, burned] = await Promise.all([
+        myToken.name(),
+        myToken.symbol(),
+        myToken.cap(),
+        myToken.totalSupply(),
+        myToken.burned()
+      ])
+      expect(name).to.eq('Tutellus Token')
+      expect(symbol).to.eq('TUT')
+      expect(cap.toString()).to.eq('200000000000000000000000000')
+      expect(totalSupply.toString()).to.eq('184000000000000000000000000')
+      expect(burned.toString()).to.eq('0')
+    })
+    it('Check rolemanager', async () => {
+      const rolemanagerAddress = await myDeployer.rolemanager()
+      const tokenAddress = await myDeployer.token()
+      const holdersVaultAddress = await myDeployer.holdersVault()
+      const myToken = await Token.at(tokenAddress)
+      const myRolemanager = await RoleManager.at(rolemanagerAddress)
+      const defaultadminrole = formatBytes32String(0x0000000000000000000000000000000000000000)
+      const response = await myRolemanager.hasRole(defaultadminrole, owner)
+      const response2 = await myToken.isMinter(holdersVaultAddress)
+      expect(response).to.eq(true)
+      expect(response2).to.eq(true)
+    })
   })
 })

@@ -33,8 +33,9 @@
     "@openzeppelin/test-helpers": "^0.5.10",
     "buidler-gas-reporter": "^0.1.4",
     "chai": "^4.3.0",
-    "ethers": "^5.0.31",
+    "ethers": "^5.4.7",
     "hardhat": "^2.5.0",
+    "hardhat-gas-reporter": "^1.0.4",
     "snazzy": "^9.0.0",
     "solhint": "^3.3.2",
     "standard": "^16.0.3"
