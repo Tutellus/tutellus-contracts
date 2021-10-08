@@ -20,6 +20,21 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
 
     address public token;
 
+    constructor (
+      address rolemanager,
+      address token_, 
+      uint256 amount, 
+      uint blocks
+    )  
+    {
+      __TutellusYieldRewardsVault_init(
+        rolemanager,
+        token_, 
+        amount, 
+        blocks
+      );
+    }
+
     function add(address account, uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
       _id[account] = _total;
       _address[_total] = account;
@@ -69,29 +84,9 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       tokenInterface.transfer(account, amount);
     }
 
-    // Initializes the contract
-    function initialize(
-      address rolemanager,
-      address token_, 
-      uint256[] memory allocation, 
-      uint256 amount, 
-      uint blocks
-    ) 
-      public 
-    {
-      __TutellusYieldRewardsVault_init(
-        rolemanager,
-        token_, 
-        allocation, 
-        amount, 
-        blocks
-      );
-    }
-
     function __TutellusYieldRewardsVault_init(
       address rolemanager,
       address token_, 
-      uint256[] memory allocation, 
       uint256 amount, 
       uint blocks
     ) 
@@ -100,8 +95,7 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
     {
       __AccessControlProxyPausable_init(rolemanager);
       __TutellusYieldRewardsVault_init_unchained(
-        token_, 
-        allocation, 
+        token_,
         amount, 
         blocks
       );
@@ -109,7 +103,6 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
 
     function __TutellusYieldRewardsVault_init_unchained(
       address token_, 
-      uint256[] memory allocation, 
       uint256 amount, 
       uint blocks
     ) 
@@ -117,10 +110,7 @@ contract TutellusYieldRewardsVault is AccessControlProxyPausable {
       initializer 
     {
         token = token_;
-        ITutellusERC20 tokenInterface = ITutellusERC20(token);
-        tokenInterface.mint(address(this), amount);
 
-        updateAllocation(allocation);
         _startBlock = block.number;
         _endBlock = block.number + blocks;
         _increment = (2 * amount) / (blocks ** 2);

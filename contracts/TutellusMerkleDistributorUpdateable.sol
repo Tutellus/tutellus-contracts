@@ -46,19 +46,16 @@ contract TutellusMerkleDistributorUpdateable is AccessControlProxyPausable {
         emit Claimed(index, account, claimed);
     }
 
-
-    function initialize(address rolemanager, address token_, uint256 amount) public {
-      __MerkleDistributorUpdateable_init(rolemanager, token_, amount);
+    constructor(address rolemanager, address token_) {
+      __MerkleDistributorUpdateable_init(rolemanager, token_);
     }
 
-    function __MerkleDistributorUpdateable_init(address rolemanager, address token_, uint256 amount) internal initializer {
+    function __MerkleDistributorUpdateable_init(address rolemanager, address token_) internal initializer {
       __AccessControlProxyPausable_init(rolemanager);
-      __MerkleDistributorUpdateable_init_unchained(token_, amount);
+      __MerkleDistributorUpdateable_init_unchained(token_);
     }
 
-    function __MerkleDistributorUpdateable_init_unchained(address token_, uint256 amount) internal initializer {
+    function __MerkleDistributorUpdateable_init_unchained(address token_) internal initializer {
       token = token_;
-      ITutellusERC20 tokenInterface = ITutellusERC20(token);
-      tokenInterface.mint(address(this), amount);
     }
 }

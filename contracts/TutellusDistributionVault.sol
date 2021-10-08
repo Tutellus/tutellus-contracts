@@ -17,27 +17,21 @@ contract TutellusDistributionVault is AccessControlProxyPausable {
 
     event Update(address account);
     event Distribute(address sender, address account, uint256 amount);
-    event MigrateStakeholder(address from, address to);
     event AddStakeholder(address stakeholder, uint256 allocated, uint startBlock, uint endBlock);
 
     mapping (address=>Stakeholder) public stakeholders;
 
-    function __TutellusDistributionVault_init(address rolemanager, address token_, uint256 amount) internal initializer {
+    constructor(address rolemanager, address token_) {
+      __TutellusDistributionVault_init(rolemanager, token_);
+    }
+
+    function __TutellusDistributionVault_init(address rolemanager, address token_) internal initializer {
       __AccessControlProxyPausable_init(rolemanager);
-      __TutellusDistributionVault_init_unchained(token_, amount);
+      __TutellusDistributionVault_init_unchained(token_);
     }
 
-    function __TutellusDistributionVault_init_unchained(address token_, uint256 amount) internal initializer {
+    function __TutellusDistributionVault_init_unchained(address token_) internal initializer {
       token = token_;
-      ITutellusERC20 tokenInterface = ITutellusERC20(token);
-      tokenInterface.mint(address(this), amount);
-    }
-
-    function _resetStakeholder(address account) internal {
-      stakeholders[account].distributed = 0;
-      stakeholders[account].releasePerBlock = 0;
-      stakeholders[account].endBlock = 0;
-      stakeholders[account].startBlock = 0;
     }
 
     function allocated(address account) public view returns(uint256){
@@ -104,19 +98,8 @@ contract TutellusDistributionVault is AccessControlProxyPausable {
         stakeholders[account].releasePerBlock = allocated_ / (endBlocks - startBlocks);
         stakeholders[account].startBlock = block.number + startBlocks;
         stakeholders[account].endBlock = block.number + endBlocks;
+        ITutellusERC20 tokenInterface = ITutellusERC20(token);
+        tokenInterface.mint(address(this), allocated_);
         emit AddStakeholder(account, allocated_, stakeholders[account].startBlock, stakeholders[account].endBlock);
-    }
-
-    function migrateStakeholder(address from, address to) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      require(releasePerBlock(to) > 0, "TutellusDistributionVault: new address is already a stakeholder");
-      stakeholders[to].distributed = stakeholders[from].distributed;
-      stakeholders[to].releasePerBlock = stakeholders[from].releasePerBlock;
-      stakeholders[to].endBlock = stakeholders[from].endBlock;
-      _resetStakeholder(from);
-      emit MigrateStakeholder(from, to);
-    }
-
-    function initialize(address rolemanager, address token_, uint256 amount) public {
-      __TutellusDistributionVault_init(rolemanager, token_, amount);
     }
 }

@@ -64,8 +64,8 @@ contract TutellusStaking is AccessControlProxyPausable {
 
     // Sets maximum and minimum fees
     function setFees(uint256 minFee_, uint256 maxFee_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      require(minFee_ < maxFee_, "TutellusStakingVault: mininum fee must be greater than maximum fee");
-      require(minFee_ <= 1e20 && maxFee_ <= 1e20, "TutellusStakingVault: fees must be less than 100e18");
+      require(minFee_ < maxFee_, "TutellusStaking: mininum fee must be greater than maximum fee");
+      require(minFee_ <= 1e20 && maxFee_ <= 1e20, "TutellusStaking: fees must be less than 100e18");
       minFee = minFee_;
       maxFee = maxFee_;
       emit UpdateFees(minFee, maxFee, feeInterval);
@@ -86,11 +86,10 @@ contract TutellusStaking is AccessControlProxyPausable {
     }
 
     // Deposits tokens for staking
-    function deposit(uint256 amount) public whenNotPaused {
-      require(block.number < endBlock, "TutellusStakingVault: staking contract has finished");
-      require(amount > 0, "TutellusStakingVault: amount must be over zero");
+    function depositFrom(address account, uint256 amount) public whenNotPaused {
+      require(block.number < endBlock, "TutellusStaking: staking contract has finished");
+      require(amount > 0, "TutellusStaking: amount must be over zero");
 
-      address account = msg.sender;
       UserInfo storage user = _userInfo[account];
 
       _update();
@@ -109,14 +108,14 @@ contract TutellusStaking is AccessControlProxyPausable {
 
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
 
-      require(tokenInterface.balanceOf(account) >= amount, "TutellusStakingVault: user has not enough balance");
-      require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusStakingVault: amount exceeds allowance");
+      require(tokenInterface.balanceOf(account) >= amount, "TutellusStaking: user has not enough balance");
+      require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusStaking: amount exceeds allowance");
 
       if(autoreward) {
         _reward(account);
       }
 
-      require(tokenInterface.transferFrom(account, address(this), amount), "TutellusStakingVault: deposit transfer failed");
+      require(tokenInterface.transferFrom(account, address(this), amount), "TutellusStaking: deposit transfer failed");
 
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -125,12 +124,12 @@ contract TutellusStaking is AccessControlProxyPausable {
 
     // Withdraws tokens from staking
     function withdraw(uint256 amount) public whenNotPaused {
-      require(amount > 0, "TutellusStakingVault: amount must be over zero");
+      require(amount > 0, "TutellusStaking: amount must be over zero");
 
       address account = msg.sender;
       UserInfo storage user = _userInfo[account];
 
-      require(amount <= user.amount, "TutellusStakingVault: user has not enough staking balance");
+      require(amount <= user.amount, "TutellusStaking: user has not enough staking balance");
 
       _update();
       _updateRewards(account);
@@ -154,7 +153,7 @@ contract TutellusStaking is AccessControlProxyPausable {
       if(burned > 0){
         tokenInterface.burn(burned);
       }
-      require(tokenInterface.transfer(account, amount), "TutellusStakingVault: withdraw transfer failed");
+      require(tokenInterface.transfer(account, amount), "TutellusStaking: withdraw transfer failed");
 
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -169,7 +168,7 @@ contract TutellusStaking is AccessControlProxyPausable {
       _update();
       _updateRewards(account);
 
-      require(user.notClaimed > 0, "TutellusStakingVault: nothing to claim");
+      require(user.notClaimed > 0, "TutellusStaking: nothing to claim");
 
       _reward(account);
 
@@ -223,17 +222,17 @@ contract TutellusStaking is AccessControlProxyPausable {
         return rewards;
     }
 
-    // Initializes the contract
-    function initialize(address rolemanager, address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) public {
-      __TutellusStakingVault_init(rolemanager, vault_, minFee_, maxFee_, feeInterval_);
+    constructor (address token_, address rolemanager, address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) {
+      __TutellusStaking_init(token_, rolemanager, vault_, minFee_, maxFee_, feeInterval_);
     }
 
-    function __TutellusStakingVault_init(address rolemanager, address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+    function __TutellusStaking_init(address token_, address rolemanager, address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
       __AccessControlProxyPausable_init(rolemanager);
-      __TutellusStakingVault_init_unchained(vault_, minFee_, maxFee_, feeInterval_);
+      __TutellusStaking_init_unchained(token_, vault_, minFee_, maxFee_, feeInterval_);
     }
 
-    function __TutellusStakingVault_init_unchained(address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+    function __TutellusStaking_init_unchained(address token_, address vault_, uint256 minFee_, uint256 maxFee_, uint feeInterval_) internal initializer {
+      token = token_;
       vault = vault_;
       setFees(minFee_, maxFee_);
       setFeeInterval(feeInterval_);
@@ -252,7 +251,7 @@ contract TutellusStaking is AccessControlProxyPausable {
     function syncBalance(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       uint256 gap = getTokenGap();
-      require(gap > 0, "TutellusStakingVault: there is no gap");
+      require(gap > 0, "TutellusStaking: there is no gap");
       tokenInterface.transfer(account, gap);
       emit SyncBalance(account, gap);
     }
@@ -263,13 +262,14 @@ contract TutellusStaking is AccessControlProxyPausable {
       return user.amount;
     }
 
-    function migrate(address to) public returns (bytes memory){
-      uint256 amount = _userInfo[msg.sender].amount;
+    function migrate(address to, bytes memory data) public returns (bytes memory){
+      address account = msg.sender;
+      uint256 amount = _userInfo[account].amount;
       withdraw(amount);
-      (bool success, bytes memory data) = to.delegatecall(
-        abi.encodeWithSignature("deposit(uint256)", amount)
-      );
-      require(success, "TutellusStakingVault: migration has failed");
-      return data;
+      (bool success, bytes memory response) = to.call(
+            abi.encodeWithSignature("depositFrom(address,uint256,bytes memory)", account, amount, data)
+        );
+      require(success, "TutellusStaking: migration has failed");
+      return response;
     }
 }
