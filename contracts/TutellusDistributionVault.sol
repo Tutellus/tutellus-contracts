@@ -7,8 +7,10 @@ import "./utils/AccessControlProxyPausable.sol";
 contract TutellusDistributionVault is AccessControlProxyPausable {
 
     address public token;
+    uint256 private _limit;
+    uint256 private _minted;
 
-    struct Stakeholder{
+    struct Holder{
         uint256 distributed;
         uint256 releasePerBlock;
         uint startBlock;
@@ -17,26 +19,27 @@ contract TutellusDistributionVault is AccessControlProxyPausable {
 
     event Update(address account);
     event Distribute(address sender, address account, uint256 amount);
-    event AddStakeholder(address stakeholder, uint256 allocated, uint startBlock, uint endBlock);
+    event AddHolder(address holder, uint256 allocated, uint startBlock, uint endBlock);
 
-    mapping (address=>Stakeholder) public stakeholders;
+    mapping (address=>Holder) public holders;
 
-    constructor(address rolemanager, address token_) {
-      __TutellusDistributionVault_init(rolemanager, token_);
+    constructor(address rolemanager, address token_, uint256 limit) {
+      __TutellusDistributionVault_init(rolemanager, token_, limit);
     }
 
-    function __TutellusDistributionVault_init(address rolemanager, address token_) internal initializer {
+    function __TutellusDistributionVault_init(address rolemanager, address token_, uint256 limit) internal initializer {
       __AccessControlProxyPausable_init(rolemanager);
-      __TutellusDistributionVault_init_unchained(token_);
+      __TutellusDistributionVault_init_unchained(token_, limit);
     }
 
-    function __TutellusDistributionVault_init_unchained(address token_) internal initializer {
+    function __TutellusDistributionVault_init_unchained(address token_, uint256 limit) internal initializer {
       token = token_;
+      _limit = limit;
     }
 
     function allocated(address account) public view returns(uint256){
       if(releasePerBlock(account) > 0) {
-        return (endBlock(account) - startBlock(account)) / releasePerBlock(account);
+        return (endBlock(account) - startBlock(account)) * releasePerBlock(account);
       } else {
         return 0;
       }
@@ -59,19 +62,19 @@ contract TutellusDistributionVault is AccessControlProxyPausable {
     }
 
     function distributed(address account) public view returns(uint256){
-      return stakeholders[account].distributed;
+      return holders[account].distributed;
     }
 
     function releasePerBlock(address account) public view returns(uint256){
-      return stakeholders[account].releasePerBlock;
+      return holders[account].releasePerBlock;
     }
 
     function endBlock(address account) public view returns(uint256){
-      return stakeholders[account].endBlock;
+      return holders[account].endBlock;
     }
 
     function startBlock(address account) public view returns(uint256){
-      return stakeholders[account].startBlock;
+      return holders[account].startBlock;
     }
 
     function available(address account) public view returns(uint256){
@@ -81,8 +84,8 @@ contract TutellusDistributionVault is AccessControlProxyPausable {
     function distribute(address account) public whenNotPaused {
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       uint256 amount = available(account);
-      require(amount >= 0, "TutellusDistributionVault: No available tokens");
-      stakeholders[account].distributed += amount;
+      require(amount > 0, "TutellusDistributionVault: no available tokens");
+      holders[account].distributed += amount;
       tokenInterface.transfer(account, amount);
       emit Distribute(msg.sender, account, amount);
     }
@@ -92,14 +95,22 @@ contract TutellusDistributionVault is AccessControlProxyPausable {
         distribute(account);
     }
 
-    function addStakeholder(address account, uint256 allocated_, uint startBlocks, uint endBlocks) public onlyRole(DEFAULT_ADMIN_ROLE){
-        require(endBlocks > startBlocks, "TutellusDistributionVault: endBlock must be after startBlock");
-        stakeholders[account].distributed = 0;
-        stakeholders[account].releasePerBlock = allocated_ / (endBlocks - startBlocks);
-        stakeholders[account].startBlock = block.number + startBlocks;
-        stakeholders[account].endBlock = block.number + endBlocks;
+    function addHolderBatch(address[] memory account, uint256[] memory allocated_, uint[] memory startBlocks, uint[] memory endBlocks) public {
+      for(uint256 i=0; i< account.length; i++) {
+        addHolder(account[i], allocated_[i], startBlocks[i], endBlocks[i]);
+      }
+    }
+
+    function addHolder(address account, uint256 allocated_, uint startBlocks, uint endBlocks) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(endBlocks > startBlocks, "TutellusDistributionVault: start block exceeds end block");
+        _minted += allocated_;
+        require(_minted <= _limit, "TutellusDistributionVault: minted exceeds limit");
+        holders[account].distributed = 0;
+        holders[account].releasePerBlock = allocated_ / (endBlocks - startBlocks);
+        holders[account].startBlock = block.number + startBlocks;
+        holders[account].endBlock = block.number + endBlocks;
         ITutellusERC20 tokenInterface = ITutellusERC20(token);
         tokenInterface.mint(address(this), allocated_);
-        emit AddStakeholder(account, allocated_, stakeholders[account].startBlock, stakeholders[account].endBlock);
+        emit AddHolder(account, allocated_, holders[account].startBlock, holders[account].endBlock);
     }
 }

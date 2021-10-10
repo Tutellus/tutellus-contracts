@@ -14,7 +14,7 @@ contract TutellusFarming is AccessControlProxyPausable {
 
     uint256 public balance;
     uint256 public accRewardsPerShare;
-    uint256 private _released;
+    uint256 private _released; 
 
     uint public lastUpdate;
     uint public stakers;
