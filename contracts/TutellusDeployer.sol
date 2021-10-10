@@ -22,7 +22,7 @@ contract TutellusDeployer {
         treasury = treasury_;
         rolemanager = address(new TutellusRoleManager(msg.sender));
         token = address(new TutellusERC20('Tutellus Token', 'TUT', 2e26, rolemanager));
-        holdersVault = address(new TutellusDistributionVault(rolemanager, token));
+        holdersVault = address(new TutellusDistributionVault(rolemanager, token, 16000000e18));
         farmingVault = address(new TutellusYFRewardsVault(rolemanager, token, 64000000e18, 47336400));
         rewardsVault = address(new TutellusMerkleDistributorUpdateable(rolemanager, token));
         treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 29600000e18, 78894000));

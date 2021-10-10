@@ -646,8 +646,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusFarming.sol": {
-      "lastModificationDate": 1633707779147,
-      "contentHash": "7b3c2009c73f7cdc4b36aa6977a265f6",
+      "lastModificationDate": 1633863555472,
+      "contentHash": "7628c16564161186f15f8d6fa2b325c5",
       "sourceName": "contracts/TutellusFarming.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -903,8 +903,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDeployer.sol": {
-      "lastModificationDate": 1633711326394,
-      "contentHash": "08ada9504e84522f408bfd06e2f3fb41",
+      "lastModificationDate": 1633865379760,
+      "contentHash": "a0d1c1d8c0ea9c52fa583ac14515f98f",
       "sourceName": "contracts/TutellusDeployer.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -1017,8 +1017,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDistributionVault.sol": {
-      "lastModificationDate": 1633703869403,
-      "contentHash": "506d658deb196a8a20213c7429e7d05e",
+      "lastModificationDate": 1633866275643,
+      "contentHash": "9221692ec4f782cca0a43c82def14ab0",
       "sourceName": "contracts/TutellusDistributionVault.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -1088,8 +1088,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusYFRewardsVault.sol": {
-      "lastModificationDate": 1633707717188,
-      "contentHash": "9cd5fe637d766009c460dde1841bdd38",
+      "lastModificationDate": 1633863987629,
+      "contentHash": "7c8228c5a2b6f61380a28515ac58ca78",
       "sourceName": "contracts/TutellusYFRewardsVault.sol",
       "solcConfig": {
         "version": "0.8.2",

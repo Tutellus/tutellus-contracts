@@ -64,7 +64,7 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
     }
 
     function releasedRange(uint from, uint to) public view returns (uint256) {
-      require(from < to, "TutellusYieldTutellusYieldRewardstoken: {from} is after {to}");
+      require(from <= to, "TutellusYFRewardsVault: {from} is after {to}");
       if (to > _endBlock) to = _endBlock;
       if (from < _startBlock) from = _startBlock;
       uint256 comp0 = (_increment * ((to - _startBlock) ** 2)) / 2;
@@ -74,7 +74,7 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
 
     function releasedId(address account) public view returns (uint256) {
       uint256 id = _id[account];
-      return _released[id] + releasedRange(block.number, _lastUpdate) * _allocation[id] / 1e20;
+      return _released[id] + releasedRange(_lastUpdate, block.number) * _allocation[id] / 1e20;
     }
 
     function distributeTokens(address account, uint256 amount) public {
@@ -114,5 +114,6 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
         _startBlock = block.number;
         _endBlock = block.number + blocks;
         _increment = (2 * amount) / (blocks ** 2);
+        _lastUpdate = block.number;
     }
 }
