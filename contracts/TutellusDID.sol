@@ -45,12 +45,31 @@ contract TutellusDID is Initializable, AccessControlUpgradeable, ERC721HolderUpg
     /// @param value_ Msg.value to be sent in call
     /// @param gas_ Gas limit sent in call
     /// @return encoded result of function call
-    function forward(address destination_, bytes memory data_, uint value_, uint gas_) external returns(bytes memory) {
+    function forward(address destination_, bytes calldata data_, uint value_, uint gas_) external returns(bytes memory) {
         bytes memory result_ = _forward(destination_, data_, value_, gas_);
         
         emit Forward(destination_, data_, value_, gas_, result_);
         
         return result_;
+    }
+
+    function forwardBatch(address[]  calldata destination_, bytes[]  calldata data_, uint[]  calldata value_, uint[] calldata gas_) external returns(bytes[] memory) {
+        require(
+            destination_.length == data_.length &&
+            data_.length == value_.length &&
+            value_.length == gas_.length,
+            "DID: arrays length mismatch"
+        );
+
+        bytes[] memory results_ = new bytes[](destination_.length);
+
+        for (uint i = 0; i < results_.length; i++) {
+            results_[i] = _forward(destination_[i], data_[i], value_[i], gas_[i]);
+
+            emit Forward(destination_[i], data_[i], value_[i], gas_[i], results_[i]);
+        }
+
+        return results_;
     }
 
     function verificationCheck(address destination_) public view returns(bool) {

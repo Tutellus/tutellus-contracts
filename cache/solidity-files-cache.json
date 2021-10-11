@@ -796,8 +796,8 @@
       ]
     },
     "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusDID.sol": {
-      "lastModificationDate": 1633689820085,
-      "contentHash": "6204e53c58620f8212098ec9db40fbb5",
+      "lastModificationDate": 1633939883845,
+      "contentHash": "58c82c620fdb17c725d4ce5c205d63ef",
       "sourceName": "contracts/TutellusDID.sol",
       "solcConfig": {
         "version": "0.8.2",
