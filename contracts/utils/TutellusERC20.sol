@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUp
 
 contract TutellusERC20 is AccessControlProxyPausable, ERC20CappedUpgradeable {
 
-    uint256 private burned_;
+    uint256 public burned;
 
     event Mint(address account, uint256 amount);
     event Burn(address account, uint256 amount);
@@ -26,20 +26,15 @@ contract TutellusERC20 is AccessControlProxyPausable, ERC20CappedUpgradeable {
     }
 
     function _mint(address account, uint256 amount) virtual internal override {
-        require(totalSupply() + burned_ + amount <= cap(), "TutellusERC20: mint amount exceeds cap");
+        require(totalSupply() + burned + amount <= cap(), "TutellusERC20: mint amount exceeds cap");
         super._mint(account, amount);
         emit Mint(account, amount);
     }
 
     function _burn(address account, uint256 amount) virtual internal override {
-        require(totalSupply() - burned_ >= amount, "TutellusERC20: burn amount exceeds supply");
-        burned_ += amount;
+        burned += amount;
         super._burn(account, amount);
         emit Burn(account, amount);
-    }
-
-    function burned() public view returns (uint256) {
-        return burned_;
     }
 
     function mint(address account, uint256 amount) public onlyRole(keccak256('MINTER_ROLE')) {
@@ -48,9 +43,5 @@ contract TutellusERC20 is AccessControlProxyPausable, ERC20CappedUpgradeable {
 
     function burn(uint256 amount) public {
         _burn(_msgSender(), amount);
-    }
-
-    function isMinter(address account) public view returns (bool) {
-        return hasRole(keccak256('MINTER_ROLE'), account);
     }
 }

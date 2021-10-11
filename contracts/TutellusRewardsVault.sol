@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./utils/AccessControlProxyPausable.sol";
 import "./interfaces/ITutellusERC20.sol";
 
-contract TutellusYFRewardsVault is AccessControlProxyPausable {
+contract TutellusRewardsVault is AccessControlProxyPausable {
 
     mapping(address=>uint256) private _id;
     mapping(uint256=>address) private _address;
@@ -27,7 +27,7 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
       uint blocks
     )  
     {
-      __TutellusYFRewardsVault_init(
+      __TutellusRewardsVault_init(
         rolemanager,
         token_, 
         amount, 
@@ -45,14 +45,14 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
     function updateAllocation(uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
       uint256 sum = 0;
       uint256 length = allocation.length;
-      require(length == _total, "TutellusYFRewardsVault: allocation array must have same length as number of accounts");
+      require(length == _total, "TutellusRewardsVault: allocation array must have same length as number of accounts");
       for(uint256 i=0; i<length; i++) {
         _allocation[i] = allocation[i];
         _released[i] = releasedId(_address[i]);
         sum+=allocation[i];
       }
       _lastUpdate = block.number;
-      require(sum<=1e20, "TutellusYFRewardsVault: allocation sum must be lower than 1e20");
+      require(sum<=1e20, "TutellusRewardsVault: allocation sum must be lower than 1e20");
     }
 
     function released() public view returns (uint256) {
@@ -64,7 +64,7 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
     }
 
     function releasedRange(uint from, uint to) public view returns (uint256) {
-      require(from <= to, "TutellusYFRewardsVault: {from} is after {to}");
+      require(from <= to, "TutellusRewardsVault: {from} is after {to}");
       if (to > _endBlock) to = _endBlock;
       if (from < _startBlock) from = _startBlock;
       uint256 comp0 = (_increment * ((to - _startBlock) ** 2)) / 2;
@@ -78,13 +78,13 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
     }
 
     function distributeTokens(address account, uint256 amount) public {
-      require(amount <= availableId(account), "TutellusYFRewardsVault: amount exceeds available");
+      require(amount <= availableId(account), "TutellusRewardsVault: amount exceeds available");
       _distributed[_id[msg.sender]] += amount;
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       tokenInterface.transfer(account, amount);
     }
 
-    function __TutellusYFRewardsVault_init(
+    function __TutellusRewardsVault_init(
       address rolemanager,
       address token_, 
       uint256 amount, 
@@ -94,14 +94,14 @@ contract TutellusYFRewardsVault is AccessControlProxyPausable {
       initializer 
     {
       __AccessControlProxyPausable_init(rolemanager);
-      __TutellusYFRewardsVault_init_unchained(
+      __TutellusRewardsVault_init_unchained(
         token_,
         amount, 
         blocks
       );
     }
 
-    function __TutellusYFRewardsVault_init_unchained(
+    function __TutellusRewardsVault_init_unchained(
       address token_, 
       uint256 amount, 
       uint blocks

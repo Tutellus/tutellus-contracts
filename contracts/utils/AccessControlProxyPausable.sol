@@ -13,9 +13,8 @@ abstract contract AccessControlProxyPausable is PausableUpgradeable {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
     modifier onlyRole(bytes32 role) {
-        IAccessControlUpgradeable manager = IAccessControlUpgradeable(_manager);
         address account = msg.sender;
-        require(manager.hasRole(role, account), string(
+        require(hasRole(role, account), string(
                     abi.encodePacked(
                         "AccessControlProxyPausable: account ",
                         StringsUpgradeable.toHexString(uint160(account), 20),
