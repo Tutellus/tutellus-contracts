@@ -646,8 +646,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusFarming.sol": {
-      "lastModificationDate": 1633863555472,
-      "contentHash": "7628c16564161186f15f8d6fa2b325c5",
+      "lastModificationDate": 1633940895668,
+      "contentHash": "50f4651b223d6024d156b53bb19f072a",
       "sourceName": "contracts/TutellusFarming.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -674,7 +674,7 @@
       "imports": [
         "./utils/AccessControlProxyPausable.sol",
         "./interfaces/IERC20.sol",
-        "./interfaces/ITutellusYFRewardsVault.sol"
+        "./interfaces/ITutellusRewardsVault.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
@@ -684,8 +684,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/AccessControlProxyPausable.sol": {
-      "lastModificationDate": 1633711136219,
-      "contentHash": "0c64b79d0cabfe9e4b4c85193efda527",
+      "lastModificationDate": 1633951782844,
+      "contentHash": "db4337a22b7b996e781c26d9fe5aa53f",
       "sourceName": "contracts/utils/AccessControlProxyPausable.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -722,8 +722,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusStaking.sol": {
-      "lastModificationDate": 1633707773378,
-      "contentHash": "38a721b42bce8df741a3d6fee4d3e5b8",
+      "lastModificationDate": 1633940905073,
+      "contentHash": "2d0c4b53f4c5e226aedfc8dc3537dd37",
       "sourceName": "contracts/TutellusStaking.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -750,7 +750,7 @@
       "imports": [
         "./utils/AccessControlProxyPausable.sol",
         "./interfaces/ITutellusERC20.sol",
-        "./interfaces/ITutellusYFRewardsVault.sol"
+        "./interfaces/ITutellusRewardsVault.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
@@ -794,8 +794,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusTreasuryVault.sol": {
-      "lastModificationDate": 1633707530981,
-      "contentHash": "676b9cbd509c90588f624eeff8d06a29",
+      "lastModificationDate": 1633950808408,
+      "contentHash": "3367520294c60f5b5d2de4cdfda3acf0",
       "sourceName": "contracts/TutellusTreasuryVault.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -828,44 +828,6 @@
       ],
       "artifacts": [
         "TutellusTreasuryVault"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusMerkleDistributorUpdateable.sol": {
-      "lastModificationDate": 1633704781069,
-      "contentHash": "bcbd8ffc57c7291b0ad67544c538f808",
-      "sourceName": "contracts/TutellusMerkleDistributorUpdateable.sol",
-      "solcConfig": {
-        "version": "0.8.2",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol",
-        "./utils/AccessControlProxyPausable.sol",
-        "./interfaces/ITutellusERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "TutellusMerkleDistributorUpdateable"
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/node_modules/@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol": {
@@ -903,8 +865,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDeployer.sol": {
-      "lastModificationDate": 1633865379760,
-      "contentHash": "a0d1c1d8c0ea9c52fa583ac14515f98f",
+      "lastModificationDate": 1633956397479,
+      "contentHash": "d73ee73b1244276001b2b338bcc9b8aa",
       "sourceName": "contracts/TutellusDeployer.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -931,9 +893,9 @@
       "imports": [
         "./utils/TutellusERC20.sol",
         "./TutellusRoleManager.sol",
-        "./TutellusDistributionVault.sol",
-        "./TutellusYFRewardsVault.sol",
-        "./TutellusMerkleDistributorUpdateable.sol",
+        "./TutellusHoldersVault.sol",
+        "./TutellusRewardsVault.sol",
+        "./TutellusClientsVault.sol",
         "./TutellusTreasuryVault.sol"
       ],
       "versionPragmas": [
@@ -944,8 +906,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/utils/TutellusERC20.sol": {
-      "lastModificationDate": 1633711176074,
-      "contentHash": "38226056b7a1172ad88a43276d3b692a",
+      "lastModificationDate": 1633957000942,
+      "contentHash": "8f913415c8bb5bc9dc861dd7df9e1643",
       "sourceName": "contracts/utils/TutellusERC20.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -981,8 +943,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusRoleManager.sol": {
-      "lastModificationDate": 1633708727459,
-      "contentHash": "9111f89ce8b30abf9e1ddb7d713b9e76",
+      "lastModificationDate": 1633956374927,
+      "contentHash": "17837204662f289d4b33a734bb4279a2",
       "sourceName": "contracts/TutellusRoleManager.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -1016,47 +978,10 @@
         "TutellusRoleManager"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDistributionVault.sol": {
-      "lastModificationDate": 1633866275643,
-      "contentHash": "9221692ec4f782cca0a43c82def14ab0",
-      "sourceName": "contracts/TutellusDistributionVault.sol",
-      "solcConfig": {
-        "version": "0.8.2",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./interfaces/ITutellusERC20.sol",
-        "./utils/AccessControlProxyPausable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "TutellusDistributionVault"
-      ]
-    },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/ITutellusYFRewardsVault.sol": {
-      "lastModificationDate": 1633707765398,
-      "contentHash": "76c9d4b0acfde950122a5cb9d17a6c3d",
-      "sourceName": "contracts/interfaces/ITutellusYFRewardsVault.sol",
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/ITutellusRewardsVault.sol": {
+      "lastModificationDate": 1633940916253,
+      "contentHash": "4a6a1143aaea3d26bb846e8cce5c0c5c",
+      "sourceName": "contracts/interfaces/ITutellusRewardsVault.sol",
       "solcConfig": {
         "version": "0.8.2",
         "settings": {
@@ -1084,13 +1009,13 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "ITutellusYFRewardsVault"
+        "ITutellusRewardsVault"
       ]
     },
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusYFRewardsVault.sol": {
-      "lastModificationDate": 1633863987629,
-      "contentHash": "7c8228c5a2b6f61380a28515ac58ca78",
-      "sourceName": "contracts/TutellusYFRewardsVault.sol",
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusRewardsVault.sol": {
+      "lastModificationDate": 1633940847608,
+      "contentHash": "a09f0864620c4e468bf211c81f2d2c75",
+      "sourceName": "contracts/TutellusRewardsVault.sol",
       "solcConfig": {
         "version": "0.8.2",
         "settings": {
@@ -1121,7 +1046,82 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "TutellusYFRewardsVault"
+        "TutellusRewardsVault"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusHoldersVault.sol": {
+      "lastModificationDate": 1633945096836,
+      "contentHash": "be535e186773436e75e3025f16831d9e",
+      "sourceName": "contracts/TutellusHoldersVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/ITutellusERC20.sol",
+        "./utils/AccessControlProxyPausable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusHoldersVault"
+      ]
+    },
+    "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusClientsVault.sol": {
+      "lastModificationDate": 1633941009510,
+      "contentHash": "e767a0bed849522d4168acb915565b2c",
+      "sourceName": "contracts/TutellusClientsVault.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol",
+        "./utils/AccessControlProxyPausable.sol",
+        "./interfaces/ITutellusERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusClientsVault"
       ]
     }
   }
