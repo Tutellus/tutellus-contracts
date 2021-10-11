@@ -20,19 +20,34 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
 
     address public token;
 
+    event Init(uint startBlock, uint endBlock, uint256 increment);
+    event AddAccount(address account);
+    event UpdateAllocation(uint256[] allocation);
+    event DistributeTokens(address sender, address account, uint256 amount);
+
     constructor (
       address rolemanager,
       address token_, 
       uint256 amount, 
-      uint blocks
+      uint startBlock_,
+      uint endBlock_
     )  
     {
       __TutellusRewardsVault_init(
         rolemanager,
         token_, 
         amount, 
-        blocks
+        startBlock_,
+        endBlock_
       );
+    }
+
+    function startBlock() public view returns (uint) {
+      return _startBlock;
+    } 
+
+    function endBlock() public view returns (uint) {
+      return _endBlock;
     }
 
     function add(address account, uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -40,6 +55,7 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
       _address[_total] = account;
       _total+=1;
       updateAllocation(allocation);
+      emit AddAccount(account);
     }
 
     function updateAllocation(uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -47,16 +63,17 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
       uint256 length = allocation.length;
       require(length == _total, "TutellusRewardsVault: allocation array must have same length as number of accounts");
       for(uint256 i=0; i<length; i++) {
-        _allocation[i] = allocation[i];
         _released[i] = releasedId(_address[i]);
+        _allocation[i] = allocation[i];
         sum+=allocation[i];
       }
       _lastUpdate = block.number;
-      require(sum<=1e20, "TutellusRewardsVault: allocation sum must be lower than 1e20");
+      require(sum==1e20, "TutellusRewardsVault: total allocation must be 1e20");
+      emit UpdateAllocation(allocation);
     }
 
     function released() public view returns (uint256) {
-      return releasedRange(block.number, _startBlock);
+      return releasedRange(_startBlock, block.number);
     }
 
     function availableId(address account) public view returns (uint256) {
@@ -65,8 +82,12 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
 
     function releasedRange(uint from, uint to) public view returns (uint256) {
       require(from <= to, "TutellusRewardsVault: {from} is after {to}");
-      if (to > _endBlock) to = _endBlock;
-      if (from < _startBlock) from = _startBlock;
+      if (to > _endBlock) {
+        to = _endBlock;
+      }
+      if (from < _startBlock) {
+        from = _startBlock;
+      }
       uint256 comp0 = (_increment * ((to - _startBlock) ** 2)) / 2;
       uint256 comp1 = (_increment * ((from - _startBlock) ** 2)) / 2;
       return comp0 - comp1;
@@ -74,7 +95,7 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
 
     function releasedId(address account) public view returns (uint256) {
       uint256 id = _id[account];
-      return _released[id] + releasedRange(_lastUpdate, block.number) * _allocation[id] / 1e20;
+      return _released[id] + ((releasedRange(_lastUpdate, block.number) * _allocation[id]) / 1e20);
     }
 
     function distributeTokens(address account, uint256 amount) public {
@@ -82,13 +103,15 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
       _distributed[_id[msg.sender]] += amount;
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       tokenInterface.transfer(account, amount);
+      emit DistributeTokens(msg.sender, account, amount);
     }
 
     function __TutellusRewardsVault_init(
       address rolemanager,
       address token_, 
       uint256 amount, 
-      uint blocks
+      uint startBlock_,
+      uint endBlock_
     ) 
       internal 
       initializer 
@@ -97,23 +120,27 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
       __TutellusRewardsVault_init_unchained(
         token_,
         amount, 
-        blocks
+        startBlock_,
+        endBlock_
       );
     }
 
     function __TutellusRewardsVault_init_unchained(
       address token_, 
       uint256 amount, 
-      uint blocks
+      uint startBlock_,
+      uint endBlock_
     ) 
       internal 
       initializer 
-    {
+    {   
+        require(endBlock_ > startBlock_, "TutellusRewardsVault: start block exceeds end block");
         token = token_;
-
-        _startBlock = block.number;
-        _endBlock = block.number + blocks;
+        _startBlock = startBlock_;
+        _endBlock = endBlock_;
+        uint blocks = endBlock_ - startBlock_;
         _increment = (2 * amount) / (blocks ** 2);
         _lastUpdate = block.number;
+        emit Init(_startBlock, _endBlock, _increment);
     }
 }

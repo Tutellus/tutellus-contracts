@@ -15,12 +15,14 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
     uint private _increment;
 
     event Claim(address treasury, uint256 amount);
+    event Init(uint startBlock, uint endBlock, uint256 increment);
 
     constructor (address rolemanager,
       address treasury_,
       address token_,
       uint256 amount, 
-      uint blocks
+      uint startBlock_,
+      uint endBlock_
     )
     {
       __TutellusTreasuryVault_init(
@@ -28,7 +30,8 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
         treasury_,
         token_,
         amount, 
-        blocks
+        startBlock_,
+        endBlock_
       );
     }
 
@@ -63,7 +66,8 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
       address treasury_,
       address token_,
       uint256 amount, 
-      uint blocks
+      uint startBlock_,
+      uint endBlock_
     ) 
       internal 
       initializer 
@@ -73,7 +77,8 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
         treasury_,
         token_,
         amount, 
-        blocks
+        startBlock_,
+        endBlock_
       );
     }
 
@@ -81,16 +86,19 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
       address treasury_,
       address token_,
       uint256 amount,
-      uint blocks
+      uint startBlock_,
+      uint endBlock_
     ) 
       internal 
       initializer 
-    {
-        token = token_;
-        treasury = treasury_;
-
-        _startBlock = block.number;
-        _endBlock = block.number + blocks;
-        _increment = (2 * amount) / (blocks ** 2);
+    {   
+      require(endBlock_ > startBlock_, "TutellusTreasuryVault: start block exceeds end block");
+      token = token_;
+      treasury = treasury_;
+      _startBlock = startBlock_;
+      _endBlock = endBlock_;
+      uint blocks = endBlock_ - startBlock_;
+      _increment = (2 * amount) / (blocks ** 2);
+      emit Init(_startBlock, _endBlock, _increment);
     }
 }

@@ -6,6 +6,7 @@ const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 // const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
+const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -54,7 +55,8 @@ describe('Deployer', function () {
     [owner, person] = await web3.eth.getAccounts()
   })
   beforeEach(async () => {
-    myDeployer = await Deployer.new(owner)
+    const previous = await latestBlock()
+    myDeployer = await Deployer.new(owner, previous)
     const addresses = await getAddresses()
     await setInstances(addresses)
   })
@@ -77,9 +79,7 @@ describe('Deployer', function () {
     it('Check rolemanager', async () => {
       const defaultadminrole = formatBytes32String(0x0000000000000000000000000000000000000000)
       const response = await myRolemanager.hasRole(defaultadminrole, owner)
-      const response2 = await myToken.isMinter(myDeployer.address)
       expect(response).to.eq(true)
-      expect(response2).to.eq(true)
     })
   })
   describe('After deploy', () => {
@@ -91,16 +91,16 @@ describe('Deployer', function () {
     })
     it('Add holder and claim', async () => {
       await myHoldersVault.add(person, ether('10'))
-      const response = await myHoldersVault.claim({ from: person }) // 10 / 8 = 1.25 * 2 blocks = 2.5
+      const response = await myHoldersVault.claim({ from: person }) // 10 / 8 = 1.25 * 4 blocks = 2.5
       expectEvent(response, 'Distribute', {
         account: person,
-        amount: ether('2.5')
+        amount: ether('3.75')
       })
     })
     it('Claim treasury', async () => {
       const response = await myTreasuryVault.claim() // 1 block => 16444.4 / 2 = 8222.2
       expectEvent(response, 'Claim', {
-        amount: ether('8222.222222222222222222')
+        amount: ether('32888.888888888888888888')
       })
     })
   })
