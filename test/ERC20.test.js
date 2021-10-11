@@ -13,7 +13,7 @@ const RoleManager = artifacts.require('TutellusRoleManager')
 let myToken, myRoleManager
 let owner, person
 
-describe.only('TutellusERC20', function () {
+describe('TutellusERC20', function () {
   before(async () => {
     [owner, person] = await web3.eth.getAccounts()
   })

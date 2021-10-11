@@ -20,7 +20,6 @@ contract TutellusStaking is AccessControlProxyPausable {
 
     uint public lastUpdate;
     uint public feeInterval;
-    uint public endBlock;
     uint public stakers;
 
     struct UserInfo {
@@ -45,18 +44,16 @@ contract TutellusStaking is AccessControlProxyPausable {
     event Update(uint256 balance, uint256 accRewardsPerShare, uint lastUpdate, uint stakers);
     event UpdateUserInfo(address account, uint256 amount, uint256 rewardDebt, uint256 notClaimed, uint endInterval);
     event UpdateFees(uint256 minFee, uint256 maxFee, uint feeInterval);
-    event updatevault(address vault);
-    event UpdateEndBlock(uint endBlock);
 
     // Updates a level
     function _update() internal {
       if (block.number <= lastUpdate) {
         return;
       }
+      ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
+      uint256 released = rewardsInterface.releasedId(address(this)) - _released;
+      _released += released;
       if(balance > 0) {
-        ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
-        uint256 released = rewardsInterface.releasedId(address(this)) - _released;
-        _released += released;
         accRewardsPerShare += (released * 1e18 / balance);
       }
       lastUpdate = block.number;
@@ -87,7 +84,6 @@ contract TutellusStaking is AccessControlProxyPausable {
 
     // Deposits tokens for staking
     function depositFrom(address account, uint256 amount) public whenNotPaused {
-      require(block.number < endBlock, "TutellusStaking: staking contract has finished");
       require(amount > 0, "TutellusStaking: amount must be over zero");
 
       UserInfo storage user = _userInfo[account];

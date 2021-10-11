@@ -19,15 +19,15 @@ contract TutellusDeployer {
     address public clientsVault;
     address public treasuryVault;
 
-    constructor(address treasury_) {
+    constructor(address treasury_, uint startBlock) {
         treasury = treasury_;
         rolemanager = address(new TutellusRoleManager());
         token = address(new TutellusERC20('Tutellus Token', 'TUT', 2e26, rolemanager));
-        holdersVault = address(new TutellusHoldersVault(rolemanager, token, 10000000e18, block.number, block.number + 8));
-        teamVault = address(new TutellusHoldersVault(rolemanager, token, 6000000e18, block.number + 8, block.number + 21));
-        rewardsVault = address(new TutellusRewardsVault(rolemanager, token, 64000000e18, 36)); // 47336400 = 3 años
+        holdersVault = address(new TutellusHoldersVault(rolemanager, token, 10000000e18, startBlock, startBlock + 8)); //
+        teamVault = address(new TutellusHoldersVault(rolemanager, token, 6000000e18, startBlock + 8, startBlock + 21));
+        rewardsVault = address(new TutellusRewardsVault(rolemanager, token, 64000000e18, startBlock, startBlock + 36)); // 47336400 = 3 años
         clientsVault = address(new TutellusClientsVault(rolemanager, token));
-        treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 29600000e18, 60 )); // 78894000 = 5 años
+        treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 29600000e18, startBlock, startBlock + 60)); // 78894000 = 5 años
 
         TutellusRoleManager rolemanagerInstance = TutellusRoleManager(rolemanager);
         rolemanagerInstance.grantMinterRole(address(this));

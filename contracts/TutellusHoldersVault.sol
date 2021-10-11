@@ -7,8 +7,8 @@ import "./utils/AccessControlProxyPausable.sol";
 contract TutellusHoldersVault is AccessControlProxyPausable {
 
     address public token;
-    uint public startBlock;
-    uint public endBlock;
+    uint private _startBlock;
+    uint private _endBlock;
     uint256 private _limit;
     uint256 private _minted;
     mapping(address=>uint256) public distributed;
@@ -17,6 +17,7 @@ contract TutellusHoldersVault is AccessControlProxyPausable {
     event Update(address account);
     event Distribute(address sender, address account, uint256 amount);
     event Add(address holder, uint256 allocated);
+    event Init(uint startBlock, uint endBlock, uint256 limit);
 
     constructor(address rolemanager, address token_, uint256 limit, uint256 startBlock_, uint endBlock_) {
         require(endBlock_ > startBlock_, "TutellusHoldersVault: start block exceeds end block");
@@ -31,19 +32,20 @@ contract TutellusHoldersVault is AccessControlProxyPausable {
     function __TutellusHoldersVault_init_unchained(address token_, uint256 limit, uint256 startBlock_, uint endBlock_) internal initializer {
       token = token_;
       _limit = limit;
-      startBlock = startBlock_;
-      endBlock = endBlock_;
+      _startBlock = startBlock_;
+      _endBlock = endBlock_;
+      emit Init(_startBlock, _endBlock, limit);
     }
 
     function released(address account) public view returns(uint256) {
       uint current = block.number;
-      if (current > endBlock) {
+      if (current > _endBlock) {
         return allocated[account];
-      } else if (current < startBlock) {
+      } else if (current < _startBlock) {
         return 0;
       } else {
-        uint blocks = current - startBlock;
-        return allocated[account] * blocks / (endBlock - startBlock);
+        uint blocks = current - _startBlock;
+        return allocated[account] * blocks / (_endBlock - _startBlock);
       }
     }
 
