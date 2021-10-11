@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./utils/AccessControlProxyPausable.sol";
 import "./interfaces/IERC20.sol";
-import "./interfaces/ITutellusYFRewardsVault.sol";
+import "./interfaces/ITutellusRewardsVault.sol";
 
 contract TutellusFarming is AccessControlProxyPausable {
 
@@ -42,7 +42,7 @@ contract TutellusFarming is AccessControlProxyPausable {
         return;
       }
       if(balance > 0) {
-        ITutellusYFRewardsVault rewardsInterface = ITutellusYFRewardsVault(vault);
+        ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
         uint256 released = rewardsInterface.releasedId(address(this)) - _released;
         _released += released;
         accRewardsPerShare += (released * 1e18 / balance);
@@ -147,7 +147,7 @@ contract TutellusFarming is AccessControlProxyPausable {
     }
 
     function _reward(address account) internal {
-      ITutellusYFRewardsVault rewardsInterface = ITutellusYFRewardsVault(vault);
+      ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
       uint256 amount = _userInfo[account].notClaimed;
       if(amount > 0) {
         _userInfo[account].notClaimed = 0;
@@ -162,7 +162,7 @@ contract TutellusFarming is AccessControlProxyPausable {
         UserInfo memory user = _userInfo[user_];
         uint256 rewards = user.notClaimed;
         if(balance > 0){
-          ITutellusYFRewardsVault rewardsInterface = ITutellusYFRewardsVault(vault);
+          ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
           uint256 released = rewardsInterface.releasedId(address(this)) - _released;
           uint256 total = (released * 1e18 / balance);
           rewards += (accRewardsPerShare - user.rewardDebt + total) * user.amount / 1e18;

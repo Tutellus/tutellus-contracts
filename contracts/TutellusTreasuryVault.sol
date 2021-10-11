@@ -9,10 +9,12 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
     address public token;
     address public treasury;
 
-    uint256 private _released;
+    uint256 private _distributed;
     uint private _startBlock;
     uint private _endBlock;
     uint private _increment;
+
+    event Claim(address treasury, uint256 amount);
 
     constructor (address rolemanager,
       address treasury_,
@@ -31,11 +33,11 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
     }
 
     function released() public view returns (uint256) {
-      return releasedRange(block.number, _startBlock);
+      return releasedRange(_startBlock, block.number);
     }
 
     function releasedRange(uint from, uint to) public view returns (uint256) {
-      require(from < to, "TutellusYieldTutellusYieldRewardstoken: {from} is after {to}");
+      require(from < to, "TutellusTreasuryVault: {from} is after {to}");
       if (to > _endBlock) to = _endBlock;
       if (from < _startBlock) from = _startBlock;
       uint256 comp0 = (_increment * ((to - _startBlock) ** 2)) / 2;
@@ -47,11 +49,13 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
       treasury = treasury_;
     }
 
-    function claim() public onlyRole(DEFAULT_ADMIN_ROLE) {
-      uint256 amount = released() - _released;
+    function claim() public {
+      uint256 amount = released() - _distributed;
+      _distributed += amount;
       require(amount > 0, "TutellusTreasuryVault: nothing to claim");
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       tokenInterface.transfer(treasury, amount);
+      emit Claim(treasury, amount);
     }
 
     function __TutellusTreasuryVault_init(
