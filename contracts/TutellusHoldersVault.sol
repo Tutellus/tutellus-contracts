@@ -68,7 +68,7 @@ contract TutellusHoldersVault is AccessControlProxyPausable {
         distribute(account);
     }
 
-    function addBatch(address[] memory account, uint256[] memory allocated_) public {
+    function addBatch(address[] memory account, uint256[] memory allocated_) public onlyRole(DEFAULT_ADMIN_ROLE) {
       require(account.length == allocated_.length, 'TutellusHoldersVault: length must be the same');
       require(account.length != 0, 'TutellusHoldersVault: length cannot be null');
       uint256 length = account.length;
@@ -79,12 +79,12 @@ contract TutellusHoldersVault is AccessControlProxyPausable {
     }
 
     function add(address account, uint256 allocated_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _minted += allocated_;
-        require(_minted <= _limit, "TutellusHoldersVault: minted exceeds limit");
-        distributed[account] = 0;
-        allocated[account] = allocated_;
-        ITutellusERC20 tokenInterface = ITutellusERC20(token);
-        tokenInterface.mint(address(this), allocated_);
-        emit Add(account, allocated_);
+      require(allocated_ > 0, "TutellusHoldersVault: cannot mint 0 tokens");
+      _minted += allocated_;
+      require(_minted <= _limit, "TutellusHoldersVault: minted exceeds limit");
+      allocated[account] += allocated_;
+      ITutellusERC20 tokenInterface = ITutellusERC20(token);
+      tokenInterface.mint(address(this), allocated_);
+      emit Add(account, allocated_);
     }
 }
