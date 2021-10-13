@@ -14,8 +14,9 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
     uint private _endBlock;
     uint private _increment;
 
-    event Claim(address treasury, uint256 amount);
+    event Claim(address sender, address treasury, uint256 amount);
     event Init(uint startBlock, uint endBlock, uint256 increment);
+    event UpdateTreasury(address previous, address next);
 
     constructor (address rolemanager,
       address treasury_,
@@ -49,7 +50,10 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
     }
 
     function updateTreasury(address treasury_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+      address previous = treasury;
       treasury = treasury_;
+      address next = treasury;
+      emit UpdateTreasury(previous, next);
     }
 
     function claim() public {
@@ -58,7 +62,7 @@ contract TutellusTreasuryVault is AccessControlProxyPausable {
       require(amount > 0, "TutellusTreasuryVault: nothing to claim");
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       tokenInterface.transfer(treasury, amount);
-      emit Claim(treasury, amount);
+      emit Claim(msg.sender, treasury, amount);
     }
 
     function __TutellusTreasuryVault_init(

@@ -6,11 +6,14 @@ import "./interfaces/ITutellusERC20.sol";
 
 contract TutellusRewardsVault is AccessControlProxyPausable {
 
-    mapping(address=>uint256) private _id;
-    mapping(uint256=>address) private _address;
-    mapping(uint256=>uint256) private _allocation;
-    mapping(uint256=>uint256) private _released;
-    mapping(uint256=>uint256) private _distributed;
+    struct Info {
+      uint256 allocation;
+      uint256 released;
+      uint256 distributed;
+    }
+
+    mapping(address=>Info) private info;
+    mapping(uint256=>address) private id;
     
     uint private _lastUpdate;
     uint private _startBlock;
@@ -21,7 +24,7 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
     address public token;
 
     event Init(uint startBlock, uint endBlock, uint256 increment);
-    event AddAccount(address account);
+    event Add(address account);
     event UpdateAllocation(uint256[] allocation);
     event DistributeTokens(address sender, address account, uint256 amount);
 
@@ -51,11 +54,11 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
     }
 
     function add(address account, uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      _id[account] = _total;
-      _address[_total] = account;
+      id[_total] = account;
+      info[account] = Info(0,0,0);
       _total+=1;
       updateAllocation(allocation);
-      emit AddAccount(account);
+      emit Add(account);
     }
 
     function updateAllocation(uint256[] memory allocation) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -63,8 +66,8 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
       uint256 length = allocation.length;
       require(length == _total, "TutellusRewardsVault: allocation array must have same length as number of accounts");
       for(uint256 i=0; i<length; i++) {
-        _released[i] = releasedId(_address[i]);
-        _allocation[i] = allocation[i];
+        info[id[i]].released = releasedId(id[i]);
+        info[id[i]].allocation = allocation[i];
         sum+=allocation[i];
       }
       _lastUpdate = block.number;
@@ -77,7 +80,7 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
     }
 
     function availableId(address account) public view returns (uint256) {
-      return releasedId(account) - _distributed[_id[account]];
+      return releasedId(account) - info[account].distributed;
     }
 
     function releasedRange(uint from, uint to) public view returns (uint256) {
@@ -94,13 +97,12 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
     }
 
     function releasedId(address account) public view returns (uint256) {
-      uint256 id = _id[account];
-      return _released[id] + ((releasedRange(_lastUpdate, block.number) * _allocation[id]) / 1e20);
+      return info[account].released + ((releasedRange(_lastUpdate, block.number) * info[account].allocation) / 1e20);
     }
 
     function distributeTokens(address account, uint256 amount) public {
-      require(amount <= availableId(account), "TutellusRewardsVault: amount exceeds available");
-      _distributed[_id[msg.sender]] += amount;
+      require(amount <= availableId(msg.sender), "TutellusRewardsVault: amount exceeds available");
+      info[msg.sender].distributed += amount;
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       tokenInterface.transfer(account, amount);
       emit DistributeTokens(msg.sender, account, amount);

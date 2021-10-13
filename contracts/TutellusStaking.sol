@@ -39,13 +39,14 @@ contract TutellusStaking is AccessControlProxyPausable {
     event Withdraw(address account, uint256 amount, uint256 burned);
     event Rewards(address account, uint256 amount);
 
-    event SyncBalance(address account, uint256 gap);
+    event SyncBalance(address account, uint256 amount);
     event ToggleAutoreward(bool autoreward);
     event Update(uint256 balance, uint256 accRewardsPerShare, uint lastUpdate, uint stakers);
     event UpdateUserInfo(address account, uint256 amount, uint256 rewardDebt, uint256 notClaimed, uint endInterval);
-    event UpdateFees(uint256 minFee, uint256 maxFee, uint feeInterval);
+    event SetFees(uint256 minFee, uint256 maxFee);
+    event SetFeeInterval(uint feeInterval);
+    event Migrate(address from, address to, address account, uint256 amount, bytes response);
 
-    // Updates a level
     function _update() internal {
       if (block.number <= lastUpdate) {
         return;
@@ -61,17 +62,17 @@ contract TutellusStaking is AccessControlProxyPausable {
 
     // Sets maximum and minimum fees
     function setFees(uint256 minFee_, uint256 maxFee_) public onlyRole(DEFAULT_ADMIN_ROLE) {
-      require(minFee_ < maxFee_, "TutellusStaking: mininum fee must be greater than maximum fee");
+      require(minFee_ <= maxFee_, "TutellusStaking: mininum fee must be greater or equal than maximum fee");
       require(minFee_ <= 1e20 && maxFee_ <= 1e20, "TutellusStaking: fees must be less than 100e18");
       minFee = minFee_;
       maxFee = maxFee_;
-      emit UpdateFees(minFee, maxFee, feeInterval);
+      emit SetFees(minFee, maxFee);
     }
 
     // Sets fee interval (blocks) for staking
     function setFeeInterval(uint feeInterval_) public onlyRole(DEFAULT_ADMIN_ROLE) {
       feeInterval = feeInterval_;
-      emit UpdateFees(minFee, maxFee, feeInterval);
+      emit SetFeeInterval(feeInterval);
     }
 
     // Updates rewards for an account
@@ -119,7 +120,7 @@ contract TutellusStaking is AccessControlProxyPausable {
     }
 
     // Withdraws tokens from staking
-    function withdraw(uint256 amount) public whenNotPaused {
+    function withdraw(uint256 amount) public whenNotPaused returns (uint256) {
       require(amount > 0, "TutellusStaking: amount must be over zero");
 
       address account = msg.sender;
@@ -154,6 +155,7 @@ contract TutellusStaking is AccessControlProxyPausable {
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
       emit Withdraw(account, amount, burned);
+      return amount;
     }
 
     // Claims rewards
@@ -258,14 +260,14 @@ contract TutellusStaking is AccessControlProxyPausable {
       return user.amount;
     }
 
-    function migrate(address to, bytes memory data) public returns (bytes memory){
+    function migrate(address to) public returns (bytes memory){
       address account = msg.sender;
-      uint256 amount = _userInfo[account].amount;
-      withdraw(amount);
+      uint256 amount = withdraw(_userInfo[account].amount);
       (bool success, bytes memory response) = to.call(
-            abi.encodeWithSignature("depositFrom(address,uint256,bytes memory)", account, amount, data)
+            abi.encodeWithSignature("depositFrom(address,uint256)", account, amount)
         );
-      require(success, "TutellusStaking: migration has failed");
+      require(success, 'TutellusStaking: migration failed');
+      emit Migrate(address(this), to, account, amount, response);
       return response;
     }
 }

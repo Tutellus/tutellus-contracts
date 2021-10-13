@@ -31,20 +31,20 @@ contract TutellusFarming is AccessControlProxyPausable {
     event Deposit(address account, uint256 amount);
     event Withdraw(address account, uint256 amount);
     event Rewards(address account, uint256 amount);
-    event SyncBalance(address account, uint256 gap);
+    event SyncBalance(address account, uint256 amount);
     event ToggleAutoreward(bool autoreward);
     event Update(uint256 balance, uint256 accRewardsPerShare, uint lastUpdate, uint stakers);
     event UpdateUserInfo(address account, uint256 amount, uint256 rewardDebt, uint256 notClaimed);
+    event Migrate(address from, address to, address account, uint256 amount, bytes response);
 
-    // Updates a level
     function _update() internal {
       if (block.number <= lastUpdate) {
         return;
       }
+      ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
+      uint256 released = rewardsInterface.releasedId(address(this)) - _released;
+      _released += released;
       if(balance > 0) {
-        ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
-        uint256 released = rewardsInterface.releasedId(address(this)) - _released;
-        _released += released;
         accRewardsPerShare += (released * 1e18 / balance);
       }
       lastUpdate = block.number;
@@ -91,7 +91,7 @@ contract TutellusFarming is AccessControlProxyPausable {
     }
 
     // Withdraws tokens from staking
-    function withdraw(uint256 amount) public whenNotPaused {
+    function withdraw(uint256 amount) public whenNotPaused returns (uint256) {
       require(amount > 0, "TutellusFarming: amount must be over zero");
 
       address account = msg.sender;
@@ -121,6 +121,7 @@ contract TutellusFarming is AccessControlProxyPausable {
       emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
       emit UpdateUserInfo(account, user.amount, user.rewardDebt, user.notClaimed);
       emit Withdraw(account, amount);
+      return amount;
     }
 
     // Claims rewards
@@ -170,12 +171,12 @@ contract TutellusFarming is AccessControlProxyPausable {
         return rewards;
     }
 
-    constructor (address rolemanager, address token_, address vault_) {
-      __TutellusFarming_init(rolemanager, token_, vault_);
+    constructor (address token_, address rolemanager_, address vault_) {
+      __TutellusFarming_init(token_, rolemanager_, vault_);
     }
 
-    function __TutellusFarming_init(address rolemanager, address token_, address vault_) internal initializer {
-      __AccessControlProxyPausable_init(rolemanager);
+    function __TutellusFarming_init(address token_, address rolemanager_, address vault_) internal initializer {
+      __AccessControlProxyPausable_init(rolemanager_);
       __TutellusFarming_init_unchained(token_, vault_);
     }
 
@@ -212,14 +213,14 @@ contract TutellusFarming is AccessControlProxyPausable {
       return user.amount;
     }
 
-    function migrate(address to, bytes memory data) public returns (bytes memory){
+    function migrate(address to) public returns (bytes memory){
       address account = msg.sender;
-      uint256 amount = _userInfo[account].amount;
-      withdraw(amount);
+      uint256 amount = withdraw(_userInfo[account].amount);
       (bool success, bytes memory response) = to.call(
-            abi.encodeWithSignature("depositFrom(address,uint256,bytes memory)", account, amount, data)
+            abi.encodeWithSignature("depositFrom(address,uint256)", account, amount)
         );
-      require(success, "TutellusFarming: migration has failed");
+      require(success, 'TutellusStaking: migration failed');
+      emit Migrate(address(this), to, account, amount, response);
       return response;
     }
 }

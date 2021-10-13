@@ -13,13 +13,13 @@ contract TutellusClientsVault is AccessControlProxyPausable {
 
     mapping(address => uint256) private _alreadyClaimed;
 
-    event Claimed(uint256 index, address account, uint256 claimed);
-    event MerkleRootUpdated(bytes32 merkleRoot, string uri);
+    event Claim(uint256 index, address account, uint256 amount);
+    event UpdateMerkleRoot(bytes32 merkleRoot, string uri);
 
     function updateMerkleRoot(bytes32 merkleRoot_, string memory uri_) public onlyRole(DEFAULT_ADMIN_ROLE){
       merkleRoot = merkleRoot_;
       uri = uri_;
-      emit MerkleRootUpdated(merkleRoot, uri);
+      emit UpdateMerkleRoot(merkleRoot, uri);
     }
 
     function alreadyClaimed(address account) public view returns(uint256){
@@ -43,7 +43,7 @@ contract TutellusClientsVault is AccessControlProxyPausable {
         _alreadyClaimed[account] += claimed;
         ITutellusERC20 tokenInterface = ITutellusERC20(token);
         tokenInterface.transfer(account, amount);
-        emit Claimed(index, account, claimed);
+        emit Claim(index, account, claimed);
     }
 
     constructor(address rolemanager, address token_) {

@@ -17,6 +17,7 @@ contract TutellusHoldersVault is AccessControlProxyPausable {
     event Update(address account);
     event Distribute(address sender, address account, uint256 amount);
     event Add(address holder, uint256 allocated);
+    event AddBatch(uint256 length);
     event Init(uint startBlock, uint endBlock, uint256 limit);
 
     constructor(address rolemanager, address token_, uint256 limit, uint256 startBlock_, uint endBlock_) {
@@ -68,9 +69,13 @@ contract TutellusHoldersVault is AccessControlProxyPausable {
     }
 
     function addBatch(address[] memory account, uint256[] memory allocated_) public {
+      require(account.length == allocated_.length, 'TutellusHoldersVault: length must be the same');
+      require(account.length != 0, 'TutellusHoldersVault: length cannot be null');
+      uint256 length = account.length;
       for(uint256 i=0; i< account.length; i++) {
         add(account[i], allocated_[i]);
       }
+      emit AddBatch(length);
     }
 
     function add(address account, uint256 allocated_) public onlyRole(DEFAULT_ADMIN_ROLE) {
