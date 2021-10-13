@@ -501,8 +501,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDeployer.sol": {
-      "lastModificationDate": 1634111486349,
-      "contentHash": "242c0b338875e218ff9e1ee31a69e0c8",
+      "lastModificationDate": 1634156867584,
+      "contentHash": "96213f93cea7c8cadb93aea60aff7892",
       "sourceName": "contracts/TutellusDeployer.sol",
       "solcConfig": {
         "version": "0.8.2",
