@@ -16,13 +16,4 @@ interface ITutellusRewardsVault {
     function releasedId(address account) external view returns (uint256);
 
     function distributeTokens(address account, uint256 amount) external;
-    // Initializes the contract
-    function initialize(
-      address rolemanager,
-      address token_, 
-      uint256[] memory allocation, 
-      uint256 amount, 
-      uint blocks
-    ) 
-      external;
 }

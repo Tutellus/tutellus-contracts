@@ -20,13 +20,13 @@ const scannerSet = () => {
 async function main () {
   await bre.run('compile')
   scannerSet()
-  const myAddress = await bre.web3.eth.getAccounts()
-  const MS = '0xA45eE5aE23eb0F0f2a3CB8A70fd9C5727715dA60'
+  const accounts = await bre.web3.eth.getAccounts()
+  const myAddress = accounts[4]
   const amount = ether('1000000')
-  const myRoleManager = await RoleManager.new()
-  const myToken = await Token.new('TestPool1', 'TP1', amount, myRoleManager.address)
-  await myRoleManager.grantMinterRole(myAddress[0])
-  await myToken.mint(MS, amount)
+  const myRoleManager = await RoleManager.new({ from: myAddress })
+  const myToken = await Token.new('Test1234', 'Test1234', amount, myRoleManager.address, { from: myAddress })
+  await myRoleManager.grantMinterRole(myAddress, { from: myAddress })
+  await myToken.mint(myAddress, amount, { from: myAddress })
   console.log('Token:', myToken.address)
 }
 // We recommend this pattern to be able to use async/await everywhere

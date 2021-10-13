@@ -22,7 +22,7 @@ contract TutellusDeployer {
     constructor(address treasury_, uint startBlock) {
         treasury = treasury_;
         rolemanager = address(new TutellusRoleManager());
-        token = address(new TutellusERC20('Tutellus Token', 'TUT', 2e26, rolemanager));
+        token = address(new TutellusERC20('Tutellus token', 'TUT', 2e26, rolemanager));
         holdersVault = address(new TutellusHoldersVault(rolemanager, token, 10000000e18, startBlock, startBlock + 10519200)); //
         teamVault = address(new TutellusHoldersVault(rolemanager, token, 6000000e18, startBlock + 10519200, startBlock + 27612900));
         rewardsVault = address(new TutellusRewardsVault(rolemanager, token, 64000000e18, startBlock, startBlock + 47336400)); // 47336400 = 3 años
