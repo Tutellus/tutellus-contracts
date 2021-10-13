@@ -6,8 +6,8 @@ require('@nomiclabs/hardhat-etherscan')
 require('@openzeppelin/hardhat-upgrades')
 require('hardhat-gas-reporter')
 const { random, template } = require('lodash')
-const GAS_PRICE_DEFAULT = 20000000000
-const GAS_MULTIPLIER_DEFAULT = 1.2
+const GAS_PRICE_DEFAULT = 'auto'
+const GAS_MULTIPLIER_DEFAULT = 1
 const chains = require('./chains.json')
 const scanners = require('./scanners.json')
 // const INFURA_API_KEY = process.env.INFURA_API_KEY

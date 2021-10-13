@@ -615,8 +615,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusHoldersVault.sol": {
-      "lastModificationDate": 1634064434914,
-      "contentHash": "e9181d3e3c4bbb6f5cfdff02f6f1c441",
+      "lastModificationDate": 1634120346623,
+      "contentHash": "0cc8c1ac44dca78c958b6308f82f78aa",
       "sourceName": "contracts/TutellusHoldersVault.sol",
       "solcConfig": {
         "version": "0.8.2",
