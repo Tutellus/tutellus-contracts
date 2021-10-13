@@ -4,8 +4,8 @@ const MerkelTree = require('./merkleTree')
 const ERROR_INVALID_JSON = 'JSON not valid'
 
 const validAmount = amount => {
-  const fNum = parseFloat(amount)
-  return typeof amount === 'string' && !isNaN(fNum) && amount.length < 14 && fNum.toString().length === amount.length
+  const fNum = parseInt(amount)
+  return typeof amount === 'string' && !isNaN(fNum)
 }
 
 const checkValidJSON = (object = {}) => {
@@ -21,7 +21,7 @@ const toArray = (object = {}) => {
   return sortedKeys.reduce((acu, key) => {
     acu.push({
       account: key,
-      amount: utils.parseEther(object[key])
+      amount: BigNumber.from(object[key])
     })
     return acu
   }, [])

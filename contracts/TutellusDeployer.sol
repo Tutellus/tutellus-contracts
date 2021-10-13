@@ -23,11 +23,11 @@ contract TutellusDeployer {
         treasury = treasury_;
         rolemanager = address(new TutellusRoleManager());
         token = address(new TutellusERC20('Tutellus Token', 'TUT', 2e26, rolemanager));
-        holdersVault = address(new TutellusHoldersVault(rolemanager, token, 10000000e18, startBlock, startBlock + 8)); //
-        teamVault = address(new TutellusHoldersVault(rolemanager, token, 6000000e18, startBlock + 8, startBlock + 21));
-        rewardsVault = address(new TutellusRewardsVault(rolemanager, token, 64000000e18, startBlock, startBlock + 36)); // 47336400 = 3 años
+        holdersVault = address(new TutellusHoldersVault(rolemanager, token, 10000000e18, startBlock, startBlock + 10519200)); //
+        teamVault = address(new TutellusHoldersVault(rolemanager, token, 6000000e18, startBlock + 10519200, startBlock + 27612900));
+        rewardsVault = address(new TutellusRewardsVault(rolemanager, token, 64000000e18, startBlock, startBlock + 47336400)); // 47336400 = 3 años
         clientsVault = address(new TutellusClientsVault(rolemanager, token));
-        treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 29600000e18, startBlock, startBlock + 60)); // 78894000 = 5 años
+        treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 29600000e18, startBlock, startBlock + 78894000)); // 78894000 = 5 años
 
         TutellusRoleManager rolemanagerInstance = TutellusRoleManager(rolemanager);
         rolemanagerInstance.grantMinterRole(address(this));
@@ -40,10 +40,30 @@ contract TutellusDeployer {
         tokenInstance.mint(clientsVault, 90000000e18);
         tokenInstance.mint(treasuryVault, 29600000e18);
 
+        // TEST DATA
+        // treasury = treasury_;
+        // rolemanager = address(new TutellusRoleManager());
+        // token = address(new TutellusERC20('Tutellus Token', 'TUT', 2e26, rolemanager));
+        // holdersVault = address(new TutellusHoldersVault(rolemanager, token, 10000000e18, startBlock, startBlock + 8)); //
+        // teamVault = address(new TutellusHoldersVault(rolemanager, token, 6000000e18, startBlock + 8, startBlock + 21));
+        // rewardsVault = address(new TutellusRewardsVault(rolemanager, token, 64000000e18, startBlock, startBlock + 36)); // 47336400 = 3 años
+        // clientsVault = address(new TutellusClientsVault(rolemanager, token));
+        // treasuryVault = address(new TutellusTreasuryVault(rolemanager, treasury, token, 29600000e18, startBlock, startBlock + 60)); // 78894000 = 5 años
+
+        // TutellusRoleManager rolemanagerInstance = TutellusRoleManager(rolemanager);
+        // rolemanagerInstance.grantMinterRole(address(this));
+        // rolemanagerInstance.grantMinterRole(holdersVault);
+        // rolemanagerInstance.grantMinterRole(teamVault);
+        
+        // TutellusERC20 tokenInstance = TutellusERC20(token);
+        // tokenInstance.mint(treasury, 400000e18);
+        // tokenInstance.mint(rewardsVault, 64000000e18);
+        // tokenInstance.mint(clientsVault, 90000000e18);
+        // tokenInstance.mint(treasuryVault, 29600000e18);
+
         // after deployment:
         //      1. deploy staking and farming
         //      2. add staking and farming to the rewardsVault
         //      3. add holders to the holdersVault
-
     }
 }
