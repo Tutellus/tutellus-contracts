@@ -16,4 +16,6 @@ interface ITutellusRewardsVault {
     function releasedId(address account) external view returns (uint256);
 
     function distributeTokens(address account, uint256 amount) external;
+
+    function info(address account) external view;
 }
