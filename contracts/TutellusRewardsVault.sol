@@ -12,7 +12,7 @@ contract TutellusRewardsVault is AccessControlProxyPausable {
       uint256 distributed;
     }
 
-    mapping(address=>Info) private info;
+    mapping(address=>Info) public info;
     mapping(uint256=>address) private id;
     
     uint private _lastUpdate;

@@ -5,6 +5,7 @@ const HoldersVault = bre.artifacts.require('TutellusHoldersVault')
 const TreasuryVault = bre.artifacts.require('TutellusTreasuryVault')
 const RoleManager = bre.artifacts.require('TutellusRoleManager')
 const Token = bre.artifacts.require('TutellusERC20')
+const Staking = bre.artifacts.require('TutellusStaking')
 
 const {
   ether, expectRevert, time
@@ -28,21 +29,23 @@ async function main () {
   const startBlock = 0
   const endBlock = 1
   console.log('! Deploying Tutellus Infrastructure Mocks')
-  const myToken = await Token.new('TutellusMock', 'TUTM', 1, mockAddress)
-  const myRewardsVault = await RewardsVault.new(mockAddress, mockAddress, 0, startBlock, endBlock)
-  const myClientsVault = await ClientsVault.new(mockAddress, mockAddress)
-  const myHoldersVault = await HoldersVault.new(mockAddress, mockAddress, 0, startBlock, endBlock)
-  const myTreasuryVault = await TreasuryVault.new(mockAddress, mockAddress, mockAddress, 0, startBlock, endBlock)
-  const myRolemanager = await RoleManager.new()
+  // const myToken = await Token.new('TutellusMock', 'TUTM', 1, mockAddress)
+  // const myRewardsVault = await RewardsVault.new(mockAddress, mockAddress, 0, startBlock, endBlock)
+  // const myClientsVault = await ClientsVault.new(mockAddress, mockAddress)
+  // const myHoldersVault = await HoldersVault.new(mockAddress, mockAddress, 0, startBlock, endBlock)
+  // const myTreasuryVault = await TreasuryVault.new(mockAddress, mockAddress, mockAddress, 0, startBlock, endBlock)
+  // const myRolemanager = await RoleManager.new()
+  const myStaking = await Staking.new(mockAddress, mockAddress, mockAddress, "0", "1", "0")
+  console.log(myStaking.address)
 
-  console.log(
-    'Token:', myToken.address,
-    '\nRoleManager:', myRolemanager.address,
-    '\nRewardsVault:', myRewardsVault.address,
-    '\nHoldersVault:', myHoldersVault.address,
-    '\nClientsVault:', myClientsVault.address,
-    '\nTreasuryVault:', myTreasuryVault.address
-  )
+  // console.log(
+  //   'Token:', myToken.address,
+  //   '\nRoleManager:', myRolemanager.address,
+  //   '\nRewardsVault:', myRewardsVault.address,
+  //   '\nHoldersVault:', myHoldersVault.address,
+  //   '\nClientsVault:', myClientsVault.address,
+  //   '\nTreasuryVault:', myTreasuryVault.address
+  // )
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.

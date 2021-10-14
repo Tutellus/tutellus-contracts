@@ -22,6 +22,7 @@
     "@openzeppelin/contracts": "^4.2.0",
     "@openzeppelin/contracts-upgradeable": "^4.2.0",
     "@truffle/hdwallet-provider": "^1.2.2",
+    "csv": "^5.5.3",
     "dotenv": "^8.2.0"
   },
   "devDependencies": {

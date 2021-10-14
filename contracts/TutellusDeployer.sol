@@ -40,7 +40,6 @@ contract TutellusDeployer {
         tokenInstance.mint(clientsVault, 90000000e18);
         tokenInstance.mint(treasuryVault, 29600000e18);
 
-        // TEST DATA
         // treasury = treasury_;
         // rolemanager = address(new TutellusRoleManager());
         // token = address(new TutellusERC20('Tutellus Token', 'TUT', 2e26, rolemanager));
@@ -60,10 +59,5 @@ contract TutellusDeployer {
         // tokenInstance.mint(rewardsVault, 64000000e18);
         // tokenInstance.mint(clientsVault, 90000000e18);
         // tokenInstance.mint(treasuryVault, 29600000e18);
-
-        // after deployment:
-        //      1. deploy staking and farming
-        //      2. add staking and farming to the rewardsVault
-        //      3. add holders to the holdersVault
     }
 }

@@ -1,40 +1,6 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/IDistributionVault.sol": {
-      "lastModificationDate": 1633022322739,
-      "contentHash": "4fbb0bd5053f69b32ac6c55b54b56619",
-      "sourceName": "contracts/interfaces/IDistributionVault.sol",
-      "solcConfig": {
-        "version": "0.8.2",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IDistributionVault"
-      ]
-    },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/IERC20.sol": {
       "lastModificationDate": 1632997912526,
       "contentHash": "0eac3e1a83ee62326ca007811285b274",
@@ -146,8 +112,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/interfaces/ITutellusRewardsVault.sol": {
-      "lastModificationDate": 1633940916253,
-      "contentHash": "4a6a1143aaea3d26bb846e8cce5c0c5c",
+      "lastModificationDate": 1634200901004,
+      "contentHash": "48ac15eef27fb0cd7682c91fc8bb2416",
       "sourceName": "contracts/interfaces/ITutellusRewardsVault.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -464,8 +430,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusRewardsVault.sol": {
-      "lastModificationDate": 1634063317141,
-      "contentHash": "735a456daa7964ecffa40699216d61be",
+      "lastModificationDate": 1634197258336,
+      "contentHash": "41dedf4e3dbbda4e9d14e5ea75ac6f19",
       "sourceName": "contracts/TutellusRewardsVault.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -501,8 +467,8 @@
       ]
     },
     "/Users/victormerino/GitHub/tutellus-contracts/contracts/TutellusDeployer.sol": {
-      "lastModificationDate": 1634156867584,
-      "contentHash": "96213f93cea7c8cadb93aea60aff7892",
+      "lastModificationDate": 1634197843735,
+      "contentHash": "396407054aeeb065d23945e0ca3220ea",
       "sourceName": "contracts/TutellusDeployer.sol",
       "solcConfig": {
         "version": "0.8.2",

@@ -6,7 +6,7 @@ require('@nomiclabs/hardhat-etherscan')
 require('@openzeppelin/hardhat-upgrades')
 require('hardhat-gas-reporter')
 const { random, template } = require('lodash')
-const GAS_PRICE_DEFAULT = 'auto'
+const GAS_PRICE_DEFAULT = 30000000000
 const GAS_MULTIPLIER_DEFAULT = 1
 const chains = require('./chains.json')
 const scanners = require('./scanners.json')
