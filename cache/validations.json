@@ -139,6 +139,347 @@
           "layoutVersion": "1.1"
         }
       },
+      "TutellusFarming": {
+        "src": "contracts/TutellusFarming.sol:8",
+        "version": {
+          "withMetadata": "0cbeb804e3a365d3d4effcdfa8676238c5f0a7d3b624ebc7e09e6f5c20d03ffe",
+          "withoutMetadata": "2d3eee525388894eda702f745f39ba193d7eed3b42e29fc3d10a64290c5e8b2d",
+          "linkedWithoutMetadata": "2d3eee525388894eda702f745f39ba193d7eed3b42e29fc3d10a64290c5e8b2d"
+        },
+        "inherit": [
+          "AccessControlProxyPausable",
+          "PausableUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "depositFrom(address,uint256)",
+          "withdraw(uint256)",
+          "claim()",
+          "toggleAutoreward()",
+          "pendingRewards(address)",
+          "(address,address,address)",
+          "getTokenGap()",
+          "syncBalance(address)",
+          "getUserBalance(address)",
+          "migrate(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusFarming",
+            "src": "contracts/TutellusFarming.sol:174"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusFarming",
+              "label": "token",
+              "type": "t_address",
+              "src": "contracts/TutellusFarming.sol:10"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "vault",
+              "type": "t_address",
+              "src": "contracts/TutellusFarming.sol:11"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "autoreward",
+              "type": "t_bool",
+              "src": "contracts/TutellusFarming.sol:13"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "balance",
+              "type": "t_uint256",
+              "src": "contracts/TutellusFarming.sol:15"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "accRewardsPerShare",
+              "type": "t_uint256",
+              "src": "contracts/TutellusFarming.sol:16"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "_released",
+              "type": "t_uint256",
+              "src": "contracts/TutellusFarming.sol:17"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "lastUpdate",
+              "type": "t_uint256",
+              "src": "contracts/TutellusFarming.sol:19"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "stakers",
+              "type": "t_uint256",
+              "src": "contracts/TutellusFarming.sol:20"
+            },
+            {
+              "contract": "TutellusFarming",
+              "label": "_userInfo",
+              "type": "t_mapping(t_address,t_struct(UserInfo)508_storage)",
+              "src": "contracts/TutellusFarming.sol:28"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_struct(UserInfo)508_storage)": {
+              "label": "mapping(address => struct TutellusFarming.UserInfo)"
+            },
+            "t_struct(UserInfo)508_storage": {
+              "label": "struct TutellusFarming.UserInfo",
+              "members": [
+                {
+                  "label": "amount",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "rewardDebt",
+                  "type": "t_uint256"
+                },
+                {
+                  "label": "notClaimed",
+                  "type": "t_uint256"
+                }
+              ]
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC20": {
+        "src": "contracts/interfaces/IERC20.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusRewardsVault": {
+        "src": "contracts/interfaces/ITutellusRewardsVault.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "add(address,uint256[])",
+          "updateAllocation(uint256[])",
+          "released()",
+          "availableId(address)",
+          "releasedRange(uint256,uint256)",
+          "releasedId(address)",
+          "distributeTokens(address,uint256)",
+          "info(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "AccessControlProxyPausable": {
+        "src": "contracts/utils/AccessControlProxyPausable.sol:8",
+        "inherit": [
+          "PausableUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "pause()",
+          "unpause()",
+          "updateManager(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlProxyPausable",
+              "label": "_manager",
+              "type": "t_address",
+              "src": "contracts/utils/AccessControlProxyPausable.sol:10"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "PausableUpgradeable": {
+        "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:17",
+        "inherit": [
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "paused()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:28"
+            },
+            {
+              "contract": "PausableUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:96"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
       "TutellusStaking": {
         "src": "contracts/TutellusStaking.sol:8",
         "version": {
