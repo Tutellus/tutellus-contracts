@@ -796,7 +796,7 @@
       ]
     },
     "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusDID.sol": {
-      "lastModificationDate": 1633939883845,
+      "lastModificationDate": 1635156878010,
       "contentHash": "58c82c620fdb17c725d4ce5c205d63ef",
       "sourceName": "contracts/TutellusDID.sol",
       "solcConfig": {
@@ -1014,8 +1014,8 @@
       ]
     },
     "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusDIDFactory.sol": {
-      "lastModificationDate": 1633675542121,
-      "contentHash": "1137333c7f8a8345fef92c8c2ffbc2c4",
+      "lastModificationDate": 1635228162051,
+      "contentHash": "654f01b65addf34ad848502be4d4c5ad",
       "sourceName": "contracts/TutellusDIDFactory.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -1042,6 +1042,10 @@
       "imports": [
         "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
         "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol",
+        "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol",
+        "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol",
+        "./interfaces/ITutellusController.sol",
+        "./interfaces/ITutellusRegistry.sol",
         "./TutellusDID.sol"
       ],
       "versionPragmas": [
@@ -1587,7 +1591,7 @@
       ]
     },
     "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusDIDStorage.sol": {
-      "lastModificationDate": 1633682630665,
+      "lastModificationDate": 1635141575665,
       "contentHash": "0fa39e997952f5a9397eb496a3d2e8eb",
       "sourceName": "contracts/TutellusDIDStorage.sol",
       "solcConfig": {
@@ -1623,8 +1627,8 @@
       ]
     },
     "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusController.sol": {
-      "lastModificationDate": 1633681429576,
-      "contentHash": "43fcc94e81c577bd7e8e64eed54f0b5c",
+      "lastModificationDate": 1635227972450,
+      "contentHash": "cd36ae49b87f8fc2c8caa668ede6d627",
       "sourceName": "contracts/TutellusController.sol",
       "solcConfig": {
         "version": "0.8.2",
@@ -1650,7 +1654,8 @@
       },
       "imports": [
         "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
-        "./TutellusDIDFactory.sol"
+        "./TutellusDIDFactory.sol",
+        "./TutellusDIDRegistry.sol"
       ],
       "versionPragmas": [
         "^0.8.2"
@@ -1762,6 +1767,252 @@
       ],
       "artifacts": [
         "ITutellusDID"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\TutellusDIDRegistry.sol": {
+      "lastModificationDate": 1635155370462,
+      "contentHash": "621f431f9e39fc9bb90239e18cacee2d",
+      "sourceName": "contracts/TutellusDIDRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/ITutellusController.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TutellusDIDRegistry"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\interfaces\\ITutellusController.sol": {
+      "lastModificationDate": 1635155267922,
+      "contentHash": "d562c9dde7c6e2021a4e39e2b689bd58",
+      "sourceName": "contracts/interfaces/ITutellusController.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "ITutellusController"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\contracts\\interfaces\\ITutellusRegistry.sol": {
+      "lastModificationDate": 1635155234697,
+      "contentHash": "cc2ade0f98e96cfdde7b6ebc65c926d4",
+      "sourceName": "contracts/interfaces/ITutellusRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.2"
+      ],
+      "artifacts": [
+        "ITutellusRegistry"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\SignatureChecker.sol": {
+      "lastModificationDate": 1633353971651,
+      "contentHash": "a91a1246db664b760a34faa8b589be54",
+      "sourceName": "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ECDSA.sol",
+        "../Address.sol",
+        "../../interfaces/IERC1271.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SignatureChecker"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol": {
+      "lastModificationDate": 1633353922325,
+      "contentHash": "549712dc273f006b866af22f6fb3cadc",
+      "sourceName": "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ECDSA.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "EIP712"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\cryptography\\ECDSA.sol": {
+      "lastModificationDate": 1633353924438,
+      "contentHash": "197dbfaf7146845fa76331a4c9980e9f",
+      "sourceName": "@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ECDSA"
+      ]
+    },
+    "C:\\Users\\Guillermo\\Documents\\_tutellus\\repos\\tutellus-contracts\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC1271.sol": {
+      "lastModificationDate": 1633353951205,
+      "contentHash": "69389258a66f5201f087767c44d8df74",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC1271.sol",
+      "solcConfig": {
+        "version": "0.8.2",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC1271"
       ]
     }
   }

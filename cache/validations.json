@@ -309,6 +309,5938 @@
           "layoutVersion": "1.1"
         }
       },
+      "IERC1271": {
+        "src": "@openzeppelin\\contracts\\interfaces\\IERC1271.sol:11",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isValidSignature(bytes32,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC1967Upgrade": {
+        "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
+        "inherit": [],
+        "libraries": [
+          "StorageSlot",
+          "Address"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Proxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\Proxy.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "BeaconProxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:17",
+        "version": {
+          "withMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "withoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "linkedWithoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6"
+        },
+        "inherit": [
+          "ERC1967Upgrade",
+          "Proxy"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "BeaconProxy",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:29"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "implementation()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "UpgradeableBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:15",
+        "version": {
+          "withMetadata": "8ab53657270e74f0e78e9bea7ef2f4cd142b34de4e05d40a9a8916269e934444",
+          "withoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2",
+          "linkedWithoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2"
+        },
+        "inherit": [
+          "Ownable",
+          "Context",
+          "IBeacon"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(address)",
+          "implementation()",
+          "upgradeTo(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "UpgradeableBeacon",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "UpgradeableBeacon",
+              "label": "_implementation",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:16"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "@openzeppelin\\contracts\\utils\\Address.sol:8",
+        "version": {
+          "withMetadata": "26611e32a15a00144207b601573c8db0b03bac6851e9edb16d9974217ed40294",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "delegatecall",
+            "src": "@openzeppelin\\contracts\\utils\\Address.sol:185"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "StorageSlot": {
+        "src": "@openzeppelin\\contracts\\utils\\StorageSlot.sol:31",
+        "version": {
+          "withMetadata": "67043ca199238b571fe41b2afcdfc1902b6e0170b97676a37de1d89b17b45f48",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ECDSA": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\ECDSA.sol:11",
+        "version": {
+          "withMetadata": "da88de8eaa6820bdb8d3ec8f2b6d231abecaa08a585f2ce6e8f2cebce3a4eb43",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignatureChecker": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\SignatureChecker.sol:19",
+        "version": {
+          "withMetadata": "61cbf68f1934eab715f31ae3b33bf455366c6b6bc1a350ee7605f51ac158e12f",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "EIP712": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:26",
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "EIP712",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:51"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_DOMAIN_SEPARATOR",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:30"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_CHAIN_ID",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:31"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_NAME",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:33"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_VERSION",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:34"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_TYPE_HASH",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:35"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusController": {
+        "src": "contracts\\TutellusController.sol:8",
+        "version": {
+          "withMetadata": "9ff895bd8a7a3885d90f9e3b7396a5afa3c50eaf667b229e02d098a56d3975cd",
+          "withoutMetadata": "1ed8b55cce629b12b961a9d4996825437d292c4cb2ddc5bec3f0583ec34b7f52",
+          "linkedWithoutMetadata": "1ed8b55cce629b12b961a9d4996825437d292c4cb2ddc5bec3f0583ec34b7f52"
+        },
+        "inherit": [
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "getAddress(bytes32)",
+          "isVerified(address)",
+          "setAddress(bytes32,address)",
+          "lockId(bytes32)",
+          "setVerification(address,bool)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusController",
+            "src": "contracts\\TutellusController.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusController",
+              "label": "_addresses",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusController.sol:11"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_lockedIds",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "contracts\\TutellusController.sol:12"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_verified",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\TutellusController.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDID": {
+        "src": "contracts\\TutellusDID.sol:10",
+        "version": {
+          "withMetadata": "5cf2232d370ac5a36ec9049bf9350b73a2412d88250731520e1fbd52ba7b603d",
+          "withoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408",
+          "linkedWithoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408"
+        },
+        "inherit": [
+          "TutellusDIDStorage",
+          "ITutellusDID",
+          "ERC721HolderUpgradeable",
+          "IERC721ReceiverUpgradeable",
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "version()",
+          "()",
+          "()",
+          "forward(address,bytes,uint256,uint256)",
+          "forwardBatch(address[],bytes[],uint256[],uint256[])",
+          "verificationCheck(address)",
+          "initialize(address,address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDFactory": {
+        "src": "contracts\\TutellusDIDFactory.sol:12",
+        "version": {
+          "withMetadata": "0228429611e7f2d776e3077a02600e7e3adc6600a915d4c0103168ebb736a652",
+          "withoutMetadata": "43b65b8fa14552e62f54b53a0165c3eae103ff90f293898451ad625a673bd2b0",
+          "linkedWithoutMetadata": "43b65b8fa14552e62f54b53a0165c3eae103ff90f293898451ad625a673bd2b0"
+        },
+        "inherit": [
+          "EIP712"
+        ],
+        "libraries": [
+          "SignatureChecker"
+        ],
+        "methods": [
+          "(address)",
+          "createProxy(bytes)",
+          "createProxy(bytes,uint256,bytes)",
+          "DOMAIN_SEPARATOR()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDFactory",
+            "src": "contracts\\TutellusDIDFactory.sol:24"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "_DID_FACTORY_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:19"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_DID_FACTORY_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "beacon",
+              "type": "t_address",
+              "src": "contracts\\TutellusDIDFactory.sol:13"
+            },
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "_controller",
+              "type": "t_contract(ITutellusController)3443",
+              "src": "contracts\\TutellusDIDFactory.sol:14"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            },
+            "t_contract(ITutellusController)3443": {
+              "label": "contract ITutellusController"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDRegistry": {
+        "src": "contracts\\TutellusDIDRegistry.sol:6",
+        "version": {
+          "withMetadata": "98a7d5a0f9a4151028268aba07d805a41c703431d16d56405c5a704d407a783f",
+          "withoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815",
+          "linkedWithoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "register(bytes32,address)",
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDRegistry",
+            "src": "contracts\\TutellusDIDRegistry.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "_controller",
+              "type": "t_contract(ITutellusController)3443",
+              "src": "contracts\\TutellusDIDRegistry.sol:9"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "didByHash",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusDIDRegistry.sol:11"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "hashByDid",
+              "type": "t_mapping(t_address,t_bytes32)",
+              "src": "contracts\\TutellusDIDRegistry.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(ITutellusController)3443": {
+              "label": "contract ITutellusController"
+            },
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_bytes32)": {
+              "label": "mapping(address => bytes32)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDStorage": {
+        "src": "contracts\\TutellusDIDStorage.sol:6",
+        "version": {
+          "withMetadata": "59da96ceabcad0b8108c10ec94ca477369933a24c8ab5db6b2b805ac77aaafe5",
+          "withoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80",
+          "linkedWithoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "controller",
+              "type": "t_contract(TutellusController)2692",
+              "src": "contracts\\TutellusDIDStorage.sol:10"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "onlyVerifiedCalls",
+              "type": "t_bool",
+              "src": "contracts\\TutellusDIDStorage.sol:11"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "contracts\\TutellusDIDStorage.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2692": {
+              "label": "contract TutellusController"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusController": {
+        "src": "contracts\\interfaces\\ITutellusController.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getAddress(bytes32)",
+          "isVerified(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusDID": {
+        "src": "contracts\\interfaces\\ITutellusDID.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusRegistry": {
+        "src": "contracts\\interfaces\\ITutellusRegistry.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)",
+          "register(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "AccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:49",
+        "inherit": [
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:63"
+            },
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:219"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+              "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_struct(RoleData)43_storage": {
+              "label": "struct AccessControlUpgradeable.RoleData",
+              "members": [
+                {
+                  "label": "members",
+                  "type": "t_mapping(t_address,t_bool)"
+                },
+                {
+                  "label": "adminRole",
+                  "type": "t_bytes32"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721ReceiverUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\IERC721ReceiverUpgradeable.sol:10",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC721HolderUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:14",
+        "version": {
+          "withMetadata": "3e85aedda96284914debddc43e00dd711abd94f8ffb88628ec692eacad1effe3",
+          "withoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf",
+          "linkedWithoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf"
+        },
+        "inherit": [
+          "IERC721ReceiverUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721HolderUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:34"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:22",
+        "inherit": [
+          "IERC165Upgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC165Upgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:19",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC1271": {
+        "src": "@openzeppelin\\contracts\\interfaces\\IERC1271.sol:11",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isValidSignature(bytes32,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC1967Upgrade": {
+        "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
+        "inherit": [],
+        "libraries": [
+          "StorageSlot",
+          "Address"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Proxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\Proxy.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "BeaconProxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:17",
+        "version": {
+          "withMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "withoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "linkedWithoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6"
+        },
+        "inherit": [
+          "ERC1967Upgrade",
+          "Proxy"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "BeaconProxy",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:29"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "implementation()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "UpgradeableBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:15",
+        "version": {
+          "withMetadata": "8ab53657270e74f0e78e9bea7ef2f4cd142b34de4e05d40a9a8916269e934444",
+          "withoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2",
+          "linkedWithoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2"
+        },
+        "inherit": [
+          "Ownable",
+          "Context",
+          "IBeacon"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(address)",
+          "implementation()",
+          "upgradeTo(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "UpgradeableBeacon",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "UpgradeableBeacon",
+              "label": "_implementation",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:16"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "@openzeppelin\\contracts\\utils\\Address.sol:8",
+        "version": {
+          "withMetadata": "26611e32a15a00144207b601573c8db0b03bac6851e9edb16d9974217ed40294",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "delegatecall",
+            "src": "@openzeppelin\\contracts\\utils\\Address.sol:185"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "StorageSlot": {
+        "src": "@openzeppelin\\contracts\\utils\\StorageSlot.sol:31",
+        "version": {
+          "withMetadata": "67043ca199238b571fe41b2afcdfc1902b6e0170b97676a37de1d89b17b45f48",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ECDSA": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\ECDSA.sol:11",
+        "version": {
+          "withMetadata": "da88de8eaa6820bdb8d3ec8f2b6d231abecaa08a585f2ce6e8f2cebce3a4eb43",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignatureChecker": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\SignatureChecker.sol:19",
+        "version": {
+          "withMetadata": "61cbf68f1934eab715f31ae3b33bf455366c6b6bc1a350ee7605f51ac158e12f",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "EIP712": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:26",
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "EIP712",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:51"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_DOMAIN_SEPARATOR",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:30"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_CHAIN_ID",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:31"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_NAME",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:33"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_VERSION",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:34"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_TYPE_HASH",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:35"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusController": {
+        "src": "contracts\\TutellusController.sol:8",
+        "version": {
+          "withMetadata": "07182c179733697b5f5aa7da0c3a6380928b0201b40dd3d4b77bab59e9fc1d1f",
+          "withoutMetadata": "63be93767db8d70d1ebd13b61df7588b3ee6400472a404ce08becd57d25ab0d4",
+          "linkedWithoutMetadata": "63be93767db8d70d1ebd13b61df7588b3ee6400472a404ce08becd57d25ab0d4"
+        },
+        "inherit": [
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "getAddress(bytes32)",
+          "isVerified(address)",
+          "setAddress(bytes32,address)",
+          "lockId(bytes32)",
+          "setVerification(address,bool)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusController",
+            "src": "contracts\\TutellusController.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusController",
+              "label": "_addresses",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusController.sol:11"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_lockedIds",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "contracts\\TutellusController.sol:12"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_verified",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\TutellusController.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDID": {
+        "src": "contracts\\TutellusDID.sol:10",
+        "version": {
+          "withMetadata": "8d7b9c09b7b414ee168fd52370f3be7055130830851d4d42627c45b819c768f7",
+          "withoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408",
+          "linkedWithoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408"
+        },
+        "inherit": [
+          "TutellusDIDStorage",
+          "ITutellusDID",
+          "ERC721HolderUpgradeable",
+          "IERC721ReceiverUpgradeable",
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "version()",
+          "()",
+          "()",
+          "forward(address,bytes,uint256,uint256)",
+          "forwardBatch(address[],bytes[],uint256[],uint256[])",
+          "verificationCheck(address)",
+          "initialize(address,address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDFactory": {
+        "src": "contracts\\TutellusDIDFactory.sol:10",
+        "version": {
+          "withMetadata": "af554f8af50ca6f7547432e2ae6029897b307e3a016de2c1096a706601094c8f",
+          "withoutMetadata": "41d77bd173ae56fb494b568dc605b6d27e71e9c4fb6ae1ab0ab975a6b984d109",
+          "linkedWithoutMetadata": "41d77bd173ae56fb494b568dc605b6d27e71e9c4fb6ae1ab0ab975a6b984d109"
+        },
+        "inherit": [
+          "EIP712"
+        ],
+        "libraries": [
+          "SignatureChecker"
+        ],
+        "methods": [
+          "()",
+          "createProxy(bytes)",
+          "createProxy(bytes,uint256,bytes)",
+          "DOMAIN_SEPARATOR()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDFactory",
+            "src": "contracts\\TutellusDIDFactory.sol:19"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "_DID_FACTORY_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:14"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_DID_FACTORY_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:14"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "beacon",
+              "type": "t_address",
+              "src": "contracts\\TutellusDIDFactory.sol:11"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDRegistry": {
+        "src": "contracts\\TutellusDIDRegistry.sol:6",
+        "version": {
+          "withMetadata": "98a7d5a0f9a4151028268aba07d805a41c703431d16d56405c5a704d407a783f",
+          "withoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815",
+          "linkedWithoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "register(bytes32,address)",
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDRegistry",
+            "src": "contracts\\TutellusDIDRegistry.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "_controller",
+              "type": "t_contract(ITutellusController)3396",
+              "src": "contracts\\TutellusDIDRegistry.sol:9"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "didByHash",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusDIDRegistry.sol:11"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "hashByDid",
+              "type": "t_mapping(t_address,t_bytes32)",
+              "src": "contracts\\TutellusDIDRegistry.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(ITutellusController)3396": {
+              "label": "contract ITutellusController"
+            },
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_bytes32)": {
+              "label": "mapping(address => bytes32)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDStorage": {
+        "src": "contracts\\TutellusDIDStorage.sol:6",
+        "version": {
+          "withMetadata": "7f92ef357b3cf7645b1b6e5ad38ac739a5b97302dbcf84d588122f2c60ff8b7f",
+          "withoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80",
+          "linkedWithoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "controller",
+              "type": "t_contract(TutellusController)2688",
+              "src": "contracts\\TutellusDIDStorage.sol:10"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "onlyVerifiedCalls",
+              "type": "t_bool",
+              "src": "contracts\\TutellusDIDStorage.sol:11"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "contracts\\TutellusDIDStorage.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2688": {
+              "label": "contract TutellusController"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusController": {
+        "src": "contracts\\interfaces\\ITutellusController.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getAddress(bytes32)",
+          "isVerified(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusDID": {
+        "src": "contracts\\interfaces\\ITutellusDID.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "AccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:49",
+        "inherit": [
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:63"
+            },
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:219"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+              "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_struct(RoleData)43_storage": {
+              "label": "struct AccessControlUpgradeable.RoleData",
+              "members": [
+                {
+                  "label": "members",
+                  "type": "t_mapping(t_address,t_bool)"
+                },
+                {
+                  "label": "adminRole",
+                  "type": "t_bytes32"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721ReceiverUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\IERC721ReceiverUpgradeable.sol:10",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC721HolderUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:14",
+        "version": {
+          "withMetadata": "3e85aedda96284914debddc43e00dd711abd94f8ffb88628ec692eacad1effe3",
+          "withoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf",
+          "linkedWithoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf"
+        },
+        "inherit": [
+          "IERC721ReceiverUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721HolderUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:34"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:22",
+        "inherit": [
+          "IERC165Upgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC165Upgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:19",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC1271": {
+        "src": "@openzeppelin\\contracts\\interfaces\\IERC1271.sol:11",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isValidSignature(bytes32,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC1967Upgrade": {
+        "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
+        "inherit": [],
+        "libraries": [
+          "StorageSlot",
+          "Address"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Proxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\Proxy.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "BeaconProxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:17",
+        "version": {
+          "withMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "withoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "linkedWithoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6"
+        },
+        "inherit": [
+          "ERC1967Upgrade",
+          "Proxy"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "BeaconProxy",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:29"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "implementation()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "UpgradeableBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:15",
+        "version": {
+          "withMetadata": "8ab53657270e74f0e78e9bea7ef2f4cd142b34de4e05d40a9a8916269e934444",
+          "withoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2",
+          "linkedWithoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2"
+        },
+        "inherit": [
+          "Ownable",
+          "Context",
+          "IBeacon"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(address)",
+          "implementation()",
+          "upgradeTo(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "UpgradeableBeacon",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "UpgradeableBeacon",
+              "label": "_implementation",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:16"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "@openzeppelin\\contracts\\utils\\Address.sol:8",
+        "version": {
+          "withMetadata": "26611e32a15a00144207b601573c8db0b03bac6851e9edb16d9974217ed40294",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "delegatecall",
+            "src": "@openzeppelin\\contracts\\utils\\Address.sol:185"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "StorageSlot": {
+        "src": "@openzeppelin\\contracts\\utils\\StorageSlot.sol:31",
+        "version": {
+          "withMetadata": "67043ca199238b571fe41b2afcdfc1902b6e0170b97676a37de1d89b17b45f48",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ECDSA": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\ECDSA.sol:11",
+        "version": {
+          "withMetadata": "da88de8eaa6820bdb8d3ec8f2b6d231abecaa08a585f2ce6e8f2cebce3a4eb43",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignatureChecker": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\SignatureChecker.sol:19",
+        "version": {
+          "withMetadata": "61cbf68f1934eab715f31ae3b33bf455366c6b6bc1a350ee7605f51ac158e12f",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "EIP712": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:26",
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "EIP712",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:51"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_DOMAIN_SEPARATOR",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:30"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_CHAIN_ID",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:31"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_NAME",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:33"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_VERSION",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:34"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_TYPE_HASH",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:35"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusController": {
+        "src": "contracts\\TutellusController.sol:8",
+        "version": {
+          "withMetadata": "84763986267375bdd1cc6d35cd0a145e101b86906e88a718726362b029785d1b",
+          "withoutMetadata": "b04ad8ff8c569b244e051f79804d1ea3ba71fce4b33b78725ae9cf07659c2ea7",
+          "linkedWithoutMetadata": "b04ad8ff8c569b244e051f79804d1ea3ba71fce4b33b78725ae9cf07659c2ea7"
+        },
+        "inherit": [
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "getAddress(bytes32)",
+          "isVerified(address)",
+          "setAddress(bytes32,address)",
+          "lockId(bytes32)",
+          "setVerification(address,bool)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusController",
+            "src": "contracts\\TutellusController.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusController",
+              "label": "_addresses",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusController.sol:11"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_lockedIds",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "contracts\\TutellusController.sol:12"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_verified",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\TutellusController.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDID": {
+        "src": "contracts\\TutellusDID.sol:10",
+        "version": {
+          "withMetadata": "199d35e20c9063693964c202c05630a922f01c6858840c395f551a2b29be2753",
+          "withoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408",
+          "linkedWithoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408"
+        },
+        "inherit": [
+          "TutellusDIDStorage",
+          "ITutellusDID",
+          "ERC721HolderUpgradeable",
+          "IERC721ReceiverUpgradeable",
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "version()",
+          "()",
+          "()",
+          "forward(address,bytes,uint256,uint256)",
+          "forwardBatch(address[],bytes[],uint256[],uint256[])",
+          "verificationCheck(address)",
+          "initialize(address,address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDFactory": {
+        "src": "contracts\\TutellusDIDFactory.sol:10",
+        "version": {
+          "withMetadata": "d54206dc1083ab146d9b6d7332ccfb005a36f5d6959351eb6a9e95bca770a489",
+          "withoutMetadata": "0f0da382e822a5d1b7f6a54ba64d4ed64539511ad6aacbcb0d0c30e6871b52cb",
+          "linkedWithoutMetadata": "0f0da382e822a5d1b7f6a54ba64d4ed64539511ad6aacbcb0d0c30e6871b52cb"
+        },
+        "inherit": [
+          "EIP712"
+        ],
+        "libraries": [
+          "SignatureChecker"
+        ],
+        "methods": [
+          "()",
+          "createProxy(bytes)",
+          "createProxy(bytes,uint256,bytes)",
+          "DOMAIN_SEPARATOR()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDFactory",
+            "src": "contracts\\TutellusDIDFactory.sol:19"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "_PERMIT_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:14"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_PERMIT_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:14"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "beacon",
+              "type": "t_address",
+              "src": "contracts\\TutellusDIDFactory.sol:11"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDRegistry": {
+        "src": "contracts\\TutellusDIDRegistry.sol:6",
+        "version": {
+          "withMetadata": "98a7d5a0f9a4151028268aba07d805a41c703431d16d56405c5a704d407a783f",
+          "withoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815",
+          "linkedWithoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "register(bytes32,address)",
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDRegistry",
+            "src": "contracts\\TutellusDIDRegistry.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "_controller",
+              "type": "t_contract(ITutellusController)3396",
+              "src": "contracts\\TutellusDIDRegistry.sol:9"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "didByHash",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusDIDRegistry.sol:11"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "hashByDid",
+              "type": "t_mapping(t_address,t_bytes32)",
+              "src": "contracts\\TutellusDIDRegistry.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(ITutellusController)3396": {
+              "label": "contract ITutellusController"
+            },
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_bytes32)": {
+              "label": "mapping(address => bytes32)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDStorage": {
+        "src": "contracts\\TutellusDIDStorage.sol:6",
+        "version": {
+          "withMetadata": "1d7e358511afee4e47454b109720decc4faa5f0a736b8f3339f379ff4ff7d1ff",
+          "withoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80",
+          "linkedWithoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "controller",
+              "type": "t_contract(TutellusController)2688",
+              "src": "contracts\\TutellusDIDStorage.sol:10"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "onlyVerifiedCalls",
+              "type": "t_bool",
+              "src": "contracts\\TutellusDIDStorage.sol:11"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "contracts\\TutellusDIDStorage.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2688": {
+              "label": "contract TutellusController"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusController": {
+        "src": "contracts\\interfaces\\ITutellusController.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getAddress(bytes32)",
+          "isVerified(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusDID": {
+        "src": "contracts\\interfaces\\ITutellusDID.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "AccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:49",
+        "inherit": [
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:63"
+            },
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:219"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+              "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_struct(RoleData)43_storage": {
+              "label": "struct AccessControlUpgradeable.RoleData",
+              "members": [
+                {
+                  "label": "members",
+                  "type": "t_mapping(t_address,t_bool)"
+                },
+                {
+                  "label": "adminRole",
+                  "type": "t_bytes32"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721ReceiverUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\IERC721ReceiverUpgradeable.sol:10",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC721HolderUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:14",
+        "version": {
+          "withMetadata": "3e85aedda96284914debddc43e00dd711abd94f8ffb88628ec692eacad1effe3",
+          "withoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf",
+          "linkedWithoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf"
+        },
+        "inherit": [
+          "IERC721ReceiverUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721HolderUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:34"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:22",
+        "inherit": [
+          "IERC165Upgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC165Upgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:19",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC1271": {
+        "src": "@openzeppelin\\contracts\\interfaces\\IERC1271.sol:11",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isValidSignature(bytes32,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC1967Upgrade": {
+        "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
+        "inherit": [],
+        "libraries": [
+          "StorageSlot",
+          "Address"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Proxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\Proxy.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "BeaconProxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:17",
+        "version": {
+          "withMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "withoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "linkedWithoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6"
+        },
+        "inherit": [
+          "ERC1967Upgrade",
+          "Proxy"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "BeaconProxy",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:29"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "implementation()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "UpgradeableBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:15",
+        "version": {
+          "withMetadata": "8ab53657270e74f0e78e9bea7ef2f4cd142b34de4e05d40a9a8916269e934444",
+          "withoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2",
+          "linkedWithoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2"
+        },
+        "inherit": [
+          "Ownable",
+          "Context",
+          "IBeacon"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(address)",
+          "implementation()",
+          "upgradeTo(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "UpgradeableBeacon",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "UpgradeableBeacon",
+              "label": "_implementation",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:16"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "@openzeppelin\\contracts\\utils\\Address.sol:8",
+        "version": {
+          "withMetadata": "26611e32a15a00144207b601573c8db0b03bac6851e9edb16d9974217ed40294",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "delegatecall",
+            "src": "@openzeppelin\\contracts\\utils\\Address.sol:185"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "StorageSlot": {
+        "src": "@openzeppelin\\contracts\\utils\\StorageSlot.sol:31",
+        "version": {
+          "withMetadata": "67043ca199238b571fe41b2afcdfc1902b6e0170b97676a37de1d89b17b45f48",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ECDSA": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\ECDSA.sol:11",
+        "version": {
+          "withMetadata": "da88de8eaa6820bdb8d3ec8f2b6d231abecaa08a585f2ce6e8f2cebce3a4eb43",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignatureChecker": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\SignatureChecker.sol:19",
+        "version": {
+          "withMetadata": "61cbf68f1934eab715f31ae3b33bf455366c6b6bc1a350ee7605f51ac158e12f",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "EIP712": {
+        "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:26",
+        "inherit": [],
+        "libraries": [
+          "ECDSA"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "EIP712",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:51"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_DOMAIN_SEPARATOR",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:30"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_CACHED_CHAIN_ID",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:31"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_NAME",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:33"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_HASHED_VERSION",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:34"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_TYPE_HASH",
+            "src": "@openzeppelin\\contracts\\utils\\cryptography\\draft-EIP712.sol:35"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusController": {
+        "src": "contracts\\TutellusController.sol:8",
+        "version": {
+          "withMetadata": "30ecdd709275b419baf7287298dd5ec4330e295c49af2ef77ef1e6fe597188ad",
+          "withoutMetadata": "c62cd8721b31f08926ec35961331e69a3362d3880a5bc1de26ad02a09517f437",
+          "linkedWithoutMetadata": "c62cd8721b31f08926ec35961331e69a3362d3880a5bc1de26ad02a09517f437"
+        },
+        "inherit": [
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "getAddress(bytes32)",
+          "isVerified(address)",
+          "setAddress(bytes32,address)",
+          "lockId(bytes32)",
+          "setVerification(address,bool)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusController",
+            "src": "contracts\\TutellusController.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusController",
+              "label": "_addresses",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusController.sol:11"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_lockedIds",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "contracts\\TutellusController.sol:12"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_verified",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\TutellusController.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDID": {
+        "src": "contracts\\TutellusDID.sol:10",
+        "version": {
+          "withMetadata": "d86b1baf0b8d1c564d89c214b4ca108744214fddf17d2b607bf582bace837608",
+          "withoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408",
+          "linkedWithoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408"
+        },
+        "inherit": [
+          "TutellusDIDStorage",
+          "ITutellusDID",
+          "ERC721HolderUpgradeable",
+          "IERC721ReceiverUpgradeable",
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "version()",
+          "()",
+          "()",
+          "forward(address,bytes,uint256,uint256)",
+          "forwardBatch(address[],bytes[],uint256[],uint256[])",
+          "verificationCheck(address)",
+          "initialize(address,address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDFactory": {
+        "src": "contracts\\TutellusDIDFactory.sol:10",
+        "version": {
+          "withMetadata": "700d85aab3322a4ba18ae43d8df2f755f9287a1c16a38714580d2d2956cffeba",
+          "withoutMetadata": "9162aa1b36af1e077802ed588a2280510be0b2c2d7dae86c46cd30d83e931607",
+          "linkedWithoutMetadata": "9162aa1b36af1e077802ed588a2280510be0b2c2d7dae86c46cd30d83e931607"
+        },
+        "inherit": [
+          "EIP712"
+        ],
+        "libraries": [
+          "SignatureChecker"
+        ],
+        "methods": [
+          "()",
+          "createProxy(bytes)",
+          "createProxy(bytes,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDFactory",
+            "src": "contracts\\TutellusDIDFactory.sol:19"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "_PERMIT_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:14"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_PERMIT_TYPEHASH",
+            "src": "contracts\\TutellusDIDFactory.sol:14"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "beacon",
+              "type": "t_address",
+              "src": "contracts\\TutellusDIDFactory.sol:11"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDRegistry": {
+        "src": "contracts\\TutellusDIDRegistry.sol:6",
+        "version": {
+          "withMetadata": "98a7d5a0f9a4151028268aba07d805a41c703431d16d56405c5a704d407a783f",
+          "withoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815",
+          "linkedWithoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "register(bytes32,address)",
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDRegistry",
+            "src": "contracts\\TutellusDIDRegistry.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "_controller",
+              "type": "t_contract(ITutellusController)3387",
+              "src": "contracts\\TutellusDIDRegistry.sol:9"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "didByHash",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusDIDRegistry.sol:11"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "hashByDid",
+              "type": "t_mapping(t_address,t_bytes32)",
+              "src": "contracts\\TutellusDIDRegistry.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(ITutellusController)3387": {
+              "label": "contract ITutellusController"
+            },
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_bytes32)": {
+              "label": "mapping(address => bytes32)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDStorage": {
+        "src": "contracts\\TutellusDIDStorage.sol:6",
+        "version": {
+          "withMetadata": "422aad511b6ebcef36dd6e832017030bde78f8de8084914d022bbfd564afa4f7",
+          "withoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80",
+          "linkedWithoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "controller",
+              "type": "t_contract(TutellusController)2688",
+              "src": "contracts\\TutellusDIDStorage.sol:10"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "onlyVerifiedCalls",
+              "type": "t_bool",
+              "src": "contracts\\TutellusDIDStorage.sol:11"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "contracts\\TutellusDIDStorage.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2688": {
+              "label": "contract TutellusController"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusController": {
+        "src": "contracts\\interfaces\\ITutellusController.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getAddress(bytes32)",
+          "isVerified(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusDID": {
+        "src": "contracts\\interfaces\\ITutellusDID.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "AccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:49",
+        "inherit": [
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:63"
+            },
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:219"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+              "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_struct(RoleData)43_storage": {
+              "label": "struct AccessControlUpgradeable.RoleData",
+              "members": [
+                {
+                  "label": "members",
+                  "type": "t_mapping(t_address,t_bool)"
+                },
+                {
+                  "label": "adminRole",
+                  "type": "t_bytes32"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721ReceiverUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\IERC721ReceiverUpgradeable.sol:10",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC721HolderUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:14",
+        "version": {
+          "withMetadata": "3e85aedda96284914debddc43e00dd711abd94f8ffb88628ec692eacad1effe3",
+          "withoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf",
+          "linkedWithoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf"
+        },
+        "inherit": [
+          "IERC721ReceiverUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721HolderUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:34"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:22",
+        "inherit": [
+          "IERC165Upgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC165Upgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:19",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC1967Upgrade": {
+        "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
+        "inherit": [],
+        "libraries": [
+          "StorageSlot",
+          "Address"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Proxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\Proxy.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "BeaconProxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:17",
+        "version": {
+          "withMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "withoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "linkedWithoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6"
+        },
+        "inherit": [
+          "ERC1967Upgrade",
+          "Proxy"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "BeaconProxy",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:29"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "implementation()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "UpgradeableBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:15",
+        "version": {
+          "withMetadata": "8ab53657270e74f0e78e9bea7ef2f4cd142b34de4e05d40a9a8916269e934444",
+          "withoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2",
+          "linkedWithoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2"
+        },
+        "inherit": [
+          "Ownable",
+          "Context",
+          "IBeacon"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(address)",
+          "implementation()",
+          "upgradeTo(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "UpgradeableBeacon",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "UpgradeableBeacon",
+              "label": "_implementation",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:16"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "@openzeppelin\\contracts\\utils\\Address.sol:8",
+        "version": {
+          "withMetadata": "26611e32a15a00144207b601573c8db0b03bac6851e9edb16d9974217ed40294",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "delegatecall",
+            "src": "@openzeppelin\\contracts\\utils\\Address.sol:185"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "StorageSlot": {
+        "src": "@openzeppelin\\contracts\\utils\\StorageSlot.sol:31",
+        "version": {
+          "withMetadata": "67043ca199238b571fe41b2afcdfc1902b6e0170b97676a37de1d89b17b45f48",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusController": {
+        "src": "contracts\\TutellusController.sol:8",
+        "version": {
+          "withMetadata": "37e6cc197bc02f1bec10685b0d1b8dc1eb7ef27bd6a0661ea2a44af43ebb9a26",
+          "withoutMetadata": "30a38370fc6d4ac0ecef6449024831919ed300442ac1734db35e3e3b1efd4fe0",
+          "linkedWithoutMetadata": "30a38370fc6d4ac0ecef6449024831919ed300442ac1734db35e3e3b1efd4fe0"
+        },
+        "inherit": [
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "getAddress(bytes32)",
+          "isVerified(address)",
+          "setAddress(bytes32,address)",
+          "lockId(bytes32)",
+          "setVerification(address,bool)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusController",
+            "src": "contracts\\TutellusController.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusController",
+              "label": "_addresses",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusController.sol:11"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_lockedIds",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "contracts\\TutellusController.sol:12"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_verified",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\TutellusController.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDID": {
+        "src": "contracts\\TutellusDID.sol:10",
+        "version": {
+          "withMetadata": "a326d97b73d4f710ab0515a6a52beb102be6801fcc6f1826edefe2a1f72aa3c5",
+          "withoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408",
+          "linkedWithoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408"
+        },
+        "inherit": [
+          "TutellusDIDStorage",
+          "ITutellusDID",
+          "ERC721HolderUpgradeable",
+          "IERC721ReceiverUpgradeable",
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "version()",
+          "()",
+          "()",
+          "forward(address,bytes,uint256,uint256)",
+          "forwardBatch(address[],bytes[],uint256[],uint256[])",
+          "verificationCheck(address)",
+          "initialize(address,address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDFactory": {
+        "src": "contracts\\TutellusDIDFactory.sol:8",
+        "version": {
+          "withMetadata": "4a8e1ef1c1dda942a430bbd15c127fc23f651fbd70a0bbfe2bc8664a25f74a6f",
+          "withoutMetadata": "36b6ea915629f11c27b4a8caf73d5d133ecbf3b9ffae1f10671b23d9086d2842",
+          "linkedWithoutMetadata": "36b6ea915629f11c27b4a8caf73d5d133ecbf3b9ffae1f10671b23d9086d2842"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "createProxy(bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDFactory",
+            "src": "contracts\\TutellusDIDFactory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "beacon",
+              "type": "t_address",
+              "src": "contracts\\TutellusDIDFactory.sol:9"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDRegistry": {
+        "src": "contracts\\TutellusDIDRegistry.sol:6",
+        "version": {
+          "withMetadata": "98a7d5a0f9a4151028268aba07d805a41c703431d16d56405c5a704d407a783f",
+          "withoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815",
+          "linkedWithoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "register(bytes32,address)",
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDRegistry",
+            "src": "contracts\\TutellusDIDRegistry.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "_controller",
+              "type": "t_contract(ITutellusController)2696",
+              "src": "contracts\\TutellusDIDRegistry.sol:9"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "didByHash",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusDIDRegistry.sol:11"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "hashByDid",
+              "type": "t_mapping(t_address,t_bytes32)",
+              "src": "contracts\\TutellusDIDRegistry.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(ITutellusController)2696": {
+              "label": "contract ITutellusController"
+            },
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_bytes32)": {
+              "label": "mapping(address => bytes32)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDStorage": {
+        "src": "contracts\\TutellusDIDStorage.sol:6",
+        "version": {
+          "withMetadata": "740f65f33a3c233615ef1e6a16bc859404795fb5aa1bd01259661929ada33bf0",
+          "withoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80",
+          "linkedWithoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "controller",
+              "type": "t_contract(TutellusController)2090",
+              "src": "contracts\\TutellusDIDStorage.sol:10"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "onlyVerifiedCalls",
+              "type": "t_bool",
+              "src": "contracts\\TutellusDIDStorage.sol:11"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "contracts\\TutellusDIDStorage.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2090": {
+              "label": "contract TutellusController"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusController": {
+        "src": "contracts\\interfaces\\ITutellusController.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getAddress(bytes32)",
+          "isVerified(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusDID": {
+        "src": "contracts\\interfaces\\ITutellusDID.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "AccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:49",
+        "inherit": [
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:63"
+            },
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:219"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+              "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_struct(RoleData)43_storage": {
+              "label": "struct AccessControlUpgradeable.RoleData",
+              "members": [
+                {
+                  "label": "members",
+                  "type": "t_mapping(t_address,t_bool)"
+                },
+                {
+                  "label": "adminRole",
+                  "type": "t_bytes32"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721ReceiverUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\IERC721ReceiverUpgradeable.sol:10",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC721HolderUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:14",
+        "version": {
+          "withMetadata": "3e85aedda96284914debddc43e00dd711abd94f8ffb88628ec692eacad1effe3",
+          "withoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf",
+          "linkedWithoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf"
+        },
+        "inherit": [
+          "IERC721ReceiverUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721HolderUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:34"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:22",
+        "inherit": [
+          "IERC165Upgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC165Upgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:19",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC1967Upgrade": {
+        "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
+        "inherit": [],
+        "libraries": [
+          "StorageSlot",
+          "Address"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Proxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\Proxy.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "BeaconProxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:17",
+        "version": {
+          "withMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "withoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "linkedWithoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6"
+        },
+        "inherit": [
+          "ERC1967Upgrade",
+          "Proxy"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "BeaconProxy",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:29"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "implementation()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "UpgradeableBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:15",
+        "version": {
+          "withMetadata": "8ab53657270e74f0e78e9bea7ef2f4cd142b34de4e05d40a9a8916269e934444",
+          "withoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2",
+          "linkedWithoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2"
+        },
+        "inherit": [
+          "Ownable",
+          "Context",
+          "IBeacon"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(address)",
+          "implementation()",
+          "upgradeTo(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "UpgradeableBeacon",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "UpgradeableBeacon",
+              "label": "_implementation",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:16"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "@openzeppelin\\contracts\\utils\\Address.sol:8",
+        "version": {
+          "withMetadata": "26611e32a15a00144207b601573c8db0b03bac6851e9edb16d9974217ed40294",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "delegatecall",
+            "src": "@openzeppelin\\contracts\\utils\\Address.sol:185"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "StorageSlot": {
+        "src": "@openzeppelin\\contracts\\utils\\StorageSlot.sol:31",
+        "version": {
+          "withMetadata": "67043ca199238b571fe41b2afcdfc1902b6e0170b97676a37de1d89b17b45f48",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusController": {
+        "src": "contracts\\TutellusController.sol:8",
+        "version": {
+          "withMetadata": "4e5d8a5990fbfe30200c35ff1cd89e4e80ad848f4a356831b31b83ce5c6b8562",
+          "withoutMetadata": "feda2158b9d0c786accd861a143fa241349c3f5c8b75dd768586052abaa5bc14",
+          "linkedWithoutMetadata": "feda2158b9d0c786accd861a143fa241349c3f5c8b75dd768586052abaa5bc14"
+        },
+        "inherit": [
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "getAddress(bytes32)",
+          "isVerified(address)",
+          "setAddress(bytes32,address)",
+          "lockId(bytes32)",
+          "setVerification(address,bool)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusController",
+            "src": "contracts\\TutellusController.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusController",
+              "label": "_addresses",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusController.sol:11"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_lockedIds",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "contracts\\TutellusController.sol:12"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_verified",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\TutellusController.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDID": {
+        "src": "contracts\\TutellusDID.sol:10",
+        "version": {
+          "withMetadata": "912e73f4b9aaf5dafd7c419ee7d4c63ec194696373c144a16ab75a5beaf141cd",
+          "withoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408",
+          "linkedWithoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408"
+        },
+        "inherit": [
+          "TutellusDIDStorage",
+          "ITutellusDID",
+          "ERC721HolderUpgradeable",
+          "IERC721ReceiverUpgradeable",
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "version()",
+          "()",
+          "()",
+          "forward(address,bytes,uint256,uint256)",
+          "forwardBatch(address[],bytes[],uint256[],uint256[])",
+          "verificationCheck(address)",
+          "initialize(address,address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDFactory": {
+        "src": "contracts\\TutellusDIDFactory.sol:8",
+        "version": {
+          "withMetadata": "a9bed2da5359ba4dcf2ccb7e8a2f0efb884788d18876d7bbd62f91fb787b3d87",
+          "withoutMetadata": "590aaa17e6c05100442ea208a995c52d0767a0211b82c50ee1c3c26e4c2dbe26",
+          "linkedWithoutMetadata": "590aaa17e6c05100442ea208a995c52d0767a0211b82c50ee1c3c26e4c2dbe26"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "createProxy(bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDFactory",
+            "src": "contracts\\TutellusDIDFactory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "beacon",
+              "type": "t_address",
+              "src": "contracts\\TutellusDIDFactory.sol:9"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDRegistry": {
+        "src": "contracts\\TutellusDIDRegistry.sol:6",
+        "version": {
+          "withMetadata": "9c9cf12a66428f1dcc6dac6beff4ab935b6cec40b6170d94076d164c70e570b6",
+          "withoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815",
+          "linkedWithoutMetadata": "20c0b95c4ad30ba01e92d824df10c4d98b5275e8557acddf81a06f5b9b09b815"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "register(bytes32,address)",
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDRegistry",
+            "src": "contracts\\TutellusDIDRegistry.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "_controller",
+              "type": "t_contract(TutellusController)2090",
+              "src": "contracts\\TutellusDIDRegistry.sol:9"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "didByHash",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusDIDRegistry.sol:11"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "hashByDid",
+              "type": "t_mapping(t_address,t_bytes32)",
+              "src": "contracts\\TutellusDIDRegistry.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2090": {
+              "label": "contract TutellusController"
+            },
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_bytes32)": {
+              "label": "mapping(address => bytes32)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDStorage": {
+        "src": "contracts\\TutellusDIDStorage.sol:6",
+        "version": {
+          "withMetadata": "37c4c4aa9dc8fbb7f1462f641653522ac6491df2ed917473b29f3b2169d4dfb0",
+          "withoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80",
+          "linkedWithoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "controller",
+              "type": "t_contract(TutellusController)2090",
+              "src": "contracts\\TutellusDIDStorage.sol:10"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "onlyVerifiedCalls",
+              "type": "t_bool",
+              "src": "contracts\\TutellusDIDStorage.sol:11"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "contracts\\TutellusDIDStorage.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2090": {
+              "label": "contract TutellusController"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusController": {
+        "src": "contracts\\interfaces\\ITutellusController.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "getAddress(bytes32)",
+          "isVerified(address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusDID": {
+        "src": "contracts\\interfaces\\ITutellusDID.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusRegistry": {
+        "src": "contracts\\interfaces\\ITutellusRegistry.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)",
+          "register(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "AccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:49",
+        "inherit": [
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:63"
+            },
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:219"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+              "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_struct(RoleData)43_storage": {
+              "label": "struct AccessControlUpgradeable.RoleData",
+              "members": [
+                {
+                  "label": "members",
+                  "type": "t_mapping(t_address,t_bool)"
+                },
+                {
+                  "label": "adminRole",
+                  "type": "t_bytes32"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721ReceiverUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\IERC721ReceiverUpgradeable.sol:10",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC721HolderUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:14",
+        "version": {
+          "withMetadata": "3e85aedda96284914debddc43e00dd711abd94f8ffb88628ec692eacad1effe3",
+          "withoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf",
+          "linkedWithoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf"
+        },
+        "inherit": [
+          "IERC721ReceiverUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721HolderUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:34"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:22",
+        "inherit": [
+          "IERC165Upgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC165Upgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:19",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC1967Upgrade": {
+        "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
+        "inherit": [],
+        "libraries": [
+          "StorageSlot",
+          "Address"
+        ],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Proxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\Proxy.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "BeaconProxy": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:17",
+        "version": {
+          "withMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "withoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6",
+          "linkedWithoutMetadata": "e27be6ff4e46252098c55bd9a01424cba30ff684a1ace8ad26d1957b5e7820b6"
+        },
+        "inherit": [
+          "ERC1967Upgrade",
+          "Proxy"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "BeaconProxy",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\BeaconProxy.sol:29"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\IBeacon.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "implementation()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "UpgradeableBeacon": {
+        "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:15",
+        "version": {
+          "withMetadata": "8ab53657270e74f0e78e9bea7ef2f4cd142b34de4e05d40a9a8916269e934444",
+          "withoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2",
+          "linkedWithoutMetadata": "9506d133d290655c90b3e48a0fe0e2816ef0bb6267ea746921b12a1d65d206b2"
+        },
+        "inherit": [
+          "Ownable",
+          "Context",
+          "IBeacon"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(address)",
+          "implementation()",
+          "upgradeTo(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "UpgradeableBeacon",
+            "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "UpgradeableBeacon",
+              "label": "_implementation",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\proxy\\beacon\\UpgradeableBeacon.sol:16"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "@openzeppelin\\contracts\\utils\\Address.sol:8",
+        "version": {
+          "withMetadata": "26611e32a15a00144207b601573c8db0b03bac6851e9edb16d9974217ed40294",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "delegatecall",
+            "src": "@openzeppelin\\contracts\\utils\\Address.sol:185"
+          }
+        ],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:15",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "StorageSlot": {
+        "src": "@openzeppelin\\contracts\\utils\\StorageSlot.sol:31",
+        "version": {
+          "withMetadata": "67043ca199238b571fe41b2afcdfc1902b6e0170b97676a37de1d89b17b45f48",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusController": {
+        "src": "contracts\\TutellusController.sol:8",
+        "version": {
+          "withMetadata": "c9c675b680878e74f017005b5878714b23dfe34ba370628fd21338ce8eab92bd",
+          "withoutMetadata": "ff06ecfa6a5ce616eae4476e960d50aafd8e84b53b2cd5bcb74a5a6de19108ed",
+          "linkedWithoutMetadata": "ff06ecfa6a5ce616eae4476e960d50aafd8e84b53b2cd5bcb74a5a6de19108ed"
+        },
+        "inherit": [
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "()",
+          "getAddress(bytes32)",
+          "isVerified(address)",
+          "setAddress(bytes32,address)",
+          "lockId(bytes32)",
+          "setVerification(address,bool)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusController",
+            "src": "contracts\\TutellusController.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusController",
+              "label": "_addresses",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusController.sol:11"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_lockedIds",
+              "type": "t_mapping(t_bytes32,t_bool)",
+              "src": "contracts\\TutellusController.sol:12"
+            },
+            {
+              "contract": "TutellusController",
+              "label": "_verified",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\TutellusController.sol:13"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_bytes32,t_bool)": {
+              "label": "mapping(bytes32 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDID": {
+        "src": "contracts\\TutellusDID.sol:10",
+        "version": {
+          "withMetadata": "784999c45e3dceb75420a4ac2ccccd612c7d921cf8c76b81fe647f4cde0c32de",
+          "withoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408",
+          "linkedWithoutMetadata": "774ee9482a5b7c8b3498e6bcad3ab14c2ac49245489e846a58b8775ff02b7408"
+        },
+        "inherit": [
+          "TutellusDIDStorage",
+          "ITutellusDID",
+          "ERC721HolderUpgradeable",
+          "IERC721ReceiverUpgradeable",
+          "AccessControlUpgradeable",
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "version()",
+          "()",
+          "()",
+          "forward(address,bytes,uint256,uint256)",
+          "forwardBatch(address[],bytes[],uint256[],uint256[])",
+          "verificationCheck(address)",
+          "initialize(address,address,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDFactory": {
+        "src": "contracts\\TutellusDIDFactory.sol:8",
+        "version": {
+          "withMetadata": "999c524e24883c191874c434f94693f02b63f5df110f8504a8b2cd6e3af63130",
+          "withoutMetadata": "8af5aef77e2cdf9aec16f14699eba87082c545edd300c8bb1f039f226d55ddd6",
+          "linkedWithoutMetadata": "8af5aef77e2cdf9aec16f14699eba87082c545edd300c8bb1f039f226d55ddd6"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "()",
+          "createProxy(bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDFactory",
+            "src": "contracts\\TutellusDIDFactory.sol:13"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDFactory",
+              "label": "beacon",
+              "type": "t_address",
+              "src": "contracts\\TutellusDIDFactory.sol:9"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDRegistry": {
+        "src": "contracts\\TutellusDIDRegistry.sol:6",
+        "version": {
+          "withMetadata": "ca6b92b8efe947733f3d5c3f1be8daa36972864623c2dd157752927aa49bf86b",
+          "withoutMetadata": "84aba4d65e348e7e4c5bb15cf5f921f330ca5294d7bf6e2a47ca4c1532478bcd",
+          "linkedWithoutMetadata": "84aba4d65e348e7e4c5bb15cf5f921f330ca5294d7bf6e2a47ca4c1532478bcd"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(address)",
+          "register(bytes32,address)",
+          "isEmptyHash(bytes32)",
+          "isEmptyDID(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "TutellusDIDRegistry",
+            "src": "contracts\\TutellusDIDRegistry.sol:19"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "_controller",
+              "type": "t_contract(TutellusController)2090",
+              "src": "contracts\\TutellusDIDRegistry.sol:9"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "didByHash",
+              "type": "t_mapping(t_bytes32,t_address)",
+              "src": "contracts\\TutellusDIDRegistry.sol:11"
+            },
+            {
+              "contract": "TutellusDIDRegistry",
+              "label": "hashByDid",
+              "type": "t_mapping(t_address,t_bytes32)",
+              "src": "contracts\\TutellusDIDRegistry.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2090": {
+              "label": "contract TutellusController"
+            },
+            "t_mapping(t_bytes32,t_address)": {
+              "label": "mapping(bytes32 => address)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_bytes32)": {
+              "label": "mapping(address => bytes32)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "TutellusDIDStorage": {
+        "src": "contracts\\TutellusDIDStorage.sol:6",
+        "version": {
+          "withMetadata": "0b3da5adc144dd27f1764af85266dee46d8b065bc0cdf8843ba329c34ba14b5f",
+          "withoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80",
+          "linkedWithoutMetadata": "65b710f9c176b8002df5f1026754bfcf560042dafac245e3a3a45fb64b898c80"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "controller",
+              "type": "t_contract(TutellusController)2090",
+              "src": "contracts\\TutellusDIDStorage.sol:10"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "onlyVerifiedCalls",
+              "type": "t_bool",
+              "src": "contracts\\TutellusDIDStorage.sol:11"
+            },
+            {
+              "contract": "TutellusDIDStorage",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "contracts\\TutellusDIDStorage.sol:12"
+            }
+          ],
+          "types": {
+            "t_contract(TutellusController)2090": {
+              "label": "contract TutellusController"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ITutellusDID": {
+        "src": "contracts\\interfaces\\ITutellusDID.sol:4",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "AccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:49",
+        "inherit": [
+          "ERC165Upgradeable",
+          "IERC165Upgradeable",
+          "IAccessControlUpgradeable",
+          "ContextUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [
+          "StringsUpgradeable"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)43_storage)",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:63"
+            },
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)49_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\AccessControlUpgradeable.sol:219"
+            }
+          ],
+          "types": {
+            "t_mapping(t_bytes32,t_struct(RoleData)43_storage)": {
+              "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_struct(RoleData)43_storage": {
+              "label": "struct AccessControlUpgradeable.RoleData",
+              "members": [
+                {
+                  "label": "members",
+                  "type": "t_mapping(t_address,t_bool)"
+                },
+                {
+                  "label": "adminRole",
+                  "type": "t_bytes32"
+                }
+              ]
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_array(t_uint256)49_storage": {
+              "label": "uint256[49]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IAccessControlUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\access\\IAccessControlUpgradeable.sol:8",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "hasRole(bytes32,address)",
+          "getRoleAdmin(bytes32)",
+          "grantRole(bytes32,address)",
+          "revokeRole(bytes32,address)",
+          "renounceRole(bytes32,address)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Initializable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:17",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:21"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:26"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721ReceiverUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\IERC721ReceiverUpgradeable.sol:10",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC721HolderUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:14",
+        "version": {
+          "withMetadata": "3e85aedda96284914debddc43e00dd711abd94f8ffb88628ec692eacad1effe3",
+          "withoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf",
+          "linkedWithoutMetadata": "fd593a2425c3ddc601e910a1ec9c85223b871631d8766db914e4c74a20421acf"
+        },
+        "inherit": [
+          "IERC721ReceiverUpgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC721HolderUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:34"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ContextUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:16",
+        "inherit": [
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ContextUpgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:30"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "StringsUpgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\StringsUpgradeable.sol:8",
+        "version": {
+          "withMetadata": "ac56c65fa3040d17a29d946b3b9710d978b16069c314d7eeb4d3fc1412dd3171",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:22",
+        "inherit": [
+          "IERC165Upgradeable",
+          "Initializable"
+        ],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC165Upgradeable",
+              "label": "__gap",
+              "type": "t_array(t_uint256)50_storage",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\ERC165Upgradeable.sol:35"
+            }
+          ],
+          "types": {
+            "t_array(t_uint256)50_storage": {
+              "label": "uint256[50]"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165Upgradeable": {
+        "src": "@openzeppelin\\contracts-upgradeable\\utils\\introspection\\IERC165Upgradeable.sol:14",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:19",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:27"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
       "ERC1967Upgrade": {
         "src": "@openzeppelin\\contracts\\proxy\\ERC1967\\ERC1967Upgrade.sol:17",
         "inherit": [],
