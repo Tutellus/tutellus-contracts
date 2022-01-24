@@ -6,7 +6,7 @@ require('@nomiclabs/hardhat-etherscan')
 require('@openzeppelin/hardhat-upgrades')
 require('hardhat-gas-reporter')
 const { random, template } = require('lodash')
-const GAS_PRICE_DEFAULT = 30000000000
+const GAS_PRICE_DEFAULT = 10000000000
 const GAS_MULTIPLIER_DEFAULT = 1
 const chains = require('./chains.json')
 const scanners = require('./scanners.json')
@@ -85,7 +85,7 @@ module.exports = {
     bsctestnet: {
       url: getUrl(97),
       chainId: 97,
-      gas: 'auto',
+      gas: 4251144,
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
       accounts: { mnemonic: process.env.MNEMONIC }
@@ -113,17 +113,70 @@ module.exports = {
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
       accounts: { mnemonic: process.env.MNEMONIC }
+    },
+    hardhat: {
+      chainId: 31337,
+      forking: {
+        url: 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+      },
+      accounts: { mnemonic: process.env.MNEMONIC }
     }
   },
   // This is a sample solc configuration that specifies which version of solc to use
   solidity: {
-    version: '0.8.2'
+    compilers: [
+      {
+        version: '0.5.16',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.8.2',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.8.0',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.8.9',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.6.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      }
+    ]
   },
-  // gasReporter: {
-  //   currency: 'USD',
-  //   gasPrice: 21,
-  //   enabled: process.env.REPORT_GAS
-  // },
+  gasReporter: {
+    currency: 'USD',
+    gasPrice: 21,
+    enabled: true
+  },
   etherscan: {
     // url: process.env.ETHERSCAN_URL,
     // apiKey: process.env.ETHERSCAN_KEY

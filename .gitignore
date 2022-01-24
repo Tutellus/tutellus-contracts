@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/artifacts
+/cache
 /.pnp
 .pnp.js
 
@@ -36,7 +38,4 @@ yarn-error.log*
 .yalc
 yalc.lock
 
-/examples/holders.json
-/examples/team.json
-holders.json
-team.json
+*.json

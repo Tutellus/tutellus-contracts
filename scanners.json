@@ -1,7 +1,8 @@
 {
-    "current": "137",
+    "current": "4",
     "url": {
         "1": "https://api.etherscan.io/api",
+        "4": "https://api-rinkeby.etherscan.io/api",
         "5": "https://api-goerli.etherscan.io/api",
         "56": "https://api.bscscan.com/api",
         "97": "https://api-testnet.bscscan.com/api",
@@ -10,6 +11,7 @@
     },
     "apikey": {
         "1": "9IKRN66FXBYZZETKF9MSTV5SP46MPH7IU3",
+        "4": "9IKRN66FXBYZZETKF9MSTV5SP46MPH7IU3",
         "5": "9IKRN66FXBYZZETKF9MSTV5SP46MPH7IU3",
         "56": "SEAZASBV3QF4AYSJW1SP4DABHPE4GIR9WI",
         "97": "SEAZASBV3QF4AYSJW1SP4DABHPE4GIR9WI",

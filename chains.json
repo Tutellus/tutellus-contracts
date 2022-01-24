@@ -776,8 +776,7 @@
     "networkId": 4,
     "nativeCurrency": { "name": "Rinkeby Ether", "symbol": "RIN", "decimals": 18 },
     "rpc": [
-      "https://rinkeby.infura.io/v3/${INFURA_API_KEY}",
-      "wss://rinkeby.infura.io/ws/v3/${INFURA_API_KEY}"
+      "https://rinkeby.infura.io/v3/${INFURA_API_KEY}"
     ],
     "faucets": ["https://faucet.rinkeby.io"],
     "infoURL": "https://www.rinkeby.io"
