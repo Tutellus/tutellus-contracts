@@ -10,16 +10,16 @@ async function main () {
 
   const keys = Object.keys(ids)
 
-  for(let i=0; i < keys.length; i++) {
-    const key = keys[i];
-    const addr = ids[key];
-    const myContract = await ACPP.at(addr);
-  
-    console.log(`Setting id of ${key}`);
-    await myManager.setId(ethers.utils.id(key), addr);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    const addr = ids[key]
+    const myContract = await ACPP.at(addr)
 
-    console.log(`Modifying rolemanager of ${key}(${myContract.address}) to ${myManager.address}...`);
-    await myContract.updateManager(myManager.address);
+    console.log(`Setting id of ${key}`)
+    await myManager.setId(ethers.utils.id(key), addr)
+
+    console.log(`Modifying rolemanager of ${key}(${myContract.address}) to ${myManager.address}...`)
+    await myContract.updateManager(myManager.address)
   }
 }
 

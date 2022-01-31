@@ -12,18 +12,16 @@ const data = {
 }
 
 const main = async () => {
-  const ipfs = ipfsHttpClient(data);
+  const ipfs = ipfsHttpClient(data)
   try {
     const file = await readFile(path.join(__dirname, jsonPath), 'utf8')
     const tree = getBalanceTree(json)
     const added = await ipfs.add(file)
     console.log('Uri: https://ipfs.io/ipfs/' + added.cid.toString())
     console.log('MerkleRoot: ', tree.toJSON().merkleRoot)
-  } catch(error) {
+  } catch (error) {
     console.error('ERROR', error)
   }
 }
 
-main();
-
-
+main()

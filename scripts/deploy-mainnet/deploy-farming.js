@@ -3,12 +3,12 @@ const Deployer = bre.artifacts.require('TutellusDeployer')
 const Farming = bre.artifacts.require('TutellusFarming')
 const RewardsVault = bre.artifacts.require('TutellusRewardsVault')
 const {
-  ether, expectRevert, time
+  ether
 } = require('@openzeppelin/test-helpers')
 const fs = require('fs')
 const scanners = require('../../scanners.json')
 const { networks } = require('../../hardhat.config')
-const { BigNumber } = require('@ethersproject/bignumber')
+// const { BigNumber } = require('@ethersproject/bignumber')
 
 const scannerSet = () => {
   const chainId = networks[bre.network.name].chainId
@@ -31,12 +31,12 @@ async function main () {
     myDeployer.clientsVault(),
     myDeployer.treasuryVault()
   ])
+  console.log('Token:', token)
   console.log('! Deploying Farming. Args: ', PAIR, rolemanager, rewardsVault)
   const myFarming = await Farming.new(PAIR, rolemanager, rewardsVault)
   console.log('! Farming deployed at: ', myFarming.address)
   console.log('! Adding Farming to RewardsVault ', myFarming.address)
   await myRewardsVault.add(myFarming.address, [ether('20'), ether('80')])
-
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.

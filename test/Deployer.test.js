@@ -14,15 +14,12 @@ const RoleManager = artifacts.require('TutellusRoleManager')
 const Staking = artifacts.require('TutellusStaking')
 const Farming = artifacts.require('TutellusFarming')
 const RewardsVault = artifacts.require('TutellusRewardsVault')
-const ClientsVault = artifacts.require('TutellusClientsVault')
 const HoldersVault = artifacts.require('TutellusHoldersVault')
-const TreasuryVault = artifacts.require('TutellusTreasuryVault')
 
 let myDeployer
 let myToken
 let myRolemanager
 let myRewardsVault
-let myClientsVault
 let myHoldersVault
 let myTreasuryVault
 let owner, person
@@ -40,13 +37,11 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myToken, myRolemanager, myRewardsVault, myClientsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
+  [myToken, myRolemanager, myRewardsVault, myHoldersVault] = await Promise.all([
     Token.at(addresses[0]),
     RoleManager.at(addresses[1]),
     RewardsVault.at(addresses[2]),
-    ClientsVault.at(addresses[3]),
-    HoldersVault.at(addresses[4]),
-    TreasuryVault.at(addresses[5])
+    HoldersVault.at(addresses[4])
   ])
 }
 

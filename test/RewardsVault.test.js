@@ -1,7 +1,6 @@
 const {
   ether, expectRevert, time
 } = require('@openzeppelin/test-helpers')
-const { formatBytes32String } = require('@ethersproject/strings')
 const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
@@ -13,17 +12,11 @@ const RoleManager = artifacts.require('TutellusRoleManager')
 const Staking = artifacts.require('TutellusStaking')
 const Farming = artifacts.require('TutellusFarming')
 const RewardsVault = artifacts.require('TutellusRewardsVault')
-const ClientsVault = artifacts.require('TutellusClientsVault')
-const HoldersVault = artifacts.require('TutellusHoldersVault')
-const TreasuryVault = artifacts.require('TutellusTreasuryVault')
 
 let myDeployer
 let myToken
 let myRolemanager
 let myRewardsVault
-let myClientsVault
-let myHoldersVault
-let myTreasuryVault
 let owner, person
 
 const getAddresses = async () => {
@@ -39,13 +32,10 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myToken, myRolemanager, myRewardsVault, myClientsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
+  [myToken, myRolemanager, myRewardsVault] = await Promise.all([
     Token.at(addresses[0]),
     RoleManager.at(addresses[1]),
-    RewardsVault.at(addresses[2]),
-    ClientsVault.at(addresses[3]),
-    HoldersVault.at(addresses[4]),
-    TreasuryVault.at(addresses[5])
+    RewardsVault.at(addresses[2])
   ])
 }
 
@@ -106,7 +96,7 @@ describe('RewardsVault', function () {
       await myRewardsVault.add(myFarming.address, [ether('20'), ether('80')])
     })
     it('Can update allocation', async () => {
-      const response = await myRewardsVault.updateAllocation([ether('10'), ether('90')])
+      await myRewardsVault.updateAllocation([ether('10'), ether('90')])
     })
     it('Cant update allocation if not admin', async () => {
       await expectRevert(myRewardsVault.updateAllocation([ether('10'), ether('90')], { from: person }), 'AccessControlProxyPausable: account 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 is missing role 0x0000000000000000000000000000000000000000000000000000000000000000')
@@ -133,7 +123,7 @@ describe('RewardsVault', function () {
       const response3 = await myRewardsVault.releasedId(myStaking.address)
       expect(response3.toString()).to.eq(ether('553086.419753086419753083').toString()) // 4-5 -> 444444.4444 + 5-6 * 0.2 -> 543309 * 0.2 = 108641 => 553086
       const response4 = await myRewardsVault.releasedId(myFarming.address)
-      expect(response4.toString()).to.eq(ether('434567.901234567901234566').toString()) // 5-6 * 0.8 -> 543309 * 0.8 = 434567 
+      expect(response4.toString()).to.eq(ether('434567.901234567901234566').toString()) // 5-6 * 0.8 -> 543309 * 0.8 = 434567
     })
     it('availableId()', async () => {
       const response = await myRewardsVault.availableId(myStaking.address)

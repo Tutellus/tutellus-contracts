@@ -4,13 +4,12 @@ require('@nomiclabs/hardhat-ethers')
 require('@nomiclabs/hardhat-truffle5')
 require('@nomiclabs/hardhat-etherscan')
 require('@openzeppelin/hardhat-upgrades')
-require('hardhat-gas-reporter')
+require('solidity-coverage')
 const { random, template } = require('lodash')
-const GAS_PRICE_DEFAULT = 10000000000
+const GAS_PRICE_DEFAULT = 30000000000
 const GAS_MULTIPLIER_DEFAULT = 1
 const chains = require('./chains.json')
 const scanners = require('./scanners.json')
-// const INFURA_API_KEY = process.env.INFURA_API_KEY
 
 const keys = {
   INFURA_API_KEY: process.env.INFURA_API_KEY
@@ -51,6 +50,19 @@ const getUrl = (chainId) => {
   return concatKeys(rpcNodes[randomIndex], keys)
 }
 
+const getAccounts = () => {
+  if (process.env.MNEMONIC) {
+    return {
+      mnemonic: process.env.MNEMONIC
+    }
+  } else {
+    if (process.env.PRIVATE_KEY) {
+      return [process.env.PRIVATE_KEY]
+    } else {
+      return undefined
+    }
+  }
+}
 // You have to export an object to set up your config
 // This object can have the following optional entries:
 // defaultNetwork, networks, solc, and paths.
@@ -64,7 +76,7 @@ module.exports = {
       gas: 'auto',
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: { mnemonic: process.env.MNEMONIC }
+      accounts: getAccounts()
     },
     goerli: {
       url: getUrl(5),
@@ -72,7 +84,7 @@ module.exports = {
       gas: 'auto',
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: { mnemonic: process.env.MNEMONIC }
+      accounts: getAccounts()
     },
     mainnet: {
       url: getUrl(1),
@@ -80,15 +92,15 @@ module.exports = {
       gas: 'auto',
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: { mnemonic: process.env.MNEMONIC }
+      accounts: getAccounts()
     },
     bsctestnet: {
       url: getUrl(97),
       chainId: 97,
-      gas: 4251144,
+      gas: 'auto',
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: { mnemonic: process.env.MNEMONIC }
+      accounts: getAccounts()
     },
     bscmainnet: {
       url: getUrl(56),
@@ -96,7 +108,7 @@ module.exports = {
       gas: 'auto',
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: { mnemonic: process.env.MNEMONIC }
+      accounts: getAccounts()
     },
     polygon: {
       url: getUrl(137),
@@ -104,7 +116,7 @@ module.exports = {
       gas: 'auto',
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: { mnemonic: process.env.MNEMONIC }
+      accounts: getAccounts()
     },
     polygonmumbai: {
       url: getUrl(80001),
@@ -112,39 +124,23 @@ module.exports = {
       gas: 'auto',
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: { mnemonic: process.env.MNEMONIC }
-    },
-    hardhat: {
-      chainId: 31337,
-      forking: {
-        url: 'https://data-seed-prebsc-1-s1.binance.org:8545/'
-      },
-      accounts: { mnemonic: process.env.MNEMONIC }
+      accounts: getAccounts()
     }
+    // hardhat: {
+    //   chainId: 31337,
+    //   forking: {
+    //     url: 'https://polygon-mainnet.g.alchemy.com/v2/' + process.env.ALCHEMY_API_KEY
+    //   }
+    // },
+    // localhost: {
+    //   chainId: 31337
+    // }
   },
   // This is a sample solc configuration that specifies which version of solc to use
   solidity: {
     compilers: [
       {
-        version: '0.5.16',
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200
-          }
-        }
-      },
-      {
-        version: '0.8.2',
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200
-          }
-        }
-      },
-      {
-        version: '0.8.0',
+        version: '0.7.5',
         settings: {
           optimizer: {
             enabled: true,
@@ -162,7 +158,16 @@ module.exports = {
         }
       },
       {
-        version: '0.6.6',
+        version: '0.6.12',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.4.18',
         settings: {
           optimizer: {
             enabled: true,
@@ -172,11 +177,11 @@ module.exports = {
       }
     ]
   },
-  gasReporter: {
-    currency: 'USD',
-    gasPrice: 21,
-    enabled: true
-  },
+  // gasReporter: {
+  //   currency: 'USD',
+  //   gasPrice: 21,
+  //   enabled: process.env.REPORT_GAS
+  // },
   etherscan: {
     // url: process.env.ETHERSCAN_URL,
     // apiKey: process.env.ETHERSCAN_KEY

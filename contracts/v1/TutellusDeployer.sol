@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../utils/TutellusERC20.sol";
-import "../TutellusRoleManager.sol";
+import "./TutellusRoleManager.sol";
 import "../TutellusHoldersVault.sol";
 import "../TutellusRewardsVault.sol";
 import "../TutellusClientsVault.sol";

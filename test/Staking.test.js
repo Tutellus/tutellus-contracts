@@ -1,7 +1,6 @@
 const {
   ether, expectRevert
 } = require('@openzeppelin/test-helpers')
-const { formatBytes32String } = require('@ethersproject/strings')
 const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
@@ -13,17 +12,13 @@ const RoleManager = artifacts.require('TutellusRoleManager')
 const Staking = artifacts.require('TutellusStaking')
 const Farming = artifacts.require('TutellusFarming')
 const RewardsVault = artifacts.require('TutellusRewardsVault')
-const ClientsVault = artifacts.require('TutellusClientsVault')
 const HoldersVault = artifacts.require('TutellusHoldersVault')
-const TreasuryVault = artifacts.require('TutellusTreasuryVault')
 
 let myDeployer
 let myToken
 let myRolemanager
 let myRewardsVault
-let myClientsVault
 let myHoldersVault
-let myTreasuryVault
 let owner, person
 
 const getAddresses = async () => {
@@ -39,13 +34,11 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myToken, myRolemanager, myRewardsVault, myClientsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
+  [myToken, myRolemanager, myRewardsVault, myHoldersVault] = await Promise.all([
     Token.at(addresses[0]),
     RoleManager.at(addresses[1]),
     RewardsVault.at(addresses[2]),
-    ClientsVault.at(addresses[3]),
-    HoldersVault.at(addresses[4]),
-    TreasuryVault.at(addresses[5])
+    HoldersVault.at(addresses[4])
   ])
 }
 
@@ -131,14 +124,14 @@ describe('Staking', function () {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myStaking.address, balance, { from: person })
-      const response = await myStaking.depositFrom(person, balance)
+      await myStaking.depositFrom(person, balance)
       await expectRevert(myStaking.withdraw(ether('1000000'), { from: person }), 'TutellusStaking: user has not enough staking balance')
     })
     it('Cannot withdraw 0 tokens', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myStaking.address, balance, { from: person })
-      const response = await myStaking.depositFrom(person, balance)
+      await myStaking.depositFrom(person, balance)
       await expectRevert(myStaking.withdraw(0, { from: person }), 'TutellusStaking: amount must be over zero')
     })
   })
