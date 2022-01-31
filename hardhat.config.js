@@ -4,6 +4,7 @@ require('@nomiclabs/hardhat-ethers')
 require('@nomiclabs/hardhat-truffle5')
 require('@nomiclabs/hardhat-etherscan')
 require('@openzeppelin/hardhat-upgrades')
+require('hardhat-gas-reporter')
 require('solidity-coverage')
 const { random, template } = require('lodash')
 const GAS_PRICE_DEFAULT = 30000000000
@@ -177,11 +178,11 @@ module.exports = {
       }
     ]
   },
-  // gasReporter: {
-  //   currency: 'USD',
-  //   gasPrice: 21,
-  //   enabled: process.env.REPORT_GAS
-  // },
+  gasReporter: {
+    currency: 'USD',
+    gasPrice: 21,
+    enabled: process.env.REPORT_GAS
+  },
   etherscan: {
     // url: process.env.ETHERSCAN_URL,
     // apiKey: process.env.ETHERSCAN_KEY
