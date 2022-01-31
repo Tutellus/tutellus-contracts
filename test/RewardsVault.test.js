@@ -5,6 +5,7 @@ const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
+const { fromEther } = require('../utils/shared')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -112,24 +113,39 @@ describe('RewardsVault', function () {
     })
     it('released()', async () => {
       const response = await myRewardsVault.released()
-      expect(response.toString()).to.eq(ether('1234567.901234567901234562').toString()) // 0-5 -> 1234567.901
+
     })
     it('releasedId()', async () => {
-      const response = await myRewardsVault.releasedId(myStaking.address)
-      expect(response.toString()).to.eq(ether('444444.444444444444444442').toString()) // 4-5 -> 444444.4444
-      const response2 = await myRewardsVault.releasedId(myFarming.address)
-      expect(response2.toString()).to.eq(ether('0').toString())
-      time.advanceBlock()
-      const response3 = await myRewardsVault.releasedId(myStaking.address)
-      expect(response3.toString()).to.eq(ether('553086.419753086419753083').toString()) // 4-5 -> 444444.4444 + 5-6 * 0.2 -> 543309 * 0.2 = 108641 => 553086
-      const response4 = await myRewardsVault.releasedId(myFarming.address)
-      expect(response4.toString()).to.eq(ether('434567.901234567901234566').toString()) // 5-6 * 0.8 -> 543309 * 0.8 = 434567
+
+      const gapS = await myRewardsVault.releasedId(myStaking.address)
+      const gapF = await myRewardsVault.releasedId(myFarming.address)
+
+      await time.advanceBlock()
+
+      const [releasedS0, releasedF0, infoS, infoF] = await Promise.all([
+        myRewardsVault.releasedId(myStaking.address),
+        myRewardsVault.releasedId(myFarming.address),
+        myRewardsVault.info(myStaking.address),
+        myRewardsVault.info(myFarming.address)
+      ])
+
+      const releasedS = releasedS0.sub(gapS);
+      const releasedF = releasedF0.sub(gapF);
+
+      const totalReleased = releasedS.add(releasedF);
+      const allocationS = infoS.allocation;
+      const allocationF = infoF.allocation;
+
+      expect(fromEther(releasedS)).approximately(fromEther(totalReleased.mul(allocationS).div(ether('100'))), 1e-17)
+      expect(fromEther(releasedF)).approximately(fromEther(totalReleased.mul(allocationF).div(ether('100'))), 1e-17)
+
     })
     it('availableId()', async () => {
-      const response = await myRewardsVault.availableId(myStaking.address)
-      expect(response.toString()).to.eq(ether('444444.444444444444444442').toString()) // 4-5 -> 444444.4444
-      const response2 = await myRewardsVault.availableId(owner)
-      expect(response2.toString()).to.eq(ether('0').toString())
+      const distributed = (await myRewardsVault.info(myStaking.address)).distributed
+      const ava = await myRewardsVault.availableId(myStaking.address)
+      const rel = await myRewardsVault.releasedId(myStaking.address)
+
+      expect(fromEther(ava)).eq(fromEther(rel.sub(distributed)))
     })
   })
   describe('Distribute tokens', () => {

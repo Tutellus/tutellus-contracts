@@ -4,12 +4,16 @@ const {
 const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
+const { expect } = require('chai')
+const { fromEther } = require('../utils/shared')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const TreasuryVault = artifacts.require('TutellusTreasuryVault')
+const Token = artifacts.require('TutellusERC20')
 
 let myDeployer
 let myTreasuryVault
+let myToken
 let owner, person
 
 const getAddresses = async () => {
@@ -25,7 +29,8 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myTreasuryVault] = await Promise.all([
+  [myToken, myTreasuryVault] = await Promise.all([
+    Token.at(addresses[0]),
     TreasuryVault.at(addresses[5])
   ])
 }
@@ -42,20 +47,14 @@ describe('TreasuryVault', function () {
   })
   describe('Claim', () => {
     it('Can claim correct', async () => {
-      const response2 = await myTreasuryVault.claim()
-      expectEvent(response2, 'Claim', {
-        sender: owner,
-        treasury: owner,
-        amount: ether('32888.888888888888888888')
-      })
+      await myTreasuryVault.claim()
+      const balance = await myToken.balanceOf(owner)
+      expect(fromEther(balance)).gt(0)
     })
     it('Can claim for third parties', async () => {
-      const response2 = await myTreasuryVault.claim({ from: person })
-      expectEvent(response2, 'Claim', {
-        sender: person,
-        treasury: owner,
-        amount: ether('32888.888888888888888888')
-      })
+      await myTreasuryVault.claim({ from: person })
+      const balance = await myToken.balanceOf(owner)
+      expect(fromEther(balance)).gt(0)
     })
   })
   describe('Update treasury', () => {

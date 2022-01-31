@@ -4,12 +4,15 @@ const {
 const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
+const { expect } = require('chai')
+const { fromEther } = require('../utils/shared')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const HoldersVault = artifacts.require('TutellusHoldersVault')
+const Token = artifacts.require('TutellusERC20')
 
 let myDeployer
-let myHoldersVault
+let myHoldersVault, myToken
 let owner, person
 
 const getAddresses = async () => {
@@ -25,8 +28,9 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myHoldersVault] = await Promise.all([
-    HoldersVault.at(addresses[3])
+  [myToken, myHoldersVault] = await Promise.all([
+    Token.at(addresses[0]),
+    HoldersVault.at(addresses[4])
   ])
 }
 
@@ -53,28 +57,16 @@ describe('HoldersVault', function () {
   })
   describe('Claim', () => {
     it('Can claim correct', async () => {
-      const response = await myHoldersVault.addBatch([owner, person], [ether('15000'), ether('15000')])
-      expectEvent(response, 'AddBatch', {
-        length: '2'
-      })
-      const response2 = await myHoldersVault.claim()
-      expectEvent(response2, 'Distribute', {
-        sender: owner,
-        account: owner,
-        amount: ether('5625')
-      })
+      await myHoldersVault.addBatch([owner, person], [ether('15000'), ether('15000')])
+      await myHoldersVault.claim()
+      const balance = await myToken.balanceOf(owner)
+      expect(fromEther(balance)).gt(0)
     })
     it('Can claim for third parties', async () => {
-      const response = await myHoldersVault.addBatch([owner, person], [ether('15000'), ether('15000')])
-      expectEvent(response, 'AddBatch', {
-        length: '2'
-      })
-      const response2 = await myHoldersVault.distribute(owner, { from: person })
-      expectEvent(response2, 'Distribute', {
-        sender: person,
-        account: owner,
-        amount: ether('5625')
-      })
+      await myHoldersVault.addBatch([owner, person], [ether('15000'), ether('15000')])
+      await myHoldersVault.distribute(owner, { from: person })
+      const balance = await myToken.balanceOf(owner)
+      expect(fromEther(balance)).gt(0)
     })
   })
 })

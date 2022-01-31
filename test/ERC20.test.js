@@ -19,7 +19,7 @@ describe('TutellusERC20', function () {
   })
   beforeEach(async () => {
     myRoleManager = await RoleManager.new()
-    myToken = await Token.new('Tutellus Token', 'TUT', ether('200000000'), myRoleManager.address)
+    myToken = await Token.new('Tutellus token', 'TUT', ether('200000000'), myRoleManager.address)
     await myRoleManager.grantMinterRole(owner)
   })
 
