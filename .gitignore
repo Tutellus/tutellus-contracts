@@ -8,7 +8,8 @@
 .pnp.js
 
 # testing
-/coverage
+coverage
+coverage.json
 
 # next.js
 /.next/
@@ -37,5 +38,3 @@ yarn-error.log*
 .vercel
 .yalc
 yalc.lock
-
-*.json

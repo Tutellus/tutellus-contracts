@@ -15,6 +15,7 @@ contract TutellusManager is AccessControlUpgradeable {
 
     event NewId(bytes32 indexed id, address addr);
     event Deployment(bytes32 indexed id, address indexed proxy, address implementation, bool upgrade);
+    event Locked(bytes32 indexed id, address addr);
 
     constructor () {
         __AccessControl_init();
@@ -73,5 +74,6 @@ contract TutellusManager is AccessControlUpgradeable {
 
     function lock(bytes32 id) public onlyRole(DEFAULT_ADMIN_ROLE) {
         locked[id] = true;
+        emit Locked(id, get[id]);
     }
 } 
