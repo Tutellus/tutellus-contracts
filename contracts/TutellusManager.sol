@@ -17,7 +17,7 @@ contract TutellusManager is AccessControlUpgradeable {
     event Deployment(bytes32 indexed id, address indexed proxy, address implementation, bool upgrade);
     event Locked(bytes32 indexed id, address addr);
 
-    constructor () {
+    function initialize() public initializer {
         __AccessControl_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(DEFAULT_ADMIN_ROLE, address(this));

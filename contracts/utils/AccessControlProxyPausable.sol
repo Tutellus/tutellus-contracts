@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 abstract contract AccessControlProxyPausable is PausableUpgradeable {
 
-    address private _manager;
+    address public config;
 
     bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
@@ -26,7 +26,7 @@ abstract contract AccessControlProxyPausable is PausableUpgradeable {
     }
 
     function hasRole(bytes32 role, address account) public view returns (bool) {
-        IAccessControlUpgradeable manager = IAccessControlUpgradeable(_manager);
+        IAccessControlUpgradeable manager = IAccessControlUpgradeable(config);
         return manager.hasRole(role, account);
     }
 
@@ -36,7 +36,7 @@ abstract contract AccessControlProxyPausable is PausableUpgradeable {
     }
 
     function __AccessControlProxyPausable_init_unchained(address manager) internal initializer {
-        _manager = manager;
+        config = manager;
     }
 
     function pause() public onlyRole(PAUSER_ROLE){
@@ -48,6 +48,6 @@ abstract contract AccessControlProxyPausable is PausableUpgradeable {
     }
 
     function updateManager(address manager) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _manager = manager;
+        config = manager;
     }
 }
