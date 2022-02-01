@@ -44,7 +44,7 @@ const setInstances = async (addresses) => {
     ])
 }
 
-describe.only('Manager', function () {
+describe('Manager', function () {
     before(async () => {
         [owner, person] = await web3.eth.getAccounts()
     })
