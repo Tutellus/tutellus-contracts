@@ -2,11 +2,15 @@
 
 # dependencies
 /node_modules
+/artifacts
+/cache
 /.pnp
 .pnp.js
+package-lock.json
 
 # testing
-/coverage
+coverage
+coverage.json
 
 # next.js
 /.next/
@@ -35,8 +39,3 @@ yarn-error.log*
 .vercel
 .yalc
 yalc.lock
-
-/examples/holders.json
-/examples/team.json
-holders.json
-team.json

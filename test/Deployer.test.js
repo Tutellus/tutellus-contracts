@@ -7,6 +7,7 @@ const { artifacts } = require('hardhat')
 // const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
+const { fromEther } = require('../utils/shared')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -14,7 +15,6 @@ const RoleManager = artifacts.require('TutellusRoleManager')
 const Staking = artifacts.require('TutellusStaking')
 const Farming = artifacts.require('TutellusFarming')
 const RewardsVault = artifacts.require('TutellusRewardsVault')
-const ClientsVault = artifacts.require('TutellusClientsVault')
 const HoldersVault = artifacts.require('TutellusHoldersVault')
 const TreasuryVault = artifacts.require('TutellusTreasuryVault')
 
@@ -22,7 +22,6 @@ let myDeployer
 let myToken
 let myRolemanager
 let myRewardsVault
-let myClientsVault
 let myHoldersVault
 let myTreasuryVault
 let owner, person
@@ -40,13 +39,12 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myToken, myRolemanager, myRewardsVault, myClientsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
+  [myToken, myRolemanager, myRewardsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
     Token.at(addresses[0]),
     RoleManager.at(addresses[1]),
     RewardsVault.at(addresses[2]),
-    ClientsVault.at(addresses[3]),
     HoldersVault.at(addresses[4]),
-    TreasuryVault.at(addresses[5])
+    TreasuryVault.at(addresses[5]),
   ])
 }
 
@@ -70,7 +68,7 @@ describe('Deployer', function () {
         myToken.totalSupply(),
         myToken.burned()
       ])
-      expect(name).to.eq('Tutellus Token')
+      expect(name).to.eq('Tutellus token')
       expect(symbol).to.eq('TUT')
       expect(cap.toString()).to.eq('200000000000000000000000000')
       expect(totalSupply.toString()).to.eq('184000000000000000000000000')
@@ -91,17 +89,14 @@ describe('Deployer', function () {
     })
     it('Add holder and claim', async () => {
       await myHoldersVault.add(person, ether('10'))
-      const response = await myHoldersVault.claim({ from: person }) // 10 / 8 = 1.25 * 4 blocks = 2.5
-      expectEvent(response, 'Distribute', {
-        account: person,
-        amount: ether('3.75')
-      })
+      await myHoldersVault.claim({ from: person }) // 10 / 8 = 1.25 * 4 blocks = 2.5
+      const balance = await myToken.balanceOf(person)
+      expect(fromEther(balance)).gt(0)
     })
     it('Claim treasury', async () => {
-      const response = await myTreasuryVault.claim() // 1 block => 16444.4 / 2 = 8222.2
-      expectEvent(response, 'Claim', {
-        amount: ether('32888.888888888888888888')
-      })
+      await myTreasuryVault.claim() // 1 block => 16444.4 / 2 = 8222.2
+      const balance = await myToken.balanceOf(owner)
+      expect(fromEther(balance)).gt(0)
     })
   })
 })

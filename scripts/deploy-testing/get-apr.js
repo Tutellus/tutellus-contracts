@@ -1,14 +1,16 @@
 const bre = require('hardhat')
-const Token = bre.artifacts.require('TutellusERC20')
-const RoleManager = bre.artifacts.require('TutellusRoleManager')
+// const Token = bre.artifacts.require('TutellusERC20')
+// const RoleManager = bre.artifacts.require('TutellusRoleManager')
+const Staking = bre.artifacts.require('TutellusStaking')
+const RewardsVault = bre.artifacts.require('TutellusRewardsVault')
 
 const {
-  ether, expectRevert, time
+  ether, time
 } = require('@openzeppelin/test-helpers')
 const fs = require('fs')
 const scanners = require('../../scanners.json')
 const { networks } = require('../../hardhat.config')
-const { BigNumber } = require('@ethersproject/bignumber')
+// const { BigNumber } = require('@ethersproject/bignumber')
 
 const scannerSet = () => {
   const chainId = networks[bre.network.name].chainId
@@ -36,7 +38,7 @@ async function main () {
 
   const stakingAllocation = stakingInfo[0]
   const stakingReleasedYear = releasedYear * stakingAllocation / ether('100')
-  const apr = 100 * stakingReleasedYear / balance 
+  const apr = 100 * stakingReleasedYear / balance
   console.log(`Staking APR: ${apr}%`)
 }
 // We recommend this pattern to be able to use async/await everywhere

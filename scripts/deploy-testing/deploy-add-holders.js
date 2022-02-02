@@ -1,8 +1,8 @@
 const bre = require('hardhat')
 const HoldersVault = bre.artifacts.require('TutellusHoldersVault')
-const {
-  ether, expectRevert, time
-} = require('@openzeppelin/test-helpers')
+// const {
+//   ether, expectRevert, time
+// } = require('@openzeppelin/test-helpers')
 const fs = require('fs')
 const scanners = require('../../scanners.json')
 const { networks } = require('../../hardhat.config')
@@ -18,9 +18,9 @@ const scannerSet = () => {
 async function main () {
   await bre.run('compile')
   scannerSet()
-  
+
   const holders = Object.keys(json)
-  const amounts = holders.map(function(x) {
+  const amounts = holders.map(function (x) {
     return json[x]
   })
   const myHoldersVault = await HoldersVault.at('0x3a9Ed1A6e4Bb78D753fBDbDDdA335486Cbe94e9A')

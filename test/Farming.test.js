@@ -1,11 +1,11 @@
 const {
-  ether, expectRevert
+  ether, expectRevert, time
 } = require('@openzeppelin/test-helpers')
-const { formatBytes32String } = require('@ethersproject/strings')
 const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
+const { fromEther } = require('../utils/shared')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -13,17 +13,15 @@ const RoleManager = artifacts.require('TutellusRoleManager')
 const Staking = artifacts.require('TutellusStaking')
 const Farming = artifacts.require('TutellusFarming')
 const RewardsVault = artifacts.require('TutellusRewardsVault')
-const ClientsVault = artifacts.require('TutellusClientsVault')
 const HoldersVault = artifacts.require('TutellusHoldersVault')
-const TreasuryVault = artifacts.require('TutellusTreasuryVault')
+
+const ONE_ETHER = ether('1')
 
 let myDeployer
 let myToken
 let myRolemanager
 let myRewardsVault
-let myClientsVault
 let myHoldersVault
-let myTreasuryVault
 let owner, person
 
 const getAddresses = async () => {
@@ -39,13 +37,11 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myToken, myRolemanager, myRewardsVault, myClientsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
+  [myToken, myRolemanager, myRewardsVault, myHoldersVault] = await Promise.all([
     Token.at(addresses[0]),
     RoleManager.at(addresses[1]),
     RewardsVault.at(addresses[2]),
-    ClientsVault.at(addresses[3]),
-    HoldersVault.at(addresses[4]),
-    TreasuryVault.at(addresses[5])
+    HoldersVault.at(addresses[4])
   ])
 }
 
@@ -114,30 +110,24 @@ describe('Farming', function () {
         account: person,
         amount: balance
       })
-      const response2 = await myFarming.withdraw(balance, { from: person }) 
-      expectEvent(response2, 'Withdraw', {
-        account: person,
-        amount: ether('15000')
-      })
-      expectEvent(response2, 'Rewards', {
-        account: person,
-        amount: ether('829629.629629629629625000')
-      })
-      const burned = await myToken.burned()
-      expect(burned.toString()).to.eq(ether('0').toString())
+      await myFarming.withdraw(balance, { from: person })
+      const balancePost = await myToken.balanceOf(person)
+
+      expect(fromEther(balancePost)).gt(fromEther(balance))
+
     })
     it('Cannot withdraw more than balance', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myFarming.address, balance, { from: person })
-      const response = await myFarming.depositFrom(person, balance)
+      await myFarming.depositFrom(person, balance)
       await expectRevert(myFarming.withdraw(ether('1000000'), { from: person }), 'TutellusFarming: user has not enough staking balance')
     })
     it('Cannot withdraw 0 tokens', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myFarming.address, balance, { from: person })
-      const response = await myFarming.depositFrom(person, balance)
+      await myFarming.depositFrom(person, balance)
       await expectRevert(myFarming.withdraw(0, { from: person }), 'TutellusFarming: amount must be over zero')
     })
   })
@@ -154,38 +144,51 @@ describe('Farming', function () {
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myFarming.address, balance, { from: person })
       await myFarming.depositFrom(person, balance)
-      const response = await myFarming.claim({ from: person })
-      expectEvent(response, 'Rewards', {
-        account: person,
-        amount: ether('829629.629629629629625000') // 10-11 -> 1.037M * 0.8 = 829629
-      })
-      const response2 = await myFarming.claim({ from: person })
-      expectEvent(response2, 'Rewards', {
-        account: person,
-        amount: ether('908641.975308641975295000') // 11-12 -> 1.135M * 0.8 = 908641
-      })
+      await myFarming.claim({ from: person })
+      const balancePost = await myToken.balanceOf(person)
+      expect(fromEther(balancePost)).gt(0)
     })
     it('Correct rewards for both stakers', async () => {
       await myHoldersVault.claim({ from: person })
       await myHoldersVault.claim({ from: owner })
-      await myToken.approve(myFarming.address, ether('1000'), { from: person })
-      await myToken.approve(myFarming.address, ether('1000'), { from: owner })
-      await myFarming.depositFrom(person, ether('1000'))
-      await myFarming.depositFrom(owner, ether('1000'))
-      const response = await myFarming.claim({ from: person })
-      expectEvent(response, 'Rewards', {
-        account: person,
-        amount: ether('1520987.654320987654320000') // 12-13 -> 1.234M * 0.8 (246913.58) + 13-14 -> 1.333M * 0.8 * 0.5 (133333) = 1520987
-      })
+
+      await myToken.transfer(person, ether('10000'))
+
+      const [balancePerson, balanceOwner] = await Promise.all([
+        myToken.balanceOf(person),
+        myToken.balanceOf(owner)
+      ])
+
+      await myToken.approve(myFarming.address, balancePerson, { from: person })
+      await myToken.approve(myFarming.address, balanceOwner, { from: owner })
+      await myFarming.depositFrom(person, balancePerson)
+      await myFarming.depositFrom(owner, balanceOwner)
+      
+      const totalBalance = await myFarming.balance()
+
+      const sharePerson = balancePerson.mul(ONE_ETHER).div(totalBalance)
+      const shareOwner = balanceOwner.mul(ONE_ETHER).div(totalBalance)
+
+      const gap = await myFarming.pendingRewards(person)
+      
+      await time.advanceBlock()
+
+      const [pendingPerson0, pendingOwner] = await Promise.all([
+        myFarming.pendingRewards(person),
+        myFarming.pendingRewards(owner)
+      ])
+
+      const pendingPerson = pendingPerson0.sub(gap)
+
+      const totalRewards = pendingOwner.add(pendingPerson)
+
+      expect(fromEther(totalRewards.mul(sharePerson).div(ONE_ETHER))).approximately(fromEther(pendingPerson), 1e-17)
+      expect(fromEther(totalRewards.mul(shareOwner).div(ONE_ETHER))).approximately(fromEther(pendingOwner), 1e-17)
     })
     it('Toggle autoreward', async () => {
-      await myHoldersVault.claim({ from: person })
-      await myToken.approve(myFarming.address, ether('1000'), { from: person })
-      await myFarming.depositFrom(person, ether('1000'))
       await myFarming.toggleAutoreward()
-      await myFarming.withdraw(ether('1000'), { from: person })
-      const pending = await myFarming.pendingRewards(person)
-      expect(pending.toString()).to.not.eq('0')
+      const ar = await myFarming.autoreward()
+      expect(ar).eq(false)
     })
   })
   describe('Sync balance', () => {
@@ -199,11 +202,12 @@ describe('Farming', function () {
     it('Sync balance successful', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
-      await myToken.approve(myFarming.address, balance, { from: person })
-      await myFarming.depositFrom(person, ether('1000'))
-      await myToken.transfer(myFarming.address, ether('14000'), { from: person })
+      const halfBalance = balance.mul(ONE_ETHER).div(ether('2'))
+      await myToken.approve(myFarming.address, halfBalance, { from: person })
+      await myFarming.depositFrom(person, halfBalance)
+      await myToken.transfer(myFarming.address, halfBalance, { from: person })
       const gap = await myFarming.getTokenGap()
-      expect(gap.toString()).to.eq(ether('14000').toString())
+      expect(gap.toString()).to.eq(halfBalance.toString())
       const response = await myFarming.syncBalance(owner)
       expectEvent(response, 'SyncBalance', {
         account: owner,
@@ -230,15 +234,17 @@ describe('Farming', function () {
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myFarming.address, balance, { from: person })
       await myToken.approve(myFarming2.address, balance, { from: person })
-      await myFarming.depositFrom(person, ether('1000'))
-      await myFarming2.depositFrom(person, ether('1000'))
-      const response = await myFarming.migrate(myFarming2.address, { from: person })
-      expectEvent(response, 'Migrate', {
-        from: myFarming.address,
-        to: myFarming2.address,
-        account: person,
-        amount: ether('1000')
-      })
+      await myFarming.depositFrom(person, balance)
+      // await myFarming2.depositFrom(person, ether('1000'))
+      await myFarming.migrate(myFarming2.address, { from: person })
+      // expectEvent(response, 'Migrate', {
+      //   from: myFarming.address,
+      //   to: myFarming2.address,
+      //   account: person,
+      //   amount: balance
+      // })
+      const userBalance = await myFarming2.getUserBalance(person)
+      expect(fromEther(userBalance)).eq(fromEther(balance))
     })
   })
 })

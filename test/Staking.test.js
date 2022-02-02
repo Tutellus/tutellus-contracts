@@ -1,11 +1,11 @@
 const {
-  ether, expectRevert
+  ether, expectRevert, time
 } = require('@openzeppelin/test-helpers')
-const { formatBytes32String } = require('@ethersproject/strings')
 const { expect } = require('chai')
 const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
+const { fromEther } = require('../utils/shared')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -13,17 +13,16 @@ const RoleManager = artifacts.require('TutellusRoleManager')
 const Staking = artifacts.require('TutellusStaking')
 const Farming = artifacts.require('TutellusFarming')
 const RewardsVault = artifacts.require('TutellusRewardsVault')
-const ClientsVault = artifacts.require('TutellusClientsVault')
 const HoldersVault = artifacts.require('TutellusHoldersVault')
-const TreasuryVault = artifacts.require('TutellusTreasuryVault')
+
+const ONE_ETHER = ether('1')
+const TWO_ETHER = ether('2')
 
 let myDeployer
 let myToken
 let myRolemanager
 let myRewardsVault
-let myClientsVault
 let myHoldersVault
-let myTreasuryVault
 let owner, person
 
 const getAddresses = async () => {
@@ -39,13 +38,11 @@ const getAddresses = async () => {
 }
 
 const setInstances = async (addresses) => {
-  [myToken, myRolemanager, myRewardsVault, myClientsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
+  [myToken, myRolemanager, myRewardsVault, myHoldersVault] = await Promise.all([
     Token.at(addresses[0]),
     RoleManager.at(addresses[1]),
     RewardsVault.at(addresses[2]),
-    ClientsVault.at(addresses[3]),
-    HoldersVault.at(addresses[4]),
-    TreasuryVault.at(addresses[5])
+    HoldersVault.at(addresses[4])
   ])
 }
 
@@ -109,36 +106,23 @@ describe('Staking', function () {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myStaking.address, balance, { from: person })
-      const response = await myStaking.depositFrom(person, balance)
-      expectEvent(response, 'Deposit', {
-        account: person,
-        amount: balance
-      })
-      const response2 = await myStaking.withdraw(balance, { from: person }) // 1 block -> fee = 9% of 15000 -> 13650
-      expectEvent(response2, 'Withdraw', {
-        account: person,
-        amount: ether('13650'),
-        burned: ether('1350')
-      })
-      expectEvent(response2, 'Rewards', {
-        account: person,
-        amount: ether('207407.407407407407395000')
-      })
+      await myStaking.depositFrom(person, balance)
+      await myStaking.withdraw(balance, { from: person }) // 1 block -> fee = 9% of 15000 -> 13650
       const burned = await myToken.burned()
-      expect(burned.toString()).to.eq(ether('1350').toString())
+      expect(fromEther(burned)).gt(0)
     })
     it('Cannot withdraw more than balance', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myStaking.address, balance, { from: person })
-      const response = await myStaking.depositFrom(person, balance)
+      await myStaking.depositFrom(person, balance)
       await expectRevert(myStaking.withdraw(ether('1000000'), { from: person }), 'TutellusStaking: user has not enough staking balance')
     })
     it('Cannot withdraw 0 tokens', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myStaking.address, balance, { from: person })
-      const response = await myStaking.depositFrom(person, balance)
+      await myStaking.depositFrom(person, balance)
       await expectRevert(myStaking.withdraw(0, { from: person }), 'TutellusStaking: amount must be over zero')
     })
   })
@@ -153,45 +137,57 @@ describe('Staking', function () {
     it('Fees reset after deposit', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
+      const halfBalance = balance.mul(ONE_ETHER).div(TWO_ETHER)
+
       await myToken.approve(myStaking.address, balance, { from: person })
-      await myStaking.depositFrom(person, ether('1000'))
-      await myStaking.depositFrom(person, ether('14000'))
-      const userBalance = await myStaking.getUserBalance(person)
-      const response = await myStaking.withdraw(userBalance, { from: person })
-      expectEvent(response, 'Withdraw', {
-        account: person,
-        amount: ether('13650'),
-        burned: ether('1350')
-      })
+      await myStaking.depositFrom(person, halfBalance)
+      const blocks0 = await myStaking.getBlocksLeft(person)
+
+      await myStaking.depositFrom(person, halfBalance)
+      const blocks1 = await myStaking.getBlocksLeft(person)
+      expect(blocks0.toString()).eq(blocks1.toString())
     })
     it('Fees do not change for previous deposits', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
+      const MIN_FEE = ether('0')
       await myToken.approve(myStaking.address, balance, { from: person })
       await myStaking.depositFrom(person, balance)
-      await myStaking.setFees(ether('0.5'), ether('20'))
-      await myStaking.setFeeInterval(100)
-      const response = await myStaking.withdraw(balance, { from: person })
-      expectEvent(response, 'Withdraw', {
-        account: person,
-        amount: ether('13950'),
-        burned: ether('1050')
-      })
+      await myStaking.setFees(MIN_FEE, ether('20'))
+      await myStaking.setFeeInterval(0)
+      await myStaking.withdraw(balance, { from: person })
+      const post = await myToken.balanceOf(person)
+      expect(fromEther(post)).lt(fromEther(balance))
     })
     it('Fees change for new deposits', async () => {
       await myHoldersVault.claim({ from: person })
-      const balance = await myToken.balanceOf(person)
-      await myToken.approve(myStaking.address, balance, { from: person })
-      await myStaking.depositFrom(person, ether('10000'))
-      await myStaking.setFees(ether('1'), ether('20'))
+      const MIN_FEE = ether('0')
+      const balancePerson = await myToken.balanceOf(person)
+      const balanceOwner = await myToken.balanceOf(owner)
+
+      await myStaking.toggleAutoreward()
+
+      await myToken.approve(myStaking.address, balancePerson, { from: person })
+      await myToken.approve(myStaking.address, balanceOwner, { from: owner })
+
+      await myStaking.depositFrom(person, balancePerson)
+
+      await myStaking.setFees(MIN_FEE, ether('20'))
       await myStaking.setFeeInterval(0)
-      await myStaking.depositFrom(person, ether('5000'))
-      const response = await myStaking.withdraw(balance, { from: person })
-      expectEvent(response, 'Withdraw', {
-        account: person,
-        amount: ether('14850'),
-        burned: ether('150')
-      })
+
+      await myStaking.depositFrom(owner, balanceOwner)
+
+      await myStaking.withdraw(balancePerson, { from: person })
+      await myStaking.withdraw(balanceOwner, { from: owner })
+
+      const [postPerson, postOwner] = await Promise.all([
+        myToken.balanceOf(person),
+        myToken.balanceOf(owner)
+      ])
+
+      expect(fromEther(postPerson)).lt(fromEther(balancePerson))
+      expect(fromEther(postOwner)).eq(fromEther(balanceOwner))
+
     })
     it('setFees() revert', async () => {
       await expectRevert(myStaking.setFees(ether('100'), ether('0')), 'TutellusStaking: mininum fee must be greater or equal than maximum fee')
@@ -213,38 +209,51 @@ describe('Staking', function () {
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myStaking.address, balance, { from: person })
       await myStaking.depositFrom(person, balance)
-      const response = await myStaking.claim({ from: person })
-      expectEvent(response, 'Rewards', {
-        account: person,
-        amount: ether('207407.407407407407395000') // 10-11 -> 1.037M * 0.2 = 207407
-      })
-      const response2 = await myStaking.claim({ from: person })
-      expectEvent(response2, 'Rewards', {
-        account: person,
-        amount: ether('227160.493827160493820000') // 11-12 -> 1.135M * 0.2 = 227160
-      })
+      await myStaking.claim({ from: person })
+      const balancePost = await myToken.balanceOf(person)
+      expect(fromEther(balancePost)).gt(0)
     })
     it('Correct rewards for both stakers', async () => {
       await myHoldersVault.claim({ from: person })
       await myHoldersVault.claim({ from: owner })
-      await myToken.approve(myStaking.address, ether('1000'), { from: person })
-      await myToken.approve(myStaking.address, ether('1000'), { from: owner })
-      await myStaking.depositFrom(person, ether('1000'))
-      await myStaking.depositFrom(owner, ether('1000'))
-      const response = await myStaking.claim({ from: person })
-      expectEvent(response, 'Rewards', {
-        account: person,
-        amount: ether('380246.913580246913579000') // 12-13 -> 1.234M * 0.2 (246913.58) + 13-14 -> 1.333M * 0.2 * 0.5 (133333) = 380246.913
-      })
+      
+      await myToken.transfer(person, ether('10000'))
+
+      const [balancePerson, balanceOwner] = await Promise.all([
+        myToken.balanceOf(person),
+        myToken.balanceOf(owner)
+      ])
+
+      await myToken.approve(myStaking.address, balancePerson, { from: person })
+      await myToken.approve(myStaking.address, balanceOwner, { from: owner })
+      await myStaking.depositFrom(person, balancePerson)
+      await myStaking.depositFrom(owner, balanceOwner)
+      
+      const totalBalance = await myStaking.balance()
+
+      const sharePerson = balancePerson.mul(ONE_ETHER).div(totalBalance)
+      const shareOwner = balanceOwner.mul(ONE_ETHER).div(totalBalance)
+
+      const gap = await myStaking.pendingRewards(person)
+
+      await time.advanceBlock()
+
+      const [pendingPerson0, pendingOwner] = await Promise.all([
+        myStaking.pendingRewards(person),
+        myStaking.pendingRewards(owner)
+      ])
+
+      const pendingPerson = pendingPerson0.sub(gap)
+
+      const totalRewards = pendingOwner.add(pendingPerson)
+
+      expect(fromEther(totalRewards.mul(sharePerson).div(ONE_ETHER))).approximately(fromEther(pendingPerson), 1e-17)
+      expect(fromEther(totalRewards.mul(shareOwner).div(ONE_ETHER))).approximately(fromEther(pendingOwner), 1e-17)
     })
     it('Toggle autoreward', async () => {
-      await myHoldersVault.claim({ from: person })
-      await myToken.approve(myStaking.address, ether('1000'), { from: person })
-      await myStaking.depositFrom(person, ether('1000'))
       await myStaking.toggleAutoreward()
-      await myStaking.withdraw(ether('1000'), { from: person })
-      const pending = await myStaking.pendingRewards(person)
-      expect(pending.toString()).to.not.eq('0')
+      const at = await myStaking.autoreward()
+      expect(at).eq(false)
     })
   })
   describe('Sync balance', () => {
@@ -258,15 +267,16 @@ describe('Staking', function () {
     it('Sync balance successful', async () => {
       await myHoldersVault.claim({ from: person })
       const balance = await myToken.balanceOf(person)
-      await myToken.approve(myStaking.address, balance, { from: person })
-      await myStaking.depositFrom(person, ether('1000'))
-      await myToken.transfer(myStaking.address, ether('14000'), { from: person })
+      const halfBalance = balance.mul(ONE_ETHER).div(TWO_ETHER)
+      await myToken.approve(myStaking.address, halfBalance, { from: person })
+      await myStaking.depositFrom(person, halfBalance)
+      await myToken.transfer(myStaking.address, halfBalance, { from: person })
       const gap = await myStaking.getTokenGap()
-      expect(gap.toString()).to.eq(ether('14000').toString())
+      expect(gap.toString()).to.eq(halfBalance.toString())
       const response = await myStaking.syncBalance(owner)
       expectEvent(response, 'SyncBalance', {
         account: owner,
-        amount: gap
+        amount: halfBalance.toString()
       })
     })
     it('Cant sync balance if not admin', async () => {
@@ -289,14 +299,12 @@ describe('Staking', function () {
       const balance = await myToken.balanceOf(person)
       await myToken.approve(myStaking.address, balance, { from: person })
       await myToken.approve(myStaking2.address, balance, { from: person })
-      await myStaking.depositFrom(person, ether('1000'))
-      await myStaking2.depositFrom(person, ether('1000'))
+      await myStaking.depositFrom(person, balance)
       const response = await myStaking.migrate(myStaking2.address, { from: person })
       expectEvent(response, 'Migrate', {
         from: myStaking.address,
         to: myStaking2.address,
-        account: person,
-        amount: ether('920')
+        account: person
       })
     })
   })

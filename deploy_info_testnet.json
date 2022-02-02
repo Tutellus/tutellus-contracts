@@ -1,0 +1,25 @@
+{
+    "token": {
+        "address": "0x75280a30520cF5Ae0a85B76fFA634D459E6cF403"
+    },
+    "factory": {
+        "name": "Nash21 Guarantee Contract",
+        "symbol": "N21NFT",
+        "address": "0xd10f3ee63549C17A355F4E46f171CE8E45514fa8",
+        "implementation": "0x322E108765a8958b7238875932533B7271A7E1c9",
+        "next_id": 1
+    },
+    "guarantee": {
+        "address": "0xAA6E2484921fe693f1D9B906E6758A1E66a7e393",
+        "implementation": "0x044A1be04478B49eb3583C4912DE45841bd1f701"
+    },
+    "deployer": {
+        "address": "0x9e523EE1C73257ba24F222F0C85649c3bdb715F4"
+    },
+    "opensea": {
+        "registry": "0xF57B2c51dED3A29e6891aba85459d600256Cf317",
+        "exchange": "0x5206e78b21Ce315ce284FB24cf05e0585A93B1d9",
+        "transfer_proxy": "0x82d102457854c985221249f86659C9d6cf12aA72",
+        "weth": "0xc778417E063141139Fce010982780140Aa0cD5Ab"
+    }
+}

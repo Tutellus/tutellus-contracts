@@ -5,7 +5,7 @@ const { artifacts } = require('hardhat')
 // const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 // const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
-const { expect } = require('chai')
+// const { expect } = require('chai')
 
 const Token = artifacts.require('TutellusERC20')
 const RoleManager = artifacts.require('TutellusRoleManager')
@@ -19,7 +19,7 @@ describe('TutellusERC20', function () {
   })
   beforeEach(async () => {
     myRoleManager = await RoleManager.new()
-    myToken = await Token.new('Tutellus Token', 'TUT', ether('200000000'), myRoleManager.address)
+    myToken = await Token.new('Tutellus token', 'TUT', ether('200000000'), myRoleManager.address)
     await myRoleManager.grantMinterRole(owner)
   })
 

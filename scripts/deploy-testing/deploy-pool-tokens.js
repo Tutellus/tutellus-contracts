@@ -3,12 +3,12 @@ const Token = bre.artifacts.require('TutellusERC20')
 const RoleManager = bre.artifacts.require('TutellusRoleManager')
 
 const {
-  ether, expectRevert, time
+  ether
 } = require('@openzeppelin/test-helpers')
 const fs = require('fs')
 const scanners = require('../../scanners.json')
 const { networks } = require('../../hardhat.config')
-const { BigNumber } = require('@ethersproject/bignumber')
+// const { BigNumber } = require('@ethersproject/bignumber')
 
 const scannerSet = () => {
   const chainId = networks[bre.network.name].chainId
