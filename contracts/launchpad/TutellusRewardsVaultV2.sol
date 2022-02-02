@@ -73,7 +73,7 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
     return released[account] + (_releasedFromLastUpdate() * allocation[account] / 100 ether);
   }
 
-  function distributeTokens(address account, uint256 amount) public {
+  function distribute(address account, uint256 amount) public {
     require(amount <= availableId(msg.sender), "TutellusRewardsVaultV2: amount exceeds available");
     distributed[account] += amount;
     IERC20 tokenInterface = IERC20(ITutellusManager(config).get(keccak256("ERC20")));
