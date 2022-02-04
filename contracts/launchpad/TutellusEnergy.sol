@@ -86,8 +86,14 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
     }
 
     function totalSupply() public view virtual override returns (uint256) {
+      uint256 scaledSupply = scaledTotalSupply();
+
+      if (scaledSupply == 0) {
+        return 0;
+      }
+
       return
-        scaledTotalSupply().rayMul(_getNormalization());
+        scaledSupply.rayMul(_getNormalization());
     }
 
     function scaledTotalSupply() public view virtual returns (uint256) {
