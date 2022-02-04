@@ -270,28 +270,11 @@ contract TutellusStakingV2 is UUPSUpgradeableByRole {
     return response;
   }
 
-  function emergencyWithdraw() whenPaused public returns (uint256) {
+  function emergencyWithdraw() public returns (uint256) {
     ITutellusERC20 tokenInterface = ITutellusERC20(token);
     data[msg.sender].amount -= data[msg.sender].amount;
     balance -= data[msg.sender].amount;
     tokenInterface.transfer(msg.sender, data[msg.sender].amount);
     return data[msg.sender].amount;
   }
-
-  //// function lastReward() public view returns (uint256) {
-
-    //   ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("REWARDS")));
-
-    //   if(block.number > rewardsInterface.startBlock() && block.number < rewardsInterface.endBlock()) {
-    //       uint256 reward = rewardsInterface.rewardPerBlock();
-    //       if (block.number > rewardsInterface.changeBlock()) {
-    //           uint256 comp0 = (rewardsInterface.increment() * ((block.number - rewardsInterface.changeBlock()) ** 2)) / 2;
-    //           uint256 comp1 = (rewardsInterface.increment() * ((block.number - rewardsInterface.changeBlock() - 1) ** 2)) / 2;
-    //           reward += (comp0 - comp1);
-    //       }
-    //       return reward * rewardsInterface.allocation(ITutellusManager(config).name(address(this))) / 100 ether;
-    //   } else {
-    //     return 0;
-    //   }
-    // }
 }
