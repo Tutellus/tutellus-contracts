@@ -10,7 +10,8 @@
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "coverage": "hardhat coverage --solcoverjs ./config.solcover.js"
+    "coverage": "hardhat coverage --solcoverjs ./config.solcover.js",
+    "interface": "hardhat gen-interface"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,7 @@
     "dotenv": "^8.2.0",
     "eslint": "^8.8.0",
     "hardhat-gas-reporter": "^1.0.7",
+    "hardhat-interface-generator": "0.0.6",
     "ipfs-http-client": "^53.0.1",
     "solidity-coverage": "^0.7.18"
   },
