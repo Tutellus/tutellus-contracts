@@ -38,7 +38,7 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
       rate = newRate;
     }
 
-    function _getNormalization() internal view returns (uint256) {
+    function getNormalization() public view returns (uint256) {
       uint40 timestamp = lastUpdateTimestamp;
 
       if (timestamp == uint40(block.timestamp)) {
