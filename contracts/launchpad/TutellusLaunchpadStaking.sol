@@ -137,9 +137,9 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   // Withdraws tokens from staking
-  function withdraw(address account, uint256 amount) public update returns (uint256) {
+  function withdraw(uint256 amount) public update returns (uint256) {
     require(amount > 0, "TutellusLaunchpadStaking: amount must be over zero");
-
+    address account = msg.sender;
     Data storage user = data[account];
 
     require(amount <= user.amount, "TutellusLaunchpadStaking: user has not enough staking balance");
@@ -204,7 +204,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   function _reward(address account) internal {
-    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("LAUNCHPAD_VAULT")));
+    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("REWARDS")));
     uint256 amount = data[account].notClaimed;
     if(amount > 0) {
       data[account].notClaimed = 0;
@@ -236,8 +236,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
       if(balance > 0){
         ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("REWARDS")));
         uint256 released = rewardsInterface.released(address(this)) - _released;
-        uint256 total = (released * 1e18 / balance);
-        rewards += (accRewardsPerShare - user.rewardDebt + total) * user.amount / 1e18;
+        uint256 total = (released * 1 ether / balance);
+        rewards += (accRewardsPerShare - user.rewardDebt + total) * user.amount / 1 ether;
       }
       return rewards;
   }

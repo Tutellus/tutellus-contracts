@@ -9,7 +9,7 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
 
   bytes32 public constant REWARDS_MANAGER_ROLE = keccak256("REWARDS_MANAGER_ROLE");
 
-  mapping(address=>uint256) public released;
+  mapping(address=>uint256) internal _released;
   mapping(address=>uint256) public distributed;
   mapping(address=>uint256) public allocation;
   mapping(uint256=>address) public id;
@@ -25,7 +25,7 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
 
   modifier update() {
     for(uint256 i=0; i<total; i++) {
-      released[id[i]] = releasedId(id[i]);
+      _released[id[i]] = released(id[i]);
     }
     lastUpdate = block.number;
     _;
@@ -61,7 +61,7 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
   }
 
   function availableId(address account) public view returns (uint256) {
-    return releasedId(account) - distributed[account];
+    return released(account) - distributed[account];
   }
 
   function _releasedFromLastUpdate() internal view returns (uint256) {
@@ -69,8 +69,8 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
     return blocks * rewardPerBlock;
   }
 
-  function releasedId(address account) public view returns (uint256) {
-    return released[account] + (_releasedFromLastUpdate() * allocation[account] / 100 ether);
+  function released(address account) public view returns (uint256) {
+    return _released[account] + (_releasedFromLastUpdate() * allocation[account] / 100 ether);
   }
 
   function distribute(address account, uint256 amount) public {

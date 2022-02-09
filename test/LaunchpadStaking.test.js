@@ -169,11 +169,61 @@ describe.only('Launchpad Staking', function () {
 
             const energyBalance = await myEnergy.balanceOf(owner)
             expect(etherToNumber(energyBalance)).eq(etherToNumber(ONE_ETHER))
+        })
+    })
+    describe('Withdraw', () => {
+        beforeEach(async () => {
+            const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+    
+            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+    
+            const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+        })
+        it('Can withdraw all and reset energy', async () => {
+            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
 
             await time.advanceBlock()
 
-            const energyBalance2 = await myEnergy.balanceOf(owner)
-            expect(etherToNumber(energyBalance2)).gt(etherToNumber(ONE_ETHER))
+            await myLaunchpadStaking.withdraw(ONE_ETHER)
+
+            const energyBalance = await myEnergy.balanceOf(owner)
+            expect(etherToNumber(energyBalance)).eq(0)
+        })
+    })
+    describe('Claim', () => {
+        beforeEach(async () => {
+            const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+    
+            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+    
+            const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+        })
+        it('Can claim rewards', async () => {
+            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+
+            const [balancePrev, rewardPerBlock] = await Promise.all([
+                myToken.balanceOf(owner),
+                myRewardsVaultV2.rewardPerBlock()
+            ]) 
+
+            await myLaunchpadStaking.claim()
+
+            const balancePost = await myToken.balanceOf(owner)
+
+            expect(etherToNumber(balancePrev) + etherToNumber(rewardPerBlock)).eq(etherToNumber(balancePost))
+
         })
     })
 })
