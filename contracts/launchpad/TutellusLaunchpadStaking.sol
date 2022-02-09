@@ -2,10 +2,14 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ITutellusERC20.sol";
+import "../interfaces/ITutellusEnergy.sol";
 import "../interfaces/ITutellusRewardsVaultV2.sol";
 import "../interfaces/ITutellusManager.sol";
+import '../utils/UUPSUpgradeableByRole.sol';
 
-contract TutellusLaunchpadStaking {
+contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
+
+  bytes32 public constant LAUNCHPAD_ADMIN_ROLE = keccak256("LAUNCHPAD_ADMIN_ROLE");
 
   bool public autoreward;
 
@@ -15,6 +19,7 @@ contract TutellusLaunchpadStaking {
   uint256 public minFee;
   uint256 public maxFee;
   uint256 public accRewardsPerShare;
+  uint256 public energyMultiplier;
 
   uint256 internal _released;
 
@@ -22,16 +27,17 @@ contract TutellusLaunchpadStaking {
   uint public feeInterval;
   uint public stakers;
 
-  address public faction;
-
   struct Data {
     uint256 amount;
     uint256 rewardDebt;
     uint256 notClaimed;
+    
     uint endInterval;
     uint256 minFee;
     uint256 maxFee;
     uint256 feeInterval;
+
+    uint256 energyDebt; 
   }
 
   mapping(address=>Data) private data;
@@ -48,20 +54,15 @@ contract TutellusLaunchpadStaking {
   event SetFees(uint256 minFee, uint256 maxFee, uint feeInterval);
   event Migrate(address from, address to, address account, uint256 amount, bytes response);
 
-  constructor (address token_) {
-    // __AccessControlProxyPausable_init(msg.sender);
+  function initialize (address tkn) public initializer {
+    __AccessControlProxyPausable_init(msg.sender);
     // minFee = 1e17;
     // maxFee = 1e19;
     // feeInterval = 1296000;
     autoreward = true;
     lastUpdate = block.number;
-    token = token_;
-    faction = msg.sender;
-  }
-
-  modifier onlyFaction {
-    require(msg.sender == faction, 'TutellusLaunchpadStaking: only faction');
-    _;
+    token = tkn;
+    energyMultiplier = 1 ether;
   }
 
   modifier update() {
@@ -85,7 +86,7 @@ contract TutellusLaunchpadStaking {
   }
 
   // Sets maximum and minimum fees, and fees interval
-  function setFees(uint256 minFee_, uint256 maxFee_, uint feeInterval_) public onlyFaction {
+  function setFees(uint256 minFee_, uint256 maxFee_, uint feeInterval_) public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
     require(minFee_ <= maxFee_, "TutellusLaunchpadStaking: mininum fee must be greater or equal than maximum fee");
     require(minFee_ <= 1e20, "TutellusLaunchpadStaking: minFee cannot exceed 100 ether");
     require(maxFee_ <= 1e20, "TutellusLaunchpadStaking: maxFee cannot exceed 100 ether");
@@ -96,10 +97,11 @@ contract TutellusLaunchpadStaking {
   }
 
   // Deposits tokens for staking
-  function deposit(address account, uint256 amount) public onlyFaction update {
+  function deposit(address account, uint256 amount) public update {
     require(amount > 0, "TutellusLaunchpadStaking: amount must be over zero");
 
     ITutellusERC20 tokenInterface = ITutellusERC20(token);
+    ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
 
     require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusLaunchpadStaking: amount exceeds allowance");
     require(tokenInterface.balanceOf(account) >= amount, "TutellusLaunchpadStaking: amount exceeds balance");
@@ -123,7 +125,11 @@ contract TutellusLaunchpadStaking {
       _reward(account);
     }
 
+    uint256 energyAmount = amount * energyMultiplier / 1 ether;
+    user.energyDebt += energyInterface.scale(energyAmount);
+
     tokenInterface.transferFrom(account, address(this), amount);
+    energyInterface.mint(account, energyAmount);
 
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -131,12 +137,20 @@ contract TutellusLaunchpadStaking {
   }
 
   // Withdraws tokens from staking
-  function withdraw(address account, uint256 amount) public onlyFaction update returns (uint256) {
+  function withdraw(address account, uint256 amount) public update returns (uint256) {
     require(amount > 0, "TutellusLaunchpadStaking: amount must be over zero");
 
     Data storage user = data[account];
 
     require(amount <= user.amount, "TutellusLaunchpadStaking: user has not enough staking balance");
+
+    ITutellusERC20 tokenInterface = ITutellusERC20(token);
+    ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
+
+    uint256 energyShare = amount * user.energyDebt / user.amount;
+    uint256 energyAmount = energyInterface.unscale(energyShare);
+
+    energyInterface.burn(account, energyAmount);
 
     _updateRewards(account);
 
@@ -148,15 +162,14 @@ contract TutellusLaunchpadStaking {
       stakers -= 1;
     }
 
-    ITutellusERC20 tokenInterface = ITutellusERC20(token);
-
     uint256 burned = amount * getFee(account) / 1e20;
-    amount -= burned;
-
+  
     if(autoreward) {
       _reward(account);
     }
+
     if(burned > 0){
+      amount -= burned;
       tokenInterface.burn(burned);
     }
     
@@ -185,7 +198,7 @@ contract TutellusLaunchpadStaking {
   }
 
   // Toggles autoreward
-  function toggleAutoreward() public onlyFaction {
+  function toggleAutoreward() public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
     autoreward = !autoreward;
     emit ToggleAutoreward(autoreward);
   }

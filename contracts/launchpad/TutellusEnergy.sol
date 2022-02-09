@@ -23,6 +23,9 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
     uint40 public lastUpdateTimestamp;
     uint256 private _normalization;
 
+    event Mint(address sender, address account, uint256 amount);
+    event Burn(address sender, address account, uint256 amount);
+
     function initialize() public initializer {
       __ERC20_init_unchained('Tutellus Energy Token', 'TET');
       __AccessControlProxyPausable_init(msg.sender);
@@ -38,7 +41,15 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
       rate = newRate;
     }
 
-    function getNormalization() public view returns (uint256) {
+    function scale(uint256 amount) public view returns (uint256) {
+      return amount.rayDiv(_getNormalization());
+    }
+
+    function unscale(uint256 amount) public view returns (uint256) {
+      return amount.rayMul(_getNormalization());
+    } 
+
+    function _getNormalization() internal view returns (uint256) {
       uint40 timestamp = lastUpdateTimestamp;
 
       if (timestamp == uint40(block.timestamp)) {
@@ -49,26 +60,29 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
     }
 
     function mint(address account, uint256 amount) external onlyRole(ENERGY_MINTER_ROLE) {
-      uint256 amountScaled = amount.rayDiv(_getNormalization());
+      uint256 amountScaled = scale(amount);
       require(amountScaled != 0, 'Cant mint 0 tokens');
 
       _mint(account, amountScaled);
 
-      emit Transfer(address(0), account, amount);
+      emit Mint(msg.sender, account, amount);
     }
 
     function burn(address account, uint256 amount) external onlyRole(ENERGY_MINTER_ROLE) {
-      uint256 amountScaled = amount.rayDiv(_getNormalization());
+      uint256 amountScaled = scale(amount);
       require(amountScaled != 0, 'Cant burn 0 tokens');
 
       _burn(account, amountScaled);
 
-      emit Transfer(account, address(0), amount);
+      emit Burn(msg.sender, account, amount);
     }
 
     function burnAll(address account) external onlyRole(ENERGY_MINTER_ROLE) {
-      require(scaledBalanceOf(account) > 0, 'Cant burn 0 tokens');
-      _burn(account, scaledBalanceOf(account));
+      uint256 amount = scaledBalanceOf(account);
+      require(amount > 0, 'Cant burn 0 tokens');
+      _burn(account, amount);
+
+      emit Burn(msg.sender, account, amount);
     }
 
     function balanceOf(address account) public view virtual override returns (uint256) {
@@ -78,7 +92,7 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
         return 0;
       }
 
-      return scaledBalance.rayMul(_getNormalization());
+      return unscale(scaledBalance);
     }
 
     function scaledBalanceOf(address account) public view virtual returns (uint256) {
@@ -92,8 +106,7 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
         return 0;
       }
 
-      return
-        scaledSupply.rayMul(_getNormalization());
+      return unscale(scaledSupply);
     }
 
     function scaledTotalSupply() public view virtual returns (uint256) {

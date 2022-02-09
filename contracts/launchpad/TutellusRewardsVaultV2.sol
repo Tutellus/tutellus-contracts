@@ -31,7 +31,7 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
     _;
   }
 
-  function initialize() public initializer{
+  function initialize() public initializer {
     __AccessControlProxyPausable_init(msg.sender);
     lastUpdate = block.number;
   }

@@ -80,7 +80,7 @@ function getCompoundedInterest(
     return ratePerSecond.mul(seconds).add(secondTerm).add(thirdTerm).mul(ONE_ETHER).div(RAY)
 }
 
-describe.only('Energy Token', function () {
+describe('Energy Token', function () {
     before(async () => {
         [owner, person] = await web3.eth.getAccounts()
     })
@@ -266,6 +266,45 @@ describe.only('Energy Token', function () {
             const expCumulated = balance0.mul(getCompoundedInterest(0, SECONDS, rate)).div(ONE_ETHER)
             
             expectApproxWeiDecimals(cumulated, expCumulated, 1)
+        })
+    })
+    describe('Scales', () => {
+        beforeEach(async () => {
+            const Energy = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
+
+            await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
+
+            const energy = await myManager.get(ENERGY_ID)
+            myEnergy = Energy.attach(energy)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
+            await myManager.grantRole(ENERGY_MANAGER_ROLE, owner)
+        })
+        it('Scale supply', async () => {
+
+            await myEnergy.mint(owner, ONE_ETHER)                                
+            await time.advanceBlock()
+            
+            const [scaledTotalSupply, totalSupply] = await Promise.all([
+                myEnergy.scaledTotalSupply(),
+                myEnergy.totalSupply()
+            ])
+            
+            const scaled = await myEnergy.scale(totalSupply)
+            expectApproxWeiDecimals(scaled, scaledTotalSupply, 1)
+        })
+        it('Unscale scaled supply', async () => {
+
+            await myEnergy.mint(owner, ONE_ETHER)                                
+            await time.advanceBlock()
+            
+            const [scaledTotalSupply, totalSupply] = await Promise.all([
+                myEnergy.scaledTotalSupply(),
+                myEnergy.totalSupply()
+            ])
+            
+            const unscaled = await myEnergy.unscale(scaledTotalSupply)
+            expectApproxWeiDecimals(totalSupply, unscaled, 1)
         })
     })
 })
