@@ -22,6 +22,9 @@ let myHoldersVault
 let myTreasuryVault
 let myManager
 let owner, person
+let myEnergy 
+
+const ENERGY_ID = ethers.utils.id('ENERGY')
 
 const getAddresses = async () => {
 const addresses = await Promise.all([
@@ -101,37 +104,37 @@ describe('Manager', function () {
             }
         })
         it('Deploying new', async () => {
-            const stakingFactory = await ethers.getContractFactory('TutellusStakingV2')
-            let initializeCalldata = stakingFactory.interface.encodeFunctionData('initialize', []);
+            const energyFactory = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = energyFactory.interface.encodeFunctionData('initialize', []);
 
-            await myManager.deploy(ethers.utils.id('STAKING_V2'), stakingFactory.bytecode, initializeCalldata)
+            await myManager.deploy(ENERGY_ID, energyFactory.bytecode, initializeCalldata)
         })
         it('Deployment of a new implementation (already initialized)', async () => {
-            const stakingFactory = await ethers.getContractFactory('TutellusStakingV2')
-            let initializeCalldata = stakingFactory.interface.encodeFunctionData('initialize', []);
+            const energyFactory = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = energyFactory.interface.encodeFunctionData('initialize', []);
 
-            await myManager.deploy(ethers.utils.id('STAKING_V2'), stakingFactory.bytecode, initializeCalldata)
-            await myManager.deploy(ethers.utils.id('STAKING_V2'), stakingFactory.bytecode, '0x')
+            await myManager.deploy(ENERGY_ID, energyFactory.bytecode, initializeCalldata)
+            await myManager.deploy(ENERGY_ID, energyFactory.bytecode, '0x')
         })
         it('Deployment of a new implementation (not initialized)', async () => {
-            const stakingFactory = await ethers.getContractFactory('TutellusStakingV2')
-            let initializeCalldata = stakingFactory.interface.encodeFunctionData('initialize', []);
+            const energyFactory = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = energyFactory.interface.encodeFunctionData('initialize', []);
 
-            await myManager.deploy(ethers.utils.id('STAKING_V2'), stakingFactory.bytecode, '0x')
+            await myManager.deploy(ENERGY_ID, energyFactory.bytecode, '0x')
             await expectRevert(
-                myManager.deploy(ethers.utils.id('STAKING_V2'), stakingFactory.bytecode, initializeCalldata),
+                myManager.deploy(ENERGY_ID, energyFactory.bytecode, initializeCalldata),
                 'Transaction reverted: function call to a non-contract account'
             ) // AccessControl not initialized
         })
         it('Deploying proxy with deployed implementation', async () => {
-            const stakingFactory = await ethers.getContractFactory('TutellusStakingV2')
-            let initializeCalldata = stakingFactory.interface.encodeFunctionData('initialize', []);
+            const energyFactory = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = energyFactory.interface.encodeFunctionData('initialize', []);
 
-            const myStaking = await stakingFactory.deploy()
+            const myEnergy = await energyFactory.deploy()
 
             await myManager.deployProxyWithImplementation(
-                ethers.utils.id('STAKING_V2'),
-                myStaking.address,
+                ENERGY_ID,
+                myEnergy.address,
                 initializeCalldata
             )
         })
@@ -166,16 +169,16 @@ describe('Manager', function () {
             )
         })
         it('Cant deploy proxy with deployed implementation if locked', async () => {
-            await myManager.lock(ethers.utils.id('STAKING_V2'))
-            const stakingFactory = await ethers.getContractFactory('TutellusStakingV2')
-            let initializeCalldata = stakingFactory.interface.encodeFunctionData('initialize', []);
+            await myManager.lock(ENERGY_ID)
+            const energyFactory = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = energyFactory.interface.encodeFunctionData('initialize', []);
 
-            const myStaking = await stakingFactory.deploy()
+            const myEnergy = await energyFactory.deploy()
 
             await expectRevert(
                 myManager.deployProxyWithImplementation(
-                    ethers.utils.id('STAKING_V2'),
-                    myStaking.address,
+                    ENERGY_ID,
+                    myEnergy.address,
                     initializeCalldata
                 ),
                 "TutellusManager: id locked"

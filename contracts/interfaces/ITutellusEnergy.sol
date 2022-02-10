@@ -1,0 +1,38 @@
+interface ITutellusEnergy {
+  function DEFAULT_ADMIN_ROLE (  ) external view returns ( bytes32 );
+  function ENERGY_MANAGER_ROLE (  ) external view returns ( bytes32 );
+  function ENERGY_MINTER_ROLE (  ) external view returns ( bytes32 );
+  function PAUSER_ROLE (  ) external view returns ( bytes32 );
+  function UPGRADER_ROLE (  ) external view returns ( bytes32 );
+  function allowance ( address owner, address spender ) external view returns ( uint256 );
+  function approve ( address spender, uint256 amount ) external returns ( bool );
+  function balanceOf ( address account ) external view returns ( uint256 );
+  function burn ( address account, uint256 amount ) external;
+  function burnAll ( address account ) external;
+  function config (  ) external view returns ( address );
+  function decimals (  ) external view returns ( uint8 );
+  function decreaseAllowance ( address spender, uint256 subtractedValue ) external returns ( bool );
+  function hasRole ( bytes32 role, address account ) external view returns ( bool );
+  function implementation (  ) external view returns ( address );
+  function increaseAllowance ( address spender, uint256 addedValue ) external returns ( bool );
+  function initialize (  ) external;
+  function lastUpdateTimestamp (  ) external view returns ( uint40 );
+  function mint ( address account, uint256 amount ) external;
+  function name (  ) external view returns ( string memory );
+  function pause (  ) external;
+  function paused (  ) external view returns ( bool );
+  function rate (  ) external view returns ( uint256 );
+  function scale ( uint256 amount ) external view returns ( uint256 );
+  function scaledBalanceOf ( address account ) external view returns ( uint256 );
+  function scaledTotalSupply (  ) external view returns ( uint256 );
+  function setRate ( uint256 newRate ) external;
+  function symbol (  ) external view returns ( string memory );
+  function totalSupply (  ) external view returns ( uint256 );
+  function transfer ( address recipient, uint256 amount ) external returns ( bool );
+  function transferFrom ( address sender, address recipient, uint256 amount ) external returns ( bool );
+  function unpause (  ) external;
+  function updateManager ( address manager ) external;
+  function upgradeTo ( address newImplementation ) external;
+  function upgradeToAndCall ( address newImplementation, bytes memory data ) external;
+  function unscale ( uint256 amount ) external view returns ( uint256 );
+}
