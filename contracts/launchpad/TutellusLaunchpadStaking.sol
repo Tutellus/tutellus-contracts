@@ -40,7 +40,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     uint256 energyDebt; 
   }
 
-  mapping(address=>Data) private data;
+  mapping(address=>Data) public data;
 
   event Claim(address account);
   event Deposit(address account, uint256 amount);
@@ -66,7 +66,6 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   modifier update() {
-    require(token != address(0), "TutellusStaking: token must be set");
     ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("REWARDS")));
     uint256 released = rewardsInterface.released(address(this)) - _released;
     _released += released;
@@ -88,8 +87,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   // Sets maximum and minimum fees, and fees interval
   function setFees(uint256 minFee_, uint256 maxFee_, uint feeInterval_) public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
     require(minFee_ <= maxFee_, "TutellusLaunchpadStaking: mininum fee must be greater or equal than maximum fee");
-    require(minFee_ <= 1e20, "TutellusLaunchpadStaking: minFee cannot exceed 100 ether");
-    require(maxFee_ <= 1e20, "TutellusLaunchpadStaking: maxFee cannot exceed 100 ether");
+    require(maxFee_ <= 100 ether, "TutellusLaunchpadStaking: maxFee cannot exceed 100 ether");
     minFee = minFee_;
     maxFee = maxFee_;
     feeInterval = feeInterval_;
@@ -102,9 +100,6 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
     ITutellusERC20 tokenInterface = ITutellusERC20(token);
     ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
-
-    require(tokenInterface.allowance(account, address(this)) >= amount, "TutellusLaunchpadStaking: amount exceeds allowance");
-    require(tokenInterface.balanceOf(account) >= amount, "TutellusLaunchpadStaking: amount exceeds balance");
 
     Data storage user = data[account];
 
@@ -149,7 +144,11 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
     uint256 energyShare = amount * user.energyDebt / user.amount;
     uint256 energyAmount = energyInterface.unscale(energyShare);
+    uint256 energyBalance = energyInterface.balanceOf(account);
 
+    require(energyAmount <= energyBalance, "TutellusLaunchpadStaking: need more energy to unstake");
+
+    user.energyDebt -= energyShare;
     energyInterface.burn(account, energyAmount);
 
     _updateRewards(account);

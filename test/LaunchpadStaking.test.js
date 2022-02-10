@@ -29,6 +29,7 @@ let myRewardsVaultV2
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const ENERGY_MANAGER_ROLE = ethers.utils.id('ENERGY_MANAGER_ROLE')
 const REWARDS_MANAGER_ROLE = ethers.utils.id('REWARDS_MANAGER_ROLE')
+const LAUNCHPAD_ADMIN_ROLE = ethers.utils.id('LAUNCHPAD_ADMIN_ROLE')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
 const REWARDS_ID = ethers.utils.id('REWARDS')
 const ENERGY_ID = ethers.utils.id('ENERGY');
@@ -86,7 +87,7 @@ function getCompoundedInterest(
     return ratePerSecond.mul(seconds).add(secondTerm).add(thirdTerm).mul(ONE_ETHER).div(RAY)
 }
 
-describe.only('Launchpad Staking', function () {
+describe('Launchpad Staking', function () {
     before(async () => {
         [owner, person] = await web3.eth.getAccounts()
     })
@@ -170,6 +171,12 @@ describe.only('Launchpad Staking', function () {
             const energyBalance = await myEnergy.balanceOf(owner)
             expect(etherToNumber(energyBalance)).eq(etherToNumber(ONE_ETHER))
         })
+        it('Cant deposit 0 tokens', async() => {
+            await expectRevert(
+                myLaunchpadStaking.deposit(owner, 0),
+                'TutellusLaunchpadStaking: amount must be over zero'
+            )
+        })
     })
     describe('Withdraw', () => {
         beforeEach(async () => {
@@ -181,6 +188,8 @@ describe.only('Launchpad Staking', function () {
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
             expect(launchpadStaking).not.eq(ZERO_ADDRESS)
             await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
+            await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
             await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
         })
@@ -192,8 +201,81 @@ describe.only('Launchpad Staking', function () {
 
             await myLaunchpadStaking.withdraw(ONE_ETHER)
 
+            const burned = await myToken.burned()
+
+            expect(etherToNumber(burned)).eq(0)
+
             const energyBalance = await myEnergy.balanceOf(owner)
             expect(etherToNumber(energyBalance)).eq(0)
+        })
+        it('Can withdraw and burn fees', async () => {
+            const BLOCKS = 10
+            await myLaunchpadStaking.setFees(
+                ONE_ETHER,
+                TWO_ETHER,
+                BLOCKS
+            )
+
+            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+
+            await time.advanceBlock()
+
+            await myLaunchpadStaking.withdraw(ONE_ETHER)
+
+            const burned = await myToken.burned()
+
+            expect(etherToNumber(burned)).gt(0)
+
+            const energyBalance = await myEnergy.balanceOf(owner)
+            expect(etherToNumber(energyBalance)).eq(0)
+        })
+        it('Can deposit and withdraw twice (correct energy)', async () => {
+            await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await sleep(1000)
+            await time.advanceBlock()
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+
+ 
+
+            const balance = await myLaunchpadStaking.getUserBalance(owner)
+
+            expect(etherToNumber(balance)).eq(etherToNumber(TWO_ETHER))
+
+            await myLaunchpadStaking.withdraw(ONE_ETHER)
+            await myLaunchpadStaking.withdraw(ONE_ETHER)
+
+            const postBalance = await myLaunchpadStaking.getUserBalance(owner)
+            const energyBalance = await myEnergy.balanceOf(owner)
+
+            expect(etherToNumber(postBalance)).eq(0)
+            expect(etherToNumber(energyBalance)).eq(0)
+        })
+        it('Cant withdraw 0 tokens', async() => {
+            await expectRevert(
+                myLaunchpadStaking.withdraw(0),
+                'TutellusLaunchpadStaking: amount must be over zero'
+            )
+        })
+        it('Cant withdraw more than balance', async() => {
+            await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await expectRevert(
+                myLaunchpadStaking.withdraw(TWO_ETHER),
+                'TutellusLaunchpadStaking: user has not enough staking balance'
+            )
+        })
+        it('Cant withdraw if not enought energy', async() => {
+            await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+
+            await myEnergy.burnAll(owner)
+
+            await expectRevert(
+                myLaunchpadStaking.withdraw(ONE_ETHER),
+                'TutellusLaunchpadStaking: need more energy to unstake'
+            )
         })
     })
     describe('Claim', () => {
@@ -213,17 +295,110 @@ describe.only('Launchpad Staking', function () {
             await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
             await myLaunchpadStaking.deposit(owner, ONE_ETHER)
 
-            const [balancePrev, rewardPerBlock] = await Promise.all([
+            await time.advanceBlock()
+
+            const [balancePrev, rewardPerBlock, pendingRewards] = await Promise.all([
                 myToken.balanceOf(owner),
-                myRewardsVaultV2.rewardPerBlock()
+                myRewardsVaultV2.rewardPerBlock(),
+                myLaunchpadStaking.pendingRewards(owner)
             ]) 
 
             await myLaunchpadStaking.claim()
 
             const balancePost = await myToken.balanceOf(owner)
 
-            expect(etherToNumber(balancePrev) + etherToNumber(rewardPerBlock)).eq(etherToNumber(balancePost))
+            expect(etherToNumber(balancePrev) + etherToNumber(rewardPerBlock) + etherToNumber(pendingRewards)).eq(etherToNumber(balancePost))
 
+        })
+        it('Cant claim rewards if no deposit', async () => {
+            const pendingRewards = await myLaunchpadStaking.pendingRewards(owner)
+            expect(etherToNumber(pendingRewards)).eq(0)
+            await expectRevert(
+                myLaunchpadStaking.claim(),
+                'TutellusLaunchpadStaking: nothing to claim'
+            )
+        })
+    })
+    describe('Sets', () => {
+        beforeEach(async () => {
+            const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+    
+            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+    
+            const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
+            await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+        })
+        it('Set fees to new depositors', async () => {
+            const BLOCKS = 10
+            await myLaunchpadStaking.setFees(
+                ONE_ETHER,
+                TWO_ETHER,
+                BLOCKS
+            )
+
+            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+
+            const [blocksLeft, currentBlock, maxFee] = await Promise.all([
+                myLaunchpadStaking.getBlocksLeft(owner),
+                time.latestBlock(),
+                myLaunchpadStaking.getFee(owner),
+            ])
+
+            expect(etherToNumber(maxFee)).eq(etherToNumber(TWO_ETHER))
+            expect(Number(blocksLeft.toString())).eq(BLOCKS)
+            await time.advanceBlockTo(Number(currentBlock) + BLOCKS + 1)
+
+            const [minFee, zeroBlocksLeft] = await Promise.all([
+                myLaunchpadStaking.getFee(owner),
+                myLaunchpadStaking.getBlocksLeft(owner),
+            ])
+
+            expect(etherToNumber(minFee)).eq(etherToNumber(ONE_ETHER))
+            expect(Number(zeroBlocksLeft.toString())).eq(0)
+        })
+        it('Cant set minFee greater than maxFee', async () => {
+            await expectRevert(
+                myLaunchpadStaking.setFees(TWO_ETHER, ONE_ETHER, 1),
+                'TutellusLaunchpadStaking: mininum fee must be greater or equal than maximum fee'
+            )
+        })
+        it('Cant set maxFee greater than 100 ether', async () => {
+            await expectRevert(
+                myLaunchpadStaking.setFees(TWO_ETHER, parseEther('101'), 1),
+                'TutellusLaunchpadStaking: maxFee cannot exceed 100 ether'
+            )
+        })
+    })
+    describe('Autoreward', () => {
+        beforeEach(async () => {
+            const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+    
+            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+    
+            const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
+            await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+        })
+        it('Can claim rewards after withdraw if no autoreward', async () => {
+            await myLaunchpadStaking.toggleAutoreward()
+
+            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
+            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myLaunchpadStaking.withdraw(ONE_ETHER)
+
+            const pendingRewards = await myLaunchpadStaking.pendingRewards(owner)
+            expect(etherToNumber(pendingRewards)).gt(0)
+            await myLaunchpadStaking.claim()
         })
     })
 })
