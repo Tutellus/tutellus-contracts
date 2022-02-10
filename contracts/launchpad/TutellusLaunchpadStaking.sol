@@ -10,6 +10,7 @@ import '../utils/UUPSUpgradeableByRole.sol';
 contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
   bytes32 public constant LAUNCHPAD_ADMIN_ROLE = keccak256("LAUNCHPAD_ADMIN_ROLE");
+  bytes32 public LAUNCHPAD_REWARDS = keccak256("LAUNCHPAD_REWARDS");
 
   bool public autoreward;
 
@@ -66,7 +67,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   modifier update() {
-    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("REWARDS")));
+    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("LAUNCHPAD_REWARDS")));
     uint256 released = rewardsInterface.released(address(this)) - _released;
     _released += released;
     if(balance > 0) {
@@ -203,7 +204,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   function _reward(address account) internal {
-    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("REWARDS")));
+    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(LAUNCHPAD_REWARDS));
     uint256 amount = data[account].notClaimed;
     if(amount > 0) {
       data[account].notClaimed = 0;
@@ -233,7 +234,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
       Data memory user = data[account];
       uint256 rewards = user.notClaimed;
       if(balance > 0){
-        ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("REWARDS")));
+        ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("LAUNCHPAD_REWARDS")));
         uint256 released = rewardsInterface.released(address(this)) - _released;
         uint256 total = (released * 1 ether / balance);
         rewards += (accRewardsPerShare - user.rewardDebt + total) * user.amount / 1 ether;
