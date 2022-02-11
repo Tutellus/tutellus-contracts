@@ -10,7 +10,7 @@ import '../utils/UUPSUpgradeableByRole.sol';
 contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
   bytes32 public constant LAUNCHPAD_ADMIN_ROLE = keccak256("LAUNCHPAD_ADMIN_ROLE");
-  bytes32 public LAUNCHPAD_REWARDS = keccak256("LAUNCHPAD_REWARDS");
+  bytes32 public constant LAUNCHPAD_REWARDS = keccak256("LAUNCHPAD_REWARDS");
 
   bool public autoreward;
 
@@ -247,4 +247,10 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     Data memory user = data[account];
     return user.amount;
   }
+
+  /**
+     * This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     */
+  uint256[45] private __gap;
 }
