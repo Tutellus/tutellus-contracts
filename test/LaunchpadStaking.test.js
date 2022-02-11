@@ -1,6 +1,6 @@
 const { artifacts, ethers } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
-const { expectRevert, time } = require('@openzeppelin/test-helpers')
+const { expectRevert, time, expectEvent } = require('@openzeppelin/test-helpers')
 const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
@@ -373,6 +373,18 @@ describe('Launchpad Staking', function () {
                 myLaunchpadStaking.setFees(TWO_ETHER, parseEther('101'), 1),
                 'TutellusLaunchpadStaking: maxFee cannot exceed 100 ether'
             )
+        })
+        it('Set a new energy multiplier', async () => {
+            await myLaunchpadStaking.setEnergyMultiplier(TWO_ETHER)
+            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
+
+            const LaunchpadStaking = artifacts.require('TutellusLaunchpadStaking')
+            const myLaunchpadStakingAux = await LaunchpadStaking.at(myLaunchpadStaking.address)
+            
+            const tx = await myLaunchpadStakingAux.deposit(owner, ONE_ETHER)
+            expectEvent(tx, 'Deposit', {
+                energyMinted: TWO_ETHER.toString()
+            })
         })
     })
     describe('Autoreward', () => {

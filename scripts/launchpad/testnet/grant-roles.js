@@ -9,11 +9,16 @@ const ALTCOINERS_STAKING_ID = ethers.utils.id('ALTCOINERS_STAKING')
 const ALTCOINERS_FARMING_ID = ethers.utils.id('ALTCOINERS_FARMING')
 
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
+const LAUNCHPAD_ADMIN_ROLE = ethers.utils.id('LAUNCHPAD_ADMIN_ROLE')
 
 async function main () {
   bre.run('compile')
   const Manager = await ethers.getContractFactory('TutellusManager')
   const myManager = Manager.attach('0x9b77Cb09d5E61D44fEf00e59Cfcc8Af67DAe9A45')
+  const signers = await ethers.getSigners()
+  const owner = signers[0].address
+  
+  // await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
 
   const [nakamotosStaking, nakamotosFarming, vuterinsStaking, vuterinsFarming, altcoinersStaking, altcoinersFarming] = await Promise.all([
     myManager.get(NAKAMOTOS_STAKING_ID),

@@ -44,8 +44,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   mapping(address=>Data) public data;
 
   event Claim(address account);
-  event Deposit(address account, uint256 amount);
-  event Withdraw(address account, uint256 amount, uint256 burned);
+  event Deposit(address account, uint256 amount, uint256 energyMinted);
+  event Withdraw(address account, uint256 amount, uint256 burned, uint256 energyBurned);
   event Rewards(address account, uint256 amount);
 
   event SyncBalance(address account, uint256 amount);
@@ -64,6 +64,10 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     lastUpdate = block.number;
     token = tkn;
     energyMultiplier = 1 ether;
+  }
+
+  function setEnergyMultiplier (uint256 newMultiplier) public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
+    energyMultiplier = newMultiplier;
   }
 
   modifier update() {
@@ -121,15 +125,15 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
       _reward(account);
     }
 
-    uint256 energyAmount = amount * energyMultiplier / 1 ether;
-    user.energyDebt += energyInterface.scale(energyAmount);
+    uint256 energyMinted = amount * energyMultiplier / 1 ether;
+    user.energyDebt += energyInterface.scale(energyMinted);
 
     tokenInterface.transferFrom(account, address(this), amount);
-    energyInterface.mint(account, energyAmount);
+    energyInterface.mint(account, energyMinted);
 
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
-    emit Deposit(account, amount);
+    emit Deposit(account, amount, energyMinted);
   }
 
   // Withdraws tokens from staking
@@ -144,13 +148,13 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
 
     uint256 energyShare = amount * user.energyDebt / user.amount;
-    uint256 energyAmount = energyInterface.unscale(energyShare);
+    uint256 energyBurned = energyInterface.unscale(energyShare);
     uint256 energyBalance = energyInterface.balanceOf(account);
 
-    require(energyAmount <= energyBalance, "TutellusLaunchpadStaking: need more energy to unstake");
+    require(energyBurned <= energyBalance, "TutellusLaunchpadStaking: need more energy to unstake");
 
     user.energyDebt -= energyShare;
-    energyInterface.burn(account, energyAmount);
+    energyInterface.burn(account, energyBurned);
 
     _updateRewards(account);
 
@@ -177,7 +181,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
-    emit Withdraw(account, amount, burned);
+    emit Withdraw(account, amount, burned, energyBurned);
     return amount;
   }
 
