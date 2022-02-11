@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol';
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20SnapshotUpgradeable.sol";
 import '../utils/UUPSUpgradeableByRole.sol';
 import '../libraries/math/MathUtils.sol';
 
@@ -12,7 +13,7 @@ import '../libraries/math/MathUtils.sol';
  * @author Tutellus 
  **/
 
-contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
+contract TutellusEnergy is ERC20Upgradeable, ERC20SnapshotUpgradeable, UUPSUpgradeableByRole {
 
     using WadRayMath for uint256;
 
@@ -27,7 +28,8 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
     event Burn(address sender, address account, uint256 amount);
 
     function initialize() public initializer {
-      __ERC20_init_unchained('Tutellus Energy Token', 'TET');
+      __ERC20_init_unchained('Energy Tutellus', 'eTUT');
+      __ERC20Snapshot_init();
       __AccessControlProxyPausable_init(msg.sender);
       
       lastUpdateTimestamp = uint40(block.timestamp);
@@ -59,7 +61,7 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
       return MathUtils.calculateCompoundedInterest(rate, timestamp).rayMul(_normalization);
     }
 
-    function mint(address account, uint256 amount) external onlyRole(ENERGY_MINTER_ROLE) {
+    function mint(address account, uint256 amount) external {
       uint256 amountScaled = scale(amount);
       require(amountScaled != 0, 'Cant mint 0 tokens');
 
@@ -68,7 +70,7 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
       emit Mint(msg.sender, account, amount);
     }
 
-    function burn(address account, uint256 amount) external onlyRole(ENERGY_MINTER_ROLE) {
+    function burn(address account, uint256 amount) external {
       uint256 amountScaled = scale(amount);
       require(amountScaled != 0, 'Cant burn 0 tokens');
 
@@ -77,7 +79,7 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
       emit Burn(msg.sender, account, amount);
     }
 
-    function burnAll(address account) external onlyRole(ENERGY_MINTER_ROLE) {
+    function burnAll(address account) external {
       uint256 amount = scaledBalanceOf(account);
       require(amount > 0, 'Cant burn 0 tokens');
       _burn(account, amount);
@@ -111,5 +113,13 @@ contract TutellusEnergy is ERC20Upgradeable, UUPSUpgradeableByRole {
 
     function scaledTotalSupply() public view virtual returns (uint256) {
       return super.totalSupply();
+    }
+
+    function _beforeTokenTransfer(address from, address to, uint256 amount)
+        internal
+        whenNotPaused onlyRole(ENERGY_MINTER_ROLE)
+        override(ERC20Upgradeable, ERC20SnapshotUpgradeable)
+    {
+        super._beforeTokenTransfer(from, to, amount);
     }
   }
