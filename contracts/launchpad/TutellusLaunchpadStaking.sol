@@ -186,8 +186,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   // Claims rewards
-  function claim() public update {
-    address account = msg.sender;
+  function claim(address account) public update {
     Data storage user = data[account];
 
     _updateRewards(account);
