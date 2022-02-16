@@ -9,6 +9,7 @@ import '../utils/UUPSUpgradeableByRole.sol';
 
 contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
+  bytes32 public constant FACTION_MANAGER = keccak256("FACTION_MANAGER");
   bytes32 public constant LAUNCHPAD_ADMIN_ROLE = keccak256("LAUNCHPAD_ADMIN_ROLE");
   bytes32 public constant LAUNCHPAD_REWARDS = keccak256("LAUNCHPAD_REWARDS");
 
@@ -100,7 +101,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   // Deposits tokens for staking
-  function deposit(address account, uint256 amount) public update {
+  function deposit(address account, uint256 amount) public update onlyRole(FACTION_MANAGER) {
     require(amount > 0, "TutellusLaunchpadStaking: amount must be over zero");
 
     ITutellusERC20 tokenInterface = ITutellusERC20(token);
@@ -137,9 +138,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   // Withdraws tokens from staking
-  function withdraw(uint256 amount) public update returns (uint256) {
+  function withdraw(address account, uint256 amount) public update onlyRole(FACTION_MANAGER) returns (uint256) {
     require(amount > 0, "TutellusLaunchpadStaking: amount must be over zero");
-    address account = msg.sender;
     Data storage user = data[account];
 
     require(amount <= user.amount, "TutellusLaunchpadStaking: user has not enough staking balance");
