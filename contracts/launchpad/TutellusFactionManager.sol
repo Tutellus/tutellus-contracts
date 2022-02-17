@@ -108,4 +108,8 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit FactionIn(to, account);
         emit Migrate(id, to, account);
     }
+
+    function initialize () public initializer {
+        __AccessControlProxyPausable_init(msg.sender);
+    }
 }
