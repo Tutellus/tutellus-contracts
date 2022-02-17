@@ -13,13 +13,14 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
   mapping(address=>uint256) public distributed;
   mapping(address=>uint256) public allocation;
   mapping(uint256=>address) public id;
-  
+
   uint256 public rewardPerBlock;
   uint256 public total;
   uint public lastUpdate;
 
+  event Init(uint lastUpdate);
   event NewAddress(address account, uint256 allocation);
-  event NewAllocations(uint256[] allocations);
+  event NewAllocation(address account, uint256 allocation);
   event NewRewardPerBlock(uint256 rewardPerBlock);
   event NewDistribution(address sender, address account, uint256 amount);
 
@@ -34,6 +35,7 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
   function initialize() public initializer {
     __AccessControlProxyPausable_init(msg.sender);
     lastUpdate = block.number;
+    emit Init(lastUpdate);
   }
 
   function add(address account, uint256[] memory allocations) public onlyRole(REWARDS_MANAGER_ROLE) {
@@ -55,9 +57,9 @@ contract TutellusRewardsVaultV2 is UUPSUpgradeableByRole {
     for(uint256 i=0; i<length; i++) {
       allocation[id[i]] = allocations[i];
       sum+=allocations[i];
+      emit NewAllocation(id[i], allocations[i]);
     }
     require(sum==1e20, "TutellusRewardsVaultV2: total allocation must be 1e20");
-    emit NewAllocations(allocations);
   }
 
   function availableId(address account) public view returns (uint256) {
