@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.9;
+
 interface ITutellusLaunchpadStaking {
   function DEFAULT_ADMIN_ROLE (  ) external view returns ( bytes32 );
   function LAUNCHPAD_ADMIN_ROLE (  ) external view returns ( bytes32 );
@@ -32,6 +35,6 @@ interface ITutellusLaunchpadStaking {
   function unpause (  ) external;
   function updateManager ( address manager ) external;
   function upgradeTo ( address newImplementation ) external;
-  function upgradeToAndCall ( address newImplementation, bytes data ) external;
-  function withdraw ( uint256 amount ) external returns ( uint256 );
+  function upgradeToAndCall ( address newImplementation, bytes calldata data ) external;
+  function withdraw ( address account, uint256 amount ) external returns ( uint256 );
 }

@@ -3,8 +3,9 @@ pragma solidity ^0.8.9;
 
 import '../utils/UUPSUpgradeableByRole.sol';
 import '../interfaces/ITutellusLaunchpadStaking.sol';
+import '../interfaces/ITutellusFactionManager.sol';
 
-contract TutellusFactionManager is UUPSUpgradeableByRole {
+contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRole {
 
     bytes32 public constant FACTIONS_ADMIN_ROLE = keccak256('FACTIONS_ADMIN_ROLE');
 
@@ -26,6 +27,7 @@ contract TutellusFactionManager is UUPSUpgradeableByRole {
         if (factionOf[account] == 0x00) {
             factionOf[account] = id;
             _;
+            emit FactionIn(id, account);
         } else {
             require(factionOf[account] == id, 'TutellusFactionManager: cant stake in multiple factions');
             _;
@@ -34,11 +36,13 @@ contract TutellusFactionManager is UUPSUpgradeableByRole {
 
     modifier checkAfter (address account) {
         _;
+        bytes32 id = factionOf[account];
         ITutellusLaunchpadStaking stakingInterface = ITutellusLaunchpadStaking(faction[id].stakingContract);
         ITutellusLaunchpadStaking farmingInterface = ITutellusLaunchpadStaking(faction[id].farmingContract);
 
         if (stakingInterface.getUserBalance(account) + farmingInterface.getUserBalance(account) == 0) {
             factionOf[account] == 0x00;
+            emit FactionOut(id, account);
         }
     }
 
@@ -47,31 +51,35 @@ contract TutellusFactionManager is UUPSUpgradeableByRole {
     }
 
     function updateFaction (bytes32 id, address stakingContract, address farmingContract) public onlyRole(FACTIONS_ADMIN_ROLE) {
-        factions[id] = Faction(stakingContract, farmingContract);
+        faction[id] = Faction(stakingContract, farmingContract);
     }
 
     function stake (bytes32 id, address account, uint256 amount) public isAuthorized(account) checkFaction(id, account) {
         ITutellusLaunchpadStaking(faction[id].stakingContract).deposit(account, amount);
+        emit Stake(id, account, amount);
     }
 
     function stakeLP (bytes32 id, address account, uint256 amount) public isAuthorized(account) checkFaction(id, account) {
         ITutellusLaunchpadStaking(faction[id].farmingContract).deposit(account, amount);
+        emit StakeLP(id, account, amount);
     }
 
     function unstake (address account, uint256 amount) public isAuthorized(account) checkAfter(account) {
-        uint256 id = factionOf[account];
+        bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant unstake');
         ITutellusLaunchpadStaking(faction[id].stakingContract).withdraw(account, amount);
+        emit Unstake(id, account, amount);
     }
 
     function unstakeLP (address account, uint256 amount) public isAuthorized(account) checkAfter(account) {
-        uint256 id = factionOf[account];
+        bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant unstakeLP');
         ITutellusLaunchpadStaking(faction[id].farmingContract).withdraw(account, amount);
+        emit UnstakeLP(id, account, amount);
     }
 
     function migrateFaction (address account, bytes32 to) public isAuthorized(account) {
-        uint256 id = factionOf[account];
+        bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant migrate');
         require(faction[to].stakingContract != address(0) && faction[to].farmingContract != address(0), 'TutellusFactionManager: faction does not exist');
 
@@ -82,19 +90,22 @@ contract TutellusFactionManager is UUPSUpgradeableByRole {
         uint256 farmingBalance = farmingInterface.getUserBalance(account);
 
         if (stakingBalance > 0) {
-            ITutellusLaunchpadStaking(faction[to].stakingContract).deposit(
-                account,
-                stakingInterface.withdraw(account, stakingBalance)
-            );
+            uint256 newAmount = stakingInterface.withdraw(account, stakingBalance);
+            ITutellusLaunchpadStaking(faction[to].stakingContract).deposit(account, newAmount);
+            emit Unstake(id, account, stakingBalance);
+            emit Stake(to, account, newAmount);
         }
 
         if (farmingBalance > 0) {
-            ITutellusLaunchpadStaking(faction[to].farmingContract).deposit(
-                account,
-                farmingInterface.withdraw(account, farmingBalance)
-            );
+            uint256 newAmount = farmingInterface.withdraw(account, farmingBalance);
+            ITutellusLaunchpadStaking(faction[to].farmingContract).deposit(account, newAmount);
+            emit UnstakeLP(id, account, farmingBalance);
+            emit StakeLP(to, account, newAmount);
         }
 
         factionOf[account] = to;
+        emit FactionOut(id, account);
+        emit FactionIn(to, account);
+        emit Migrate(id, to, account);
     }
 }
