@@ -1,11 +1,10 @@
 const { artifacts, ethers } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const { expectRevert, time, expectEvent } = require('@openzeppelin/test-helpers')
-const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
 const { formatEther, parseEther } = require('ethers/lib/utils')
-const { BigNumber } = require('ethers')
+const { BigNumber, constants } = require('ethers')
 const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('./utils')
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -14,6 +13,8 @@ const RewardsVault = artifacts.require('TutellusRewardsVault')
 const HoldersVault = artifacts.require('TutellusHoldersVault')
 const TreasuryVault = artifacts.require('TutellusTreasuryVault')
 const ACPP = artifacts.require('AccessControlProxyPausable')
+const LaunchpadStakingArtifact = artifacts.require('TutellusLaunchpadStaking')
+const FactionManagerArtifact = artifacts.require('TutellusFactionManager')
 
 let myDeployer
 let myToken
@@ -22,7 +23,7 @@ let myHoldersVault
 let myTreasuryVault
 let myManager
 let myEnergy
-let owner
+let owner, person
 let myRewardsVaultV2
 let myFactionManager
 
@@ -50,9 +51,6 @@ const NAKAMOTOS_FARMING_ID = ethers.utils.id('NAKAMOTOS_FARMING')
 
 const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
 const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
-
-const SECONDS = 1
-const SECONDS_PER_YEAR = 365 * 24 * 60 * 60
 
 const getAddresses = async () => {
 const addresses = await Promise.all([
@@ -114,7 +112,7 @@ describe.only('Factions', function () {
 
         const energy = await myManager.get(ENERGY_ID)
         const rvv2 = await myManager.get(REWARDS_ID)
-        expect(energy).not.eq(ZERO_ADDRESS)
+        expect(energy).not.eq(constants.ZeroAddress)
         myEnergy = Energy.attach(energy)
         myRewardsVaultV2 = RewardsVaultV2.attach(rvv2)
 
@@ -208,242 +206,304 @@ describe.only('Factions', function () {
 
             const energyBalance = await myEnergy.balanceOf(owner)
             expect(etherToNumber(energyBalance)).eq(etherToNumber(ONE_ETHER))
+
+            const faction = await myFactionManager.factionOf(owner)
+            expect(faction).eq(NAKAMOTOS_FACTION)
+        })
+        it('Cant stake into multiple factions', async () => {
+            await myToken.approve(nakamotosStaking, ONE_ETHER)
+            await myToken.approve(vuterinsStaking, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await expectRevert(
+                myFactionManager.stake(VUTERINS_FACTION, owner, ONE_ETHER),
+                'TutellusFactionManager: cant stake in multiple factions'
+            )
+        })
+        it('Cant stake from unauthorized party', async () => {
+            await myToken.approve(vuterinsStaking, ONE_ETHER)
+            const myFactionManagerArtifact = await FactionManagerArtifact.at(factionManager)
+            await expectRevert(
+                myFactionManagerArtifact.stake(VUTERINS_FACTION, owner, ONE_ETHER, { from: person }),
+                'TutellusFactionManager: account not authorized'
+            )
         })
     })
-    // describe('Withdraw', () => {
-    //     beforeEach(async () => {
-    //         const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-    //         let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+    describe('Withdraw', () => {
+        beforeEach(async () => {
+            const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
+            const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
+
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldataFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
     
-    //         await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(VUTERINS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(FACTION_MANAGER, FactionManager.bytecode, initializeCalldataFactionManager)
+
+            vuterinsStaking = await myManager.get(VUTERINS_STAKING_ID)
+            vuterinsFarming = await myManager.get(VUTERINS_FARMING_ID)
+            nakamotosStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            nakamotosFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+            factionManager = await myManager.get(FACTION_MANAGER)
+
+            await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsFarming)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosFarming)
+
+            await myRewardsVaultV2.add(vuterinsStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(vuterinsFarming, [parseEther('50'), parseEther('50')])
+            await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
+            await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
+
+            myFactionManager = FactionManager.attach(factionManager)
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
+            await myManager.grantRole(FACTION_MANAGER, owner)
+            await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
+
+            await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
+        })
+        it('Can deposit into staking and farming and withdraw all', async () => {
+            await myToken.approve(nakamotosStaking, ONE_ETHER)
+            await myToken.approve(nakamotosFarming, TWO_ETHER)
+
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, TWO_ETHER)
+
+            await time.advanceBlock()
+
+            await myFactionManager.unstake(owner, ONE_ETHER)
+            await myFactionManager.unstakeLP(owner, TWO_ETHER)
+
+            const energyBalance = await myEnergy.balanceOf(owner)
+            const faction = await myFactionManager.factionOf(owner)
+
+            expect(faction).eq(constants.HashZero)
+            expect(etherToNumber(energyBalance)).eq(0)
+        })
+        it('Can deposit and withdraw twice (correct energy)', async () => {
+            await myToken.approve(nakamotosStaking, TWO_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+
+            await time.advanceBlock()
+        
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myFactionManager.unstake(owner, ONE_ETHER)
+            await myFactionManager.unstake(owner, ONE_ETHER)
+
+            const energyBalance = await myEnergy.balanceOf(owner)
+            const faction = await myFactionManager.factionOf(owner)
+
+            expect(faction).eq(constants.HashZero)
+            expect(etherToNumber(energyBalance)).eq(0)
+        })
+        it('Cant withdraw if no faction', async() => {
+            await expectRevert(
+                myFactionManager.unstake(owner, ONE_ETHER),
+                'TutellusFactionManager: cant unstake'
+            )
+            await expectRevert(
+                myFactionManager.unstakeLP(owner, ONE_ETHER),
+                'TutellusFactionManager: cant unstakeLP'
+            )
+        })
+        it('Cant withdraw more than balance', async() => {
+            await myToken.approve(nakamotosStaking, TWO_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await expectRevert(
+                myFactionManager.unstake(owner, TWO_ETHER),
+                'TutellusLaunchpadStaking: user has not enough staking balance'
+            )
+        })
+    })
+    describe('Migrate', () => {
+        beforeEach(async () => {
+            const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
+            const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
+
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldataFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
     
-    //         const launchpadStaking = await myManager.get(VUTERINS_STAKING_ID)
-    //         expect(launchpadStaking).not.eq(ZERO_ADDRESS)
-    //         await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
-    //         await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
-    //         await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
-    //         await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
-    //         myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
-    //     })
-    //     it('Can withdraw all and reset energy', async () => {
-    //         await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(VUTERINS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(FACTION_MANAGER, FactionManager.bytecode, initializeCalldataFactionManager)
 
-    //         await time.advanceBlock()
+            vuterinsStaking = await myManager.get(VUTERINS_STAKING_ID)
+            vuterinsFarming = await myManager.get(VUTERINS_FARMING_ID)
+            nakamotosStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            nakamotosFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+            factionManager = await myManager.get(FACTION_MANAGER)
 
-    //         await myLaunchpadStaking.withdraw(ONE_ETHER)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsFarming)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosFarming)
 
-    //         const burned = await myToken.burned()
+            await myRewardsVaultV2.add(vuterinsStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(vuterinsFarming, [parseEther('50'), parseEther('50')])
+            await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
+            await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
 
-    //         expect(etherToNumber(burned)).eq(0)
+            myFactionManager = FactionManager.attach(factionManager)
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
+            await myManager.grantRole(FACTION_MANAGER, owner)
+            await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
 
-    //         const energyBalance = await myEnergy.balanceOf(owner)
-    //         expect(etherToNumber(energyBalance)).eq(0)
-    //     })
-    //     it('Can withdraw and burn fees', async () => {
-    //         const BLOCKS = 10
-    //         await myLaunchpadStaking.setFees(
-    //             ONE_ETHER,
-    //             TWO_ETHER,
-    //             BLOCKS
-    //         )
+            await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
+        })
+        it('Can deposit into staking and migrate faction', async () => {
+            await myToken.approve(nakamotosStaking, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myToken.approve(vuterinsStaking, ONE_ETHER)
 
-    //         await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
 
-    //         await time.advanceBlock()
+            expectEvent(receipt, 'Unstake', {
+                id: NAKAMOTOS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'Stake', {
+                id: VUTERINS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'Migrate', {
+                id: NAKAMOTOS_FACTION,
+                to: VUTERINS_FACTION
+            })
 
-    //         await myLaunchpadStaking.withdraw(ONE_ETHER)
+            const faction = await myFactionManager.factionOf(owner)
+            expect(faction).eq(VUTERINS_FACTION)
+        })
+        it('Can deposit into staking and migrate faction from authorized party', async () => {
+            await myToken.approve(nakamotosStaking, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myToken.approve(vuterinsStaking, ONE_ETHER)
+            await myFactionManager.authorize(person)
 
-    //         const burned = await myToken.burned()
+            const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION, { from: person })
 
-    //         expect(etherToNumber(burned)).gt(0)
+            expectEvent(receipt, 'Unstake', {
+                id: NAKAMOTOS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'Stake', {
+                id: VUTERINS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'Migrate', {
+                id: NAKAMOTOS_FACTION,
+                to: VUTERINS_FACTION
+            })
 
-    //         const energyBalance = await myEnergy.balanceOf(owner)
-    //         expect(etherToNumber(energyBalance)).eq(0)
-    //     })
-    //     it('Can deposit and withdraw twice (correct energy)', async () => {
-    //         await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
-    //         await sleep(1000)
-    //         await time.advanceBlock()
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            const faction = await myFactionManager.factionOf(owner)
+            expect(faction).eq(VUTERINS_FACTION)
+        })
+        it('Can deposit into farming and migrate faction', async () => {
+            await myToken.approve(nakamotosFarming, ONE_ETHER)
+            await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myToken.approve(vuterinsFarming, ONE_ETHER)
 
- 
+            const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
 
-    //         const balance = await myLaunchpadStaking.getUserBalance(owner)
+            expectEvent(receipt, 'UnstakeLP', {
+                id: NAKAMOTOS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'StakeLP', {
+                id: VUTERINS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'Migrate', {
+                id: NAKAMOTOS_FACTION,
+                to: VUTERINS_FACTION
+            })
 
-    //         expect(etherToNumber(balance)).eq(etherToNumber(TWO_ETHER))
+            const faction = await myFactionManager.factionOf(owner)
+            expect(faction).eq(VUTERINS_FACTION)
+        })
+        it('Can deposit into staking and farming and migrate faction', async () => {
+            await myToken.approve(nakamotosStaking, ONE_ETHER)
+            await myToken.approve(nakamotosFarming, TWO_ETHER)
 
-    //         await myLaunchpadStaking.withdraw(ONE_ETHER)
-    //         await myLaunchpadStaking.withdraw(ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, TWO_ETHER)
 
-    //         const postBalance = await myLaunchpadStaking.getUserBalance(owner)
-    //         const energyBalance = await myEnergy.balanceOf(owner)
+            await myToken.approve(vuterinsStaking, ONE_ETHER)
+            await myToken.approve(vuterinsFarming, TWO_ETHER)
 
-    //         expect(etherToNumber(postBalance)).eq(0)
-    //         expect(etherToNumber(energyBalance)).eq(0)
-    //     })
-    //     it('Cant withdraw 0 tokens', async() => {
-    //         await expectRevert(
-    //             myLaunchpadStaking.withdraw(0),
-    //             'TutellusLaunchpadStaking: amount must be over zero'
-    //         )
-    //     })
-    //     it('Cant withdraw more than balance', async() => {
-    //         await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
-    //         await expectRevert(
-    //             myLaunchpadStaking.withdraw(TWO_ETHER),
-    //             'TutellusLaunchpadStaking: user has not enough staking balance'
-    //         )
-    //     })
-    //     it('Cant withdraw if not enought energy', async() => {
-    //         await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
 
-    //         await myEnergy.burnAll(owner)
+            const {stakingContract, farmingContract} = await myFactionManager.faction(VUTERINS_FACTION)
 
-    //         await expectRevert(
-    //             myLaunchpadStaking.withdraw(ONE_ETHER),
-    //             'TutellusLaunchpadStaking: need more energy to unstake'
-    //         )
-    //     })
-    // })
-    // describe('Claim', () => {
-    //     beforeEach(async () => {
-    //         const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-    //         let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
-    
-    //         await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
-    //         const launchpadStaking = await myManager.get(VUTERINS_STAKING_ID)
-    //         expect(launchpadStaking).not.eq(ZERO_ADDRESS)
-    //         await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
-    //         await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
-    //         myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
-    //     })
-    //     it('Can claim rewards', async () => {
-    //         await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            const myStaking = await LaunchpadStakingArtifact.at(stakingContract)
+            const myFarming = await LaunchpadStakingArtifact.at(farmingContract)
 
-    //         await time.advanceBlock()
+            const [stakingBalance, farmingBalance] = await Promise.all([
+                myStaking.getUserBalance(owner),
+                myFarming.getUserBalance(owner),
+            ])
 
-    //         const [balancePrev, rewardPerBlock, pendingRewards] = await Promise.all([
-    //             myToken.balanceOf(owner),
-    //             myRewardsVaultV2.rewardPerBlock(),
-    //             myLaunchpadStaking.pendingRewards(owner)
-    //         ]) 
+            expectEqEth(stakingBalance, ONE_ETHER)
+            expectEqEth(farmingBalance, TWO_ETHER)
 
-    //         await myLaunchpadStaking.claim()
+            expectEvent(receipt, 'Unstake', {
+                id: NAKAMOTOS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'UnstakeLP', {
+                id: NAKAMOTOS_FACTION,
+                account: owner,
+                amount: TWO_ETHER.toString()
+            })
+            expectEvent(receipt, 'Stake', {
+                id: VUTERINS_FACTION,
+                account: owner,
+                amount: ONE_ETHER.toString()
+            })
+            expectEvent(receipt, 'StakeLP', {
+                id: VUTERINS_FACTION,
+                account: owner,
+                amount: TWO_ETHER.toString()
+            })
+            expectEvent(receipt, 'Migrate', {
+                id: NAKAMOTOS_FACTION,
+                to: VUTERINS_FACTION
+            })
 
-    //         const balancePost = await myToken.balanceOf(owner)
-
-    //         expect(etherToNumber(balancePrev) + etherToNumber(rewardPerBlock) + etherToNumber(pendingRewards)).eq(etherToNumber(balancePost))
-
-    //     })
-    //     it('Cant claim rewards if no deposit', async () => {
-    //         const pendingRewards = await myLaunchpadStaking.pendingRewards(owner)
-    //         expect(etherToNumber(pendingRewards)).eq(0)
-    //         await expectRevert(
-    //             myLaunchpadStaking.claim(),
-    //             'TutellusLaunchpadStaking: nothing to claim'
-    //         )
-    //     })
-    // })
-    // describe('Sets', () => {
-    //     beforeEach(async () => {
-    //         const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-    //         let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
-    
-    //         await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
-    //         const launchpadStaking = await myManager.get(VUTERINS_STAKING_ID)
-    //         expect(launchpadStaking).not.eq(ZERO_ADDRESS)
-    //         await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
-    //         await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
-    //         await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
-    //         myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
-    //     })
-    //     it('Set fees to new depositors', async () => {
-    //         const BLOCKS = 10
-    //         await myLaunchpadStaking.setFees(
-    //             ONE_ETHER,
-    //             TWO_ETHER,
-    //             BLOCKS
-    //         )
-
-    //         await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
-
-    //         const [blocksLeft, currentBlock, maxFee] = await Promise.all([
-    //             myLaunchpadStaking.getBlocksLeft(owner),
-    //             time.latestBlock(),
-    //             myLaunchpadStaking.getFee(owner),
-    //         ])
-
-    //         expect(etherToNumber(maxFee)).eq(etherToNumber(TWO_ETHER))
-    //         expect(Number(blocksLeft.toString())).eq(BLOCKS)
-    //         await time.advanceBlockTo(Number(currentBlock) + BLOCKS + 1)
-
-    //         const [minFee, zeroBlocksLeft] = await Promise.all([
-    //             myLaunchpadStaking.getFee(owner),
-    //             myLaunchpadStaking.getBlocksLeft(owner),
-    //         ])
-
-    //         expect(etherToNumber(minFee)).eq(etherToNumber(ONE_ETHER))
-    //         expect(Number(zeroBlocksLeft.toString())).eq(0)
-    //     })
-    //     it('Cant set minFee greater than maxFee', async () => {
-    //         await expectRevert(
-    //             myLaunchpadStaking.setFees(TWO_ETHER, ONE_ETHER, 1),
-    //             'TutellusLaunchpadStaking: mininum fee must be greater or equal than maximum fee'
-    //         )
-    //     })
-    //     it('Cant set maxFee greater than 100 ether', async () => {
-    //         await expectRevert(
-    //             myLaunchpadStaking.setFees(TWO_ETHER, parseEther('101'), 1),
-    //             'TutellusLaunchpadStaking: maxFee cannot exceed 100 ether'
-    //         )
-    //     })
-    //     it('Set a new energy multiplier', async () => {
-    //         await myLaunchpadStaking.setEnergyMultiplier(TWO_ETHER)
-    //         await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-
-    //         const LaunchpadStaking = artifacts.require('TutellusLaunchpadStaking')
-    //         const myLaunchpadStakingAux = await LaunchpadStaking.at(myLaunchpadStaking.address)
-            
-    //         const tx = await myLaunchpadStakingAux.deposit(owner, ONE_ETHER)
-    //         expectEvent(tx, 'Deposit', {
-    //             energyMinted: TWO_ETHER.toString()
-    //         })
-    //     })
-    // })
-    // describe('Autoreward', () => {
-    //     beforeEach(async () => {
-    //         const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-    //         let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
-    
-    //         await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
-    //         const launchpadStaking = await myManager.get(VUTERINS_STAKING_ID)
-    //         expect(launchpadStaking).not.eq(ZERO_ADDRESS)
-    //         await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
-    //         await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
-    //         await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
-    //         myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
-    //     })
-    //     it('Can claim rewards after withdraw if no autoreward', async () => {
-    //         await myLaunchpadStaking.toggleAutoreward()
-
-    //         await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-    //         await myLaunchpadStaking.deposit(owner, ONE_ETHER)
-    //         await myLaunchpadStaking.withdraw(ONE_ETHER)
-
-    //         const pendingRewards = await myLaunchpadStaking.pendingRewards(owner)
-    //         expect(etherToNumber(pendingRewards)).gt(0)
-    //         await myLaunchpadStaking.claim()
-    //     })
-    // })
+            const faction = await myFactionManager.factionOf(owner)
+            expect(faction).eq(VUTERINS_FACTION)
+        })
+        it('Cant migrate if no faction', async () => {
+            await expectRevert(
+                myFactionManager.migrateFaction(owner, VUTERINS_FACTION),
+                'TutellusFactionManager: cant migrate'
+            )
+        })
+        it('Cant migrate to a non existent faction', async () => {
+            await myToken.approve(nakamotosStaking, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await expectRevert(
+                myFactionManager.migrateFaction(owner, constants.HashZero),
+                'TutellusFactionManager: faction does not exist'
+            )
+        })
+    })
 })
   
