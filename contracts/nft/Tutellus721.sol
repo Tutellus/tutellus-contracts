@@ -11,7 +11,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
 
     bytes32 private constant ADMIN_721_ROLE = keccak256('ADMIN_721_ROLE');
     bytes32 public constant AUTH_NFT_SIGNER = keccak256('AUTH_NFT_SIGNER');
-    bytes32 private immutable _NEW_NFT_TYPEHASH = keccak256("Mint(bytes32 eventId,address account,uint256 deadline)");
+    bytes32 private immutable _NEW_NFT_TYPEHASH = keccak256('Mint(bytes32 eventId,address account,uint256 deadline)');
 
     mapping(uint256=>bytes32) public eventOf;
     mapping(bytes32=>bool) public validEvent;
