@@ -33,17 +33,18 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     uint256 amount;
     uint256 rewardDebt;
     uint256 notClaimed;
-    
+
     uint endInterval;
     uint256 minFee;
     uint256 maxFee;
     uint256 feeInterval;
 
-    uint256 energyDebt; 
+    uint256 energyDebt;
   }
 
   mapping(address=>Data) public data;
 
+  event Init(uint lastUpdate, address token, uint energyMultiplier);
   event Claim(address account);
   event Deposit(address account, uint256 amount, uint256 energyMinted);
   event Withdraw(address account, uint256 amount, uint256 burned, uint256 energyBurned);
@@ -65,6 +66,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     lastUpdate = block.number;
     token = tkn;
     energyMultiplier = 1 ether;
+
+    emit Init(lastUpdate, token, energyMultiplier);
   }
 
   function setEnergyMultiplier (uint256 newMultiplier) public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
@@ -121,7 +124,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     user.feeInterval = feeInterval;
     user.amount += amount;
     balance += amount;
-    
+
     if(autoreward) {
       _reward(account);
     }
@@ -167,7 +170,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     }
 
     uint256 burned = amount * getFee(account) / 1e20;
-  
+
     if(autoreward) {
       _reward(account);
     }
@@ -176,7 +179,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
       amount -= burned;
       tokenInterface.burn(burned);
     }
-    
+
     tokenInterface.transfer(account, amount);
 
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
