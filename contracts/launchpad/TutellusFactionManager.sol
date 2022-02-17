@@ -41,7 +41,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         ITutellusLaunchpadStaking farmingInterface = ITutellusLaunchpadStaking(faction[id].farmingContract);
 
         if (stakingInterface.getUserBalance(account) + farmingInterface.getUserBalance(account) == 0) {
-            factionOf[account] == 0x00;
+            factionOf[account] = 0x00;
             emit FactionOut(id, account);
         }
     }
