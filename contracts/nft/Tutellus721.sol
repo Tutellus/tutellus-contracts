@@ -78,9 +78,11 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
             termDebtOf[account] += e.energy;
         }
 
-        ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(_ENERGY));
-        energyInterface.mintStatic(account, e.energy);
-
+        if (e.energy > 0) {
+            ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(_ENERGY));
+            energyInterface.mintStatic(account, e.energy);
+        }
+        
         uint256 tokenId = totalSupply();
         eventOf[tokenId] = eventId;
         
@@ -100,6 +102,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
     ) public {
         require(msg.sender == ITutellusManager(config).get(_IDO));
         uint256 energy = termDebtOf[account];
+        require(energy > 0, 'Tutellus721: cant terminate without energy');
         ITutellusEnergy(ITutellusManager(config).get(_ENERGY)).burnStatic(account, energy);
         termDebtOf[account] = 0;
         emit Terminate(account, energy);
@@ -120,6 +123,10 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         return events[eventOf[tokenId]].uri;
     }
 
+    function initialize () public initializer {
+        __AccessControlProxyPausable_init(msg.sender);
+    }
+
     /**  The following functions are overrides required by Solidity */
 
     function supportsInterface(bytes4 interfaceId)
@@ -135,8 +142,9 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         internal
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
     {   
-        Event memory e = events[eventId];
-
+        Event memory e = events[eventOf[tokenId]];
+        address account = ownerOf(tokenId);
+        require(account != address(0), 'Tutellus721: token burned or not minted');
         require(!e.terminable, 'Tutellus721: can only burn interminable tokens');
         ITutellusEnergy(ITutellusManager(config).get(_ENERGY)).burnStatic(account, e.energy);
         super._burn(tokenId);
