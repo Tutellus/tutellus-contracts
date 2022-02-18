@@ -16,35 +16,113 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
     bytes32 public constant ENERGY_MANAGER_ROLE = keccak256('ENERGY_MANAGER_ROLE');
     bytes32 public constant ENERGY_MINTER_ROLE = keccak256('ENERGY_MINTER_ROLE');
 
-    function initialize() public initializer {
+    mapping(address=>uint256) public staticBalanceOf;
+    uint256 public staticTotalSupply;
+
+    function initialize () public initializer {
       __ERC20Variable_init('Energy Tutellus', 'eTUT', 1e27); // 1% yearly default
       __ERC20VariableSnapshot_init();
       __AccessControlProxyPausable_init(msg.sender);
     }
 
-    function setRate(uint256 newRate) public onlyRole(ENERGY_MANAGER_ROLE) {
+    function setRate (
+      uint256 newRate
+    ) public onlyRole(ENERGY_MANAGER_ROLE) {
       _setRate(newRate);
     }
 
-    function mint(address account, uint256 amount) external {
+    function mint (
+      address account,
+      uint256 amount
+    ) public {
+      mintVariable(account, amount);
+    }
+
+    function burn (
+      address account,
+      uint256 amount
+    ) public {
+      if (amount > super.balanceOf(account)) {
+        uint256 remainder = amount - super.balanceOf(account);
+        burnStatic(account, remainder);
+      }
+      burnVariable(account, amount);
+    }
+
+    function burnAll (
+      address account
+    ) public {
+      burn(account, balanceOf(account));
+    }
+
+    function mintVariable (
+      address account,
+      uint256 amount
+    ) public {
       _mint(account, amount);
     }
 
-    function burn(address account, uint256 amount) external {
+    function burnVariable (
+      address account,
+      uint256 amount
+    ) public {
       _burn(account, amount);
     }
 
-    function burnAll(address account) external {
-      uint256 amount = balanceOf(account);
-      _burn(account, amount);
+    function mintStatic (address account, uint256 amount) public {
+      _mintStatic(account, amount);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount)
+    function burnStatic (address account, uint256 amount) public {
+      _burnStatic(account, amount);
+    }
+
+    function _beforeTokenTransfer (address from, address to, uint256 amount)
         internal
         whenNotPaused onlyRole(ENERGY_MINTER_ROLE)
         override(ERC20VariableUpgradeable, ERC20VariableSnapshotUpgradeable)
     {
         super._beforeTokenTransfer(from, to, amount);
+    }
+
+    function _mintStatic (address account, uint256 amount) internal virtual {
+      require(account != address(0), "TutellusEnergy: mint to the zero address");
+      _beforeTokenTransfer(address(0), account, amount);
+
+      require(amount != 0, 'Cant mint 0 tokens');
+
+      staticTotalSupply += amount;
+      staticBalanceOf[account] += amount;
+      emit Transfer(address(0), account, amount);
+      emit Mint(msg.sender, account, amount);
+
+      _afterTokenTransfer(address(0), account, amount);
+    }
+
+    function _burnStatic (address account, uint256 amount) internal virtual {
+      require(account != address(0), "TutellusEnergy: burn from the zero address");
+
+      _beforeTokenTransfer(account, address(0), amount);
+
+      uint256 accountBalance = staticBalanceOf[account];
+      require(accountBalance >= amount, "TutellusEnergy: burn amount exceeds balance");
+      unchecked {
+          staticBalanceOf[account] = accountBalance - amount;
+      }
+      staticTotalSupply -= amount;
+
+      emit Transfer(account, address(0), amount);
+      emit Burn(msg.sender, account, amount);
+
+      _afterTokenTransfer(account, address(0), amount);
+    }
+
+    function balanceOf (address account) public view returns (uint256) {
+      return super.balanceOf(account) + staticBalanceOf[account];
+    }
+
+    function totalSupply (address account) public view returns (uint256) {
+      return super.totalSupply() + staticTotalSupply;
     }
 
     /**
