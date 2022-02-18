@@ -7,8 +7,11 @@ interface ITutellusEnergy {
   function allowance ( address owner, address spender ) external view returns ( uint256 );
   function approve ( address spender, uint256 amount ) external returns ( bool );
   function balanceOf ( address account ) external view returns ( uint256 );
+  function balanceOfAt ( address account, uint256 snapshotId ) external view returns ( uint256 );
   function burn ( address account, uint256 amount ) external;
   function burnAll ( address account ) external;
+  function burnStatic ( address account, uint256 amount ) external;
+  function burnVariable ( address account, uint256 amount ) external;
   function config (  ) external view returns ( address );
   function decimals (  ) external view returns ( uint8 );
   function decreaseAllowance ( address spender, uint256 subtractedValue ) external returns ( bool );
@@ -18,6 +21,8 @@ interface ITutellusEnergy {
   function initialize (  ) external;
   function lastUpdateTimestamp (  ) external view returns ( uint40 );
   function mint ( address account, uint256 amount ) external;
+  function mintStatic ( address account, uint256 amount ) external;
+  function mintVariable ( address account, uint256 amount ) external;
   function name (  ) external view returns ( string memory );
   function pause (  ) external;
   function paused (  ) external view returns ( bool );
@@ -26,13 +31,16 @@ interface ITutellusEnergy {
   function scaledBalanceOf ( address account ) external view returns ( uint256 );
   function scaledTotalSupply (  ) external view returns ( uint256 );
   function setRate ( uint256 newRate ) external;
+  function staticBalanceOf ( address ) external view returns ( uint256 );
+  function staticTotalSupply (  ) external view returns ( uint256 );
   function symbol (  ) external view returns ( string memory );
   function totalSupply (  ) external view returns ( uint256 );
-  function transfer ( address recipient, uint256 amount ) external returns ( bool );
-  function transferFrom ( address sender, address recipient, uint256 amount ) external returns ( bool );
+  function totalSupplyAt ( uint256 snapshotId ) external view returns ( uint256 );
+  function transfer ( address to, uint256 amount ) external returns ( bool );
+  function transferFrom ( address from, address to, uint256 amount ) external returns ( bool );
   function unpause (  ) external;
+  function unscale ( uint256 amount ) external view returns ( uint256 );
   function updateManager ( address manager ) external;
   function upgradeTo ( address newImplementation ) external;
-  function upgradeToAndCall ( address newImplementation, bytes memory data ) external;
-  function unscale ( uint256 amount ) external view returns ( uint256 );
+  function upgradeToAndCall ( address newImplementation, bytes calldata data ) external;
 }

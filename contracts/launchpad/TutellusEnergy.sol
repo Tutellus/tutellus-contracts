@@ -117,11 +117,11 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
       _afterTokenTransfer(account, address(0), amount);
     }
 
-    function balanceOf (address account) public view returns (uint256) {
+    function balanceOf (address account) public view override returns (uint256) {
       return super.balanceOf(account) + staticBalanceOf[account];
     }
 
-    function totalSupply (address account) public view returns (uint256) {
+    function totalSupply () public view override returns (uint256) {
       return super.totalSupply() + staticTotalSupply;
     }
 
