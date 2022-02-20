@@ -32,7 +32,7 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole{
 
         proxyAddress = address(proxy);
 
-        (,address token_,uint fundingAmount_, uint minPrefund_) = abi.decode(initializeCalldata[4:], (address, address, uint, uint));
+        (address token_,uint fundingAmount_, uint minPrefund_) = abi.decode(initializeCalldata[4:], (address, uint, uint));
 
         emit NewIDO(proxyAddress, token_, fundingAmount_, minPrefund_);
     }

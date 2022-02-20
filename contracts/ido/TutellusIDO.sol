@@ -8,6 +8,8 @@ import "../interfaces/ITutellusManager.sol";
 
 contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
 
+    bytes32 public constant IDO_USDT = keccak256("IDO_USDT");
+
     uint public prefunded;
     uint public fundingAmount;
     uint public minPrefund;
@@ -40,6 +42,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     }
 
     function prefund(uint prefundAmount_) public {
+        // TBD: allow anyone prefund or filter?
         address prefunder_ = _msgSender();
         require(prefundAmount_ >= minPrefund, "TutellusIDO: insufficient prefund");
         _prefund(prefundAmount_, prefunder_);
@@ -55,7 +58,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     function withdraw(uint amount_) public {
         address prefunder_ = _msgSender();
         _withdraw(prefunder_, amount_);
-        require(_prefunds[prefunder_] >= minPrefund, "TutellusIDO: try withdrawAllTutellian");
+        require(_prefunds[prefunder_] >= minPrefund, "TutellusIDO: try withdrawAll");
     }
 
     function claim(uint index_, address account_, uint amount_, bytes32[] calldata merkleProof_) public {
@@ -63,18 +66,18 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         require(claimableAmount_ > 0, "TutellusIDO: nothing to claim");
         _claimed[account_] += claimableAmount_;
         _verifyMerkle(index_, account_, amount_, merkleProof_);
-        address token_ = ITutellusManager(config).get(keccak256('TOKEN'));
+        address token_ = ITutellusManager(config).get(IDO_USDT);
         _transfer(token_, account_, amount_);
         emit Claim(index_, account_, amount_);
     }
 
     function sync() public onlyRole(DEFAULT_ADMIN_ROLE) {
-        address token_ = ITutellusManager(config).get(keccak256('TOKEN'));
+        address token_ = ITutellusManager(config).get(IDO_USDT);
         _sync(token_, msg.sender, prefunded);
     }
 
     function _prefund(uint prefundAmount_, address prefunder_) internal {
-        address token_ = ITutellusManager(config).get(keccak256('TOKEN'));
+        address token_ = ITutellusManager(config).get(IDO_USDT);
         _transferFrom(token_, prefunder_, address(this), prefundAmount_);
         prefunded += prefundAmount_;
         _prefunds[prefunder_] += prefundAmount_;
@@ -82,9 +85,10 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     }
 
     function _withdraw(address prefunder_, uint amount_) internal {
+        require(_prefunds[prefunder_] >= amount_, "TutellusIDO: cant withdraw more than prefunded");
         prefunded -= amount_;
-        _prefunds[prefunder_] += amount_;
-        address token_ = ITutellusManager(config).get(keccak256('TOKEN'));
+        _prefunds[prefunder_] -= amount_;
+        address token_ = ITutellusManager(config).get(IDO_USDT);
         _transfer(token_, prefunder_, amount_);
 
         emit Withdraw(prefunder_, amount_);
