@@ -114,6 +114,8 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
     }
 
     function initialize () public initializer {
+        __EIP712_init_unchained('Tutellus721', '1');
+        __ERC721_init('Tutellus721', 'TUT721');
         __AccessControlProxyPausable_init(msg.sender);
     }
 
