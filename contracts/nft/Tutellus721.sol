@@ -43,7 +43,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         bool perpetual,
         uint256 energy
     ) public onlyRole(_ADMIN_721_ROLE) {
-        require(!eventId.valid, 'Tutellus721: event valid');
+        require(!events[eventId].valid, 'Tutellus721: event valid');
         events[eventId] = Event(uri, true, perpetual, energy);
     }
 
@@ -136,7 +136,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
     {   
         address account = ownerOf(tokenId);
-        require(account != address(0), 'Tutellus721: token burned or not minted');
+        // require(account != address(0), 'Tutellus721: token burned or not minted');
 
         bytes32 eventId = eventOf[tokenId];
         uint256 energy = events[eventId].energy;
