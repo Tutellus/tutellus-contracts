@@ -5,7 +5,7 @@ const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
 const { formatEther, parseEther } = require('ethers/lib/utils')
-const { BigNumber } = require('ethers')
+const { utils } = require('ethers')
 const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('./utils')
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -25,12 +25,12 @@ let myEnergy
 let myNFT
 let owner, person
 
-const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
-const ENERGY_MANAGER_ROLE = ethers.utils.id('ENERGY_MANAGER_ROLE')
-const ADMIN_721_ROLE = ethers.utils.id('ADMIN_721_ROLE')
-const AUTH_NFT_SIGNER = ethers.utils.id('AUTH_NFT_SIGNER')
-const ENERGY_ID = ethers.utils.id('ENERGY');
-const NFT_ID = ethers.utils.id('721');
+const ENERGY_MINTER_ROLE = utils.id('ENERGY_MINTER_ROLE')
+const ENERGY_MANAGER_ROLE = utils.id('ENERGY_MANAGER_ROLE')
+const ADMIN_721_ROLE = utils.id('ADMIN_721_ROLE')
+const AUTH_NFT_SIGNER = utils.id('AUTH_NFT_SIGNER')
+const ENERGY_ID = utils.id('ENERGY');
+const NFT_ID = utils.id('721');
 const ONE_ETHER = parseEther('1')
 const TWO_ETHER = parseEther('2')
 const SIX_ETHER = parseEther('6')
@@ -61,7 +61,7 @@ const setInstances = async (addresses) => {
 }
 
 const myEvent = {
-    id: ethers.utils.id('quedada-1-madrid'),
+    id: utils.id('quedada-1-madrid'),
     energy: parseEther('0'),
     perpetual: true,
     uri: 'uri/quedada-1-madrid'
@@ -93,7 +93,7 @@ describe.only('721 tokens', function () {
             const addr = ids[key]
             const myContract = await ACPP.at(addr)
 
-            await myManager.setId(ethers.utils.id(key), addr)
+            await myManager.setId(utils.id(key), addr)
             await myContract.updateManager(myManager.address)
         }
 
@@ -170,7 +170,6 @@ describe.only('721 tokens', function () {
             }
 
             let myWallet = await new hre.ethers.Wallet.createRandom()
-            myWallet = myWallet.connect(hre.ethers.provider)
             const signer = myWallet.address
             const signature = await myWallet._signTypedData(domain, types, value)
             
