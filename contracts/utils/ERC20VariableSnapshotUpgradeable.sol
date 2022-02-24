@@ -7,7 +7,9 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ArraysUpgradeable.sol";
 
 abstract contract ERC20VariableSnapshotUpgradeable is ERC20VariableUpgradeable {
-    function __ERC20VariableSnapshot_init() internal onlyInitializing {
+    function __ERC20VariableSnapshot_init(string memory name_, string memory symbol_, uint256 rate_) internal onlyInitializing {
+        __ERC20Variable_init_unchained(name_, symbol_, rate_);
+        __ERC20VariableSnapshot_init_unchained();
     }
 
     function __ERC20VariableSnapshot_init_unchained() internal onlyInitializing {
@@ -112,7 +114,7 @@ abstract contract ERC20VariableSnapshotUpgradeable is ERC20VariableUpgradeable {
         }
     }
 
-    function _valueAt(uint256 snapshotId, Snapshots storage snapshots) private view returns (bool, uint256) {
+    function _valueAt(uint256 snapshotId, Snapshots storage snapshots) internal view returns (bool, uint256) {
         require(snapshotId > 0, "ERC20Snapshot: id is 0");
         require(snapshotId <= _getCurrentSnapshotId(), "ERC20Snapshot: nonexistent id");
 
@@ -147,7 +149,7 @@ abstract contract ERC20VariableSnapshotUpgradeable is ERC20VariableUpgradeable {
         _updateSnapshot(_totalSupplySnapshots, totalSupply());
     }
 
-    function _updateSnapshot(Snapshots storage snapshots, uint256 currentValue) private {
+    function _updateSnapshot(Snapshots storage snapshots, uint256 currentValue) internal {
         uint256 currentId = _getCurrentSnapshotId();
         if (_lastSnapshotId(snapshots.ids) < currentId) {
             snapshots.ids.push(currentId);
