@@ -153,7 +153,7 @@ describe.only('721 tokens', function () {
             const domain = {
                 name: 'Tutellus721',
                 version: '1',
-                chainId: hre.ethers.provider._network.chainId,
+                chainId: ethers.provider._network.chainId,
                 verifyingContract: myNFT.address
             }
 
