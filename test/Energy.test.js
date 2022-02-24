@@ -5,7 +5,7 @@ const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
 const { formatEther, parseEther } = require('ethers/lib/utils')
-const { BigNumber } = require('ethers')
+const { BigNumber, constants } = require('ethers')
 const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('./utils')
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -80,7 +80,7 @@ function getCompoundedInterest(
     return ratePerSecond.mul(seconds).add(secondTerm).add(thirdTerm).mul(ONE_ETHER).div(RAY)
 }
 
-describe('Energy Token', function () {
+describe.only('Energy Token', function () {
     before(async () => {
         [owner, person] = await web3.eth.getAccounts()
     })
@@ -174,6 +174,36 @@ describe('Energy Token', function () {
             ) 
         })
     })
+    describe('MintStatic', () => {
+        beforeEach(async () => {
+            const Energy = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
+
+            await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
+
+            const energy = await myManager.get(ENERGY_ID)
+            myEnergy = Energy.attach(energy)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
+        })
+        it('Minting tokens', async () => {
+            await myEnergy.mintStatic(owner, ONE_ETHER)
+            const balance = await myEnergy.balanceOf(owner)
+            expectEqEth(balance, ONE_ETHER)
+
+        })
+        it('Cant mint 0 tokens', async () => {
+            await expectRevert(
+                myEnergy.mintStatic(owner, '0'),
+                'Cant mint 0 tokens'
+            ) 
+        })
+        it('Cant mint to zero address', async () => {
+            await expectRevert(
+                myEnergy.mintStatic(constants.AddressZero, ONE_ETHER),
+                'TutellusEnergy: mint to the zero address'
+            ) 
+        })
+    })
     describe('Burn', () => {
         beforeEach(async () => {
             const Energy = await ethers.getContractFactory('TutellusEnergy')
@@ -199,7 +229,7 @@ describe('Energy Token', function () {
             const cumulated = await myEnergy.totalSupply()
             const expCumulated = balance0.mul(getCompoundedInterest(0, SECONDS, rate)).div(ONE_ETHER)
             
-            expectApproxWeiDecimals(cumulated, expCumulated, 1) // sometimes it fails if seconds do not match
+            expectApproxWeiDecimals(cumulated, expCumulated, 1)
         })
         it('Burning all', async () => {
 
@@ -228,6 +258,30 @@ describe('Energy Token', function () {
                 myEnergy.burnAll(owner),
                 'Cant burn 0 tokens'
             )
+        })
+    })
+    describe('BurnStatic', () => {
+        beforeEach(async () => {
+            const Energy = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
+
+            await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
+
+            const energy = await myManager.get(ENERGY_ID)
+            myEnergy = Energy.attach(energy)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
+        })
+        it('Burning tokens after minting', async () => {
+            await myEnergy.mintStatic(owner, ONE_ETHER)
+            await myEnergy.burn(owner, ONE_ETHER)
+            const balance = await myEnergy.balanceOf(owner)
+            expectEqEth(balance, 0)
+        })
+        it('Burning all', async () => {
+            await myEnergy.mintStatic(owner, ONE_ETHER)
+            await myEnergy.burnAll(owner)
+            const balance = await myEnergy.balanceOf(owner)
+            expectEqEth(balance, 0)
         })
     })
     describe('Rate', () => {

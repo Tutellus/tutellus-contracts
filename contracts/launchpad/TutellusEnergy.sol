@@ -51,11 +51,17 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       address account,
       uint256 amount
     ) public {
-      if (amount > super.balanceOf(account)) {
-        uint256 remainder = amount - super.balanceOf(account);
+      require(amount <= balanceOf(account), 'TutellusEnergy: amount exceeds balance');
+      uint256 variableBalance = super.balanceOf(account); 
+      if (amount > variableBalance) {
+        uint256 remainder = amount - variableBalance;
         burnStatic(account, remainder);
+        if (variableBalance > 0) {
+          burnVariable(account, variableBalance);
+        }
+      } else {
+        burnVariable(account, amount);
       }
-      burnVariable(account, amount);
     }
 
     function burnAll (

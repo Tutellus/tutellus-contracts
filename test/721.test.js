@@ -115,7 +115,7 @@ const myEvent4 = {
     uri: 'uri/non-perpetual-energy'
 }
 
-describe.only('721 tokens', function () {
+describe('721 tokens', function () {
     before(async () => {
         [owner, person, person2] = await web3.eth.getAccounts()
     })
