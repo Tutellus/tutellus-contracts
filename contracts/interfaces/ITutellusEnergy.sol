@@ -10,6 +10,7 @@ interface ITutellusEnergy {
   function balanceOfAt ( address account, uint256 snapshotId ) external view returns ( uint256 );
   function burn ( address account, uint256 amount ) external;
   function burnAll ( address account ) external;
+  function burnEvent ( bytes32 eventId, address account, uint256 amount ) external;
   function burnStatic ( address account, uint256 amount ) external;
   function burnVariable ( address account, uint256 amount ) external;
   function config (  ) external view returns ( address );
@@ -21,6 +22,7 @@ interface ITutellusEnergy {
   function initialize (  ) external;
   function lastUpdateTimestamp (  ) external view returns ( uint40 );
   function mint ( address account, uint256 amount ) external;
+  function mintEvent ( bytes32 eventId, address account, uint256 amount ) external;
   function mintStatic ( address account, uint256 amount ) external;
   function mintVariable ( address account, uint256 amount ) external;
   function name (  ) external view returns ( string memory );

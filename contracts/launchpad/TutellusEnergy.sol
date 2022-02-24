@@ -39,7 +39,7 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
       address account,
       uint256 amount
     ) public {
-      variableMint(account, amount);
+      mintVariable(account, amount);
     }
 
     function burn (
@@ -48,9 +48,9 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
     ) public {
       if (amount > super.balanceOf(account)) {
         uint256 remainder = amount - super.balanceOf(account);
-        staticBurn(account, remainder);
+        burnStatic(account, remainder);
       }
-      variableBurn(account, amount);
+      burnVariable(account, amount);
     }
 
     function burnAll (
@@ -59,21 +59,21 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
       burn(account, balanceOf(account));
     }
 
-    function variableMint (
+    function mintVariable (
       address account,
       uint256 amount
     ) public {
       _mint(account, amount);
     }
 
-    function variableBurn (
+    function burnVariable (
       address account,
       uint256 amount
     ) public {
       _burn(account, amount);
     }
 
-    function eventMint (
+    function mintEvent (
       bytes32 eventId,
       address account,
       uint256 amount
@@ -92,7 +92,7 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
       _afterTokenTransfer(address(0), account, amount);
     }
 
-    function eventBurn (
+    function burnEvent (
       bytes32 eventId,
       address account,
       uint256 amount
@@ -127,7 +127,7 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function staticMint (
+    function mintStatic (
       address account,
       uint256 amount
     ) public {
@@ -144,7 +144,7 @@ contract TutellusEnergy is ERC20VariableUpgradeable, ERC20VariableSnapshotUpgrad
       _afterTokenTransfer(address(0), account, amount);
     }
 
-    function staticBurn (
+    function burnStatic (
       address account,
       uint256 amount
     ) public {

@@ -138,26 +138,26 @@ describe.only('721 tokens', function () {
             const myEvent = {
                 id: ethers.utils.id('quedada-1-madrid'),
                 energy: parseEther('0'),
-                terminable: false,
+                perpetual: true,
                 uri: 'uri/quedada-1-madrid'
             }
 
             await myNFT.createEvent(
                 myEvent.id,
                 myEvent.uri,
-                myEvent.energy,
-                myEvent.terminable
+                myEvent.perpetual,
+                myEvent.energy
             )
             
             const {
                 uri,
                 valid,
-                terminable,
+                perpetual,
                 energy
             } = await myNFT.events(myEvent.id)
 
             expect(uri).eq(myEvent.uri)
-            expect(terminable).eq(myEvent.terminable)
+            expect(perpetual).eq(myEvent.perpetual)
             expect(valid).eq(true)
             expectEqEth(energy, myEvent.energy)
 

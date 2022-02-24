@@ -21,30 +21,29 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
     struct Event {
         string uri;
         bool valid;
-        bool terminable;
+        bool perpetual;
         uint256 energy;
     }
 
     /** Event mappings */
     mapping(bytes32=>Event) public events;
+    mapping(uint256=>bytes32) public eventOf;
 
     /** Account mappings */
-    mapping(uint256=>bytes32) public eventOf;
-    mapping(address=>uint256) public termDebtOf;
     mapping(bytes32=>bool) private _signed;
 
     /** Events */
-    event Mint(bytes32 eventId, uint256 tokenId, address account);
-    event CreateEvent(bytes32 eventId, string eventURI, bool terminable, uint256 energy);
-    event Terminate(address account, uint256 energy);
+    event Mint(bytes32 eventId, uint256 tokenId, address account, uint256 energy);
+    event Burn(bytes32 eventId, uint256 tokenId, address account, uint256 energy);
+    event CreateEvent(bytes32 eventId, string eventURI, bool perpetual, uint256 energy);
 
     function createEvent (
         bytes32 eventId,
         string memory uri,
-        uint256 energy,
-        bool terminable
+        bool perpetual,
+        uint256 energy
     ) public onlyRole(_ADMIN_721_ROLE) {
-        events[eventId] = Event(uri, true, terminable, energy);
+        events[eventId] = Event(uri, true, perpetual, energy);
     }
 
     function mint (
@@ -71,23 +70,25 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         bytes32 eventId,
         address account
     ) internal {
-        Event memory e = events[eventId];
-        require(e.valid, 'Tutellus721: event not valid');
+        bool valid = events[eventId].valid;
+        require(valid, 'Tutellus721: event not valid');
 
-        if (e.terminable) {
-            termDebtOf[account] += e.energy;
-        }
-
-        if (e.energy > 0) {
+        uint256 energy = events[eventId].energy;
+        if (energy > 0) {
             ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(_ENERGY));
-            energyInterface.mintStatic(account, e.energy);
+            bool perpetual = events[eventId].perpetual;
+            if (perpetual) {
+                energyInterface.mintStatic(account, energy);
+            } else {
+                energyInterface.mintEvent(eventId, account, energy);
+            }
         }
         
         uint256 tokenId = totalSupply();
         eventOf[tokenId] = eventId;
         
         _safeMint(account, tokenId);
-        emit Mint(eventId, tokenId, account);
+        emit Mint(eventId, tokenId, account, energy);
     }
 
     function burn (
@@ -95,17 +96,6 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
     ) public {
         require(_isApprovedOrOwner(msg.sender, tokenId) || hasRole(_ADMIN_721_ROLE, msg.sender), 'Tutellus721: invalid sender');
         _burn(tokenId);
-    }
-
-    function terminate (
-        address account
-    ) public {
-        require(msg.sender == ITutellusManager(config).get(_IDO));
-        uint256 energy = termDebtOf[account];
-        require(energy > 0, 'Tutellus721: cant terminate without energy');
-        ITutellusEnergy(ITutellusManager(config).get(_ENERGY)).burnStatic(account, energy);
-        termDebtOf[account] = 0;
-        emit Terminate(account, energy);
     }
 
     function _beforeTokenTransfer(
@@ -142,11 +132,22 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         internal
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
     {   
-        Event memory e = events[eventOf[tokenId]];
         address account = ownerOf(tokenId);
         require(account != address(0), 'Tutellus721: token burned or not minted');
-        require(!e.terminable, 'Tutellus721: can only burn interminable tokens');
-        ITutellusEnergy(ITutellusManager(config).get(_ENERGY)).burnStatic(account, e.energy);
+
+        bytes32 eventId = eventOf[tokenId];
+        uint256 energy = events[eventId].energy;
+        if (energy > 0) {
+            ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(_ENERGY));
+            bool perpetual = events[eventId].perpetual;
+            if (perpetual) {
+                energyInterface.burnStatic(account, energy);
+            } else {
+                energyInterface.burnEvent(eventId, account, energy);
+            }
+        }
+        
         super._burn(tokenId);
+        emit Burn(eventId, tokenId, account, energy);
     }
 }
