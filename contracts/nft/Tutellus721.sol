@@ -43,6 +43,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         bool perpetual,
         uint256 energy
     ) public onlyRole(_ADMIN_721_ROLE) {
+        require(!eventId.valid, 'Tutellus721: event valid');
         events[eventId] = Event(uri, true, perpetual, energy);
     }
 
