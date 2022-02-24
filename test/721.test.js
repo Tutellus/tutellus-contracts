@@ -60,11 +60,57 @@ const setInstances = async (addresses) => {
     ])
 }
 
+const sign721 = async (contract, eventId, account) => {
+    const domain = {
+        name: 'Tutellus721',
+        version: '1',
+        chainId: ethers.provider._network.chainId,
+        verifyingContract: contract.address
+    }
+
+    const types = {
+        Mint: [
+            { name: 'eventId', type: 'bytes32' },
+            { name: 'account', type: 'address' },
+        ]
+    }
+
+    const value = {
+       eventId,
+       account
+    }
+
+    let myWallet = await new ethers.Wallet.createRandom()
+
+    return {
+        signer: myWallet.address,
+        signature: await myWallet._signTypedData(domain, types, value)
+    }
+}
+
 const myEvent = {
     id: utils.id('quedada-1-madrid'),
     energy: parseEther('0'),
     perpetual: true,
     uri: 'uri/quedada-1-madrid'
+}
+const myEvent2 = {
+    id: utils.id('bootcamp-defi'),
+    energy: parseEther('1000'),
+    perpetual: true,
+    uri: 'uri/bootcamp-defi'
+}
+const myEvent3 = {
+    id: utils.id('null'),
+    energy: parseEther('0'),
+    perpetual: false,
+    uri: 'uri/null'
+}
+const myEvent4 = {
+    id: utils.id('null'),
+    energy: parseEther('1000'),
+    perpetual: false,
+    uri: 'uri/null'
 }
 
 describe.only('721 tokens', function () {
@@ -118,6 +164,7 @@ describe.only('721 tokens', function () {
     describe('Create event', () => {
         it('Can create a new event', async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createEvent(
                 myEvent.id,
                 myEvent.uri,
@@ -142,37 +189,34 @@ describe.only('721 tokens', function () {
     describe('Mint', () => {
         beforeEach(async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createEvent(
                 myEvent.id,
                 myEvent.uri,
                 myEvent.perpetual,
                 myEvent.energy
             )
+            await myNFT.createEvent(
+                myEvent2.id,
+                myEvent2.uri,
+                myEvent2.perpetual,
+                myEvent2.energy
+            )
+            await myNFT.createEvent(
+                myEvent3.id,
+                myEvent3.uri,
+                myEvent3.perpetual,
+                myEvent3.energy
+            )
+            await myNFT.createEvent(
+                myEvent4.id,
+                myEvent4.uri,
+                myEvent4.perpetual,
+                myEvent4.energy
+            )
         })
-        it('Can mint a new token', async () => {
-            const domain = {
-                name: 'Tutellus721',
-                version: '1',
-                chainId: ethers.provider._network.chainId,
-                verifyingContract: myNFT.address
-            }
-
-            const types = {
-                Mint: [
-                    { name: 'eventId', type: 'bytes32' },
-                    { name: 'account', type: 'address' },
-                ]
-            }
-
-            const value = {
-               eventId: myEvent.id,
-               account: person,
-            }
-
-            let myWallet = await new hre.ethers.Wallet.createRandom()
-            const signer = myWallet.address
-            const signature = await myWallet._signTypedData(domain, types, value)
-            
+        it('Can mint a perpetual token without energy', async () => {
+            const { signer, signature } = await sign721(myNFT, myEvent.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myEvent.id,
@@ -180,8 +224,57 @@ describe.only('721 tokens', function () {
                 signature,
                 signer
             )
-            const ownership = await myNFT.ownerOf(0)
-            expect(ownership).eq(person)
+            const ownerOf = await myNFT.ownerOf(0)
+            expect(ownerOf).eq(person)
+        })
+        it('Can mint a perpetual token with energy', async () => {
+            const { signer, signature } = await sign721(myNFT, myEvent2.id, person)
+            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myNFT.mint(
+                myEvent2.id,
+                person,
+                signature,
+                signer
+            )
+ 
+            const [ownerOf, energyBalance] = await Promise.all([
+                myNFT.ownerOf(0),
+                myEnergy.balanceOf(person)
+            ])
+            expect(ownerOf).eq(person)
+            expectEqEth(energyBalance, myEvent2.energy)
+        })
+        it('Can mint a non-perpetual token without energy', async () => {
+            const { signer, signature } = await sign721(myNFT, myEvent3.id, person)
+            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myNFT.mint(
+                myEvent3.id,
+                person,
+                signature,
+                signer
+            )
+ 
+            const [ownerOf] = await Promise.all([
+                myNFT.ownerOf(0)
+            ])
+            expect(ownerOf).eq(person)
+        })
+        it('Can mint a non-perpetual token with energy', async () => {
+            const { signer, signature } = await sign721(myNFT, myEvent4.id, person)
+            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myNFT.mint(
+                myEvent4.id,
+                person,
+                signature,
+                signer
+            )
+ 
+            const [ownerOf, eventEnergyBalance] = await Promise.all([
+                myNFT.ownerOf(0),
+                myEnergy.eventBalanceOf(myEvent4.id, person)
+            ])
+            expect(ownerOf).eq(person)
+            expectEqEth(eventEnergyBalance, myEvent4.energy)
         })
     })
 })
