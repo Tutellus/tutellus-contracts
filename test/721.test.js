@@ -28,6 +28,7 @@ let owner, person
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const ENERGY_MANAGER_ROLE = ethers.utils.id('ENERGY_MANAGER_ROLE')
 const ADMIN_721_ROLE = ethers.utils.id('ADMIN_721_ROLE')
+const AUTH_NFT_SIGNER = ethers.utils.id('AUTH_NFT_SIGNER')
 const ENERGY_ID = ethers.utils.id('ENERGY');
 const NFT_ID = ethers.utils.id('721');
 const ONE_ETHER = parseEther('1')
@@ -59,28 +60,11 @@ const setInstances = async (addresses) => {
     ])
 }
 
-function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function getCompoundedInterest(
-    from,
-    to,
-    rate
-) {
-    const seconds = to - from
-    const secondsMinusOne = seconds - 1
-    const secondsMinusTwo = seconds - 2
-
-    const ratePerSecond = rate.div(SECONDS_PER_YEAR)
-
-    const basePowerTwo = ratePerSecond.mul(ratePerSecond).div(RAY)
-    const basePowerThree = basePowerTwo.mul(ratePerSecond).div(RAY)
-
-    const secondTerm = basePowerTwo.mul(seconds * secondsMinusOne).mul(ONE_ETHER).div(TWO_ETHER)
-    const thirdTerm = basePowerThree.mul(seconds * secondsMinusOne * secondsMinusTwo).mul(ONE_ETHER).div(SIX_ETHER)
-
-    return ratePerSecond.mul(seconds).add(secondTerm).add(thirdTerm).mul(ONE_ETHER).div(RAY)
+const myEvent = {
+    id: ethers.utils.id('quedada-1-madrid'),
+    energy: parseEther('0'),
+    perpetual: true,
+    uri: 'uri/quedada-1-madrid'
 }
 
 describe.only('721 tokens', function () {
@@ -134,14 +118,6 @@ describe.only('721 tokens', function () {
     describe('Create event', () => {
         it('Can create a new event', async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
-
-            const myEvent = {
-                id: ethers.utils.id('quedada-1-madrid'),
-                energy: parseEther('0'),
-                perpetual: true,
-                uri: 'uri/quedada-1-madrid'
-            }
-
             await myNFT.createEvent(
                 myEvent.id,
                 myEvent.uri,
@@ -161,6 +137,52 @@ describe.only('721 tokens', function () {
             expect(valid).eq(true)
             expectEqEth(energy, myEvent.energy)
 
+        })
+    })
+    describe('Mint', () => {
+        beforeEach(async () => {
+            await myManager.grantRole(ADMIN_721_ROLE, owner)
+            await myNFT.createEvent(
+                myEvent.id,
+                myEvent.uri,
+                myEvent.perpetual,
+                myEvent.energy
+            )
+        })
+        it('Can mint a new token', async () => {
+            const domain = {
+                name: 'Tutellus721',
+                version: '1',
+                chainId: hre.ethers.provider._network.chainId,
+                verifyingContract: myNFT.address
+            }
+
+            const types = {
+                Mint: [
+                    { name: 'eventId', type: 'bytes32' },
+                    { name: 'account', type: 'address' },
+                ]
+            }
+
+            const value = {
+               eventId: myEvent.id,
+               account: person,
+            }
+
+            let myWallet = await new hre.ethers.Wallet.createRandom()
+            myWallet = myWallet.connect(hre.ethers.provider)
+            const signer = myWallet.address
+            const signature = await myWallet._signTypedData(domain, types, value)
+            
+            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myNFT.mint(
+                myEvent.id,
+                person,
+                signature,
+                signer
+            )
+            const ownership = await myNFT.ownerOf(0)
+            expect(ownership).eq(person)
         })
     })
 })
