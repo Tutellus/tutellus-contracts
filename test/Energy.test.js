@@ -5,7 +5,7 @@ const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
 const { formatEther, parseEther } = require('ethers/lib/utils')
-const { BigNumber, constants } = require('ethers')
+const { BigNumber, constants, utils } = require('ethers')
 const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('./utils')
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
@@ -33,7 +33,7 @@ const TWO_ETHER = parseEther('2')
 const SIX_ETHER = parseEther('6')
 const RAY = parseEther('1000000000')
 
-const SECONDS = 1
+const eventId = utils.id('myEvent')
 const SECONDS_PER_YEAR = 365 * 24 * 60 * 60
 const DECIMALS_ERROR = 9
 
@@ -371,6 +371,47 @@ describe.only('Energy Token', function () {
             const unscaled = await myEnergy.unscale(scaledTotalSupply)
             expectApproxWeiDecimals(totalSupply, unscaled, 1)
         })
+    })
+    describe('Events', () => {
+        beforeEach(async () => {
+            const Energy = await ethers.getContractFactory('TutellusEnergy')
+            let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
+
+            await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
+
+            const energy = await myManager.get(ENERGY_ID)
+            myEnergy = Energy.attach(energy)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
+        })
+        it('Minting energy for event', async () => {
+            await myEnergy.mintEvent(eventId, owner, ONE_ETHER)
+            const balance = await myEnergy.eventBalanceOf(eventId, owner)
+            expectEqEth(balance, ONE_ETHER)
+        })
+        it('Burning energy for event', async () => {
+            await myEnergy.mintEvent(eventId, owner, ONE_ETHER)
+            const balance = await myEnergy.eventBalanceOf(eventId, owner)
+            expectEqEth(balance, ONE_ETHER)
+            await myEnergy.burnEvent(eventId, owner, ONE_ETHER)
+            const afterBalance = await myEnergy.eventBalanceOf(eventId, owner)
+            expectEqEth(afterBalance, 0)
+        })
+        it('Minting multiple energies for event (check variable)', async () => {
+            const rate = await myEnergy.rate()
+            await myEnergy.mintStatic(owner, ONE_ETHER)
+            await myEnergy.mintEvent(eventId, owner, ONE_ETHER)
+            await myEnergy.mint(owner, ONE_ETHER)
+            await advanceBlockInSeconds(SECONDS_PER_YEAR)
+
+            const balance = await myEnergy.eventBalanceOf(eventId, owner)
+            const totalSupply = await myEnergy.eventTotalSupply(eventId)
+            const interest = ONE_ETHER.mul(getLinearInterest(0, SECONDS_PER_YEAR, rate)).div(ONE_ETHER)
+            expectEqEth(balance, totalSupply)
+            expectApproxWeiDecimals(balance, ONE_ETHER.add(TWO_ETHER).add(interest), DECIMALS_ERROR)
+        })
+    })
+    describe('Snapshots', () => {
+
     })
 })
   
