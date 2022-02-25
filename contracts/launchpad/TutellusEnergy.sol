@@ -146,18 +146,13 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
     ) internal whenNotPaused onlyRole(ENERGY_MINTER_ROLE)
     {
       if (from == address(0)) {
-            // mint
-            _updateSnapshot(_eventBalanceOfSnapshots[eventId][to], eventBalanceOf(eventId, to));
-            _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
-        } else if (to == address(0)) {
-            // burn
-            _updateSnapshot(_eventBalanceOfSnapshots[eventId][from], eventBalanceOf(eventId, from));
-            _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
-        } else {
-            // transfer
-            _updateSnapshot(_eventBalanceOfSnapshots[eventId][to], eventBalanceOf(eventId, to));
-            _updateSnapshot(_eventBalanceOfSnapshots[eventId][from], eventBalanceOf(eventId, from));
-        }
+        _updateSnapshot(_eventBalanceOfSnapshots[eventId][to], eventBalanceOf(eventId, to));
+        _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
+      }
+      if (to == address(0)) {
+        _updateSnapshot(_eventBalanceOfSnapshots[eventId][from], eventBalanceOf(eventId, from));
+        _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
+      }
     }
 
     function mintStatic (
