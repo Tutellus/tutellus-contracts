@@ -86,7 +86,8 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
         return _normalization;
       }
 
-      return MathUtils.calculateCompoundedInterest(rate, timestamp).rayMul(_normalization);
+    //   return MathUtils.calculateCompoundedInterest(rate, timestamp).rayMul(_normalization);
+      return MathUtils.calculateLinearInterest(rate, timestamp).rayMul(_normalization);
     }
 
     function balanceOf(address account) public view virtual override returns (uint256) {

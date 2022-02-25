@@ -26,7 +26,7 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
 
     function initialize (
     ) public initializer {
-      __ERC20VariableSnapshot_init('Energy Tutellus', 'eTUT', 1e27); // 1% yearly default
+      __ERC20VariableSnapshot_init('Tutellus Energy', 'eTUT',  1e25); // 0.01 RAY = 1% yearly default
       __AccessControlProxyPausable_init(msg.sender);
     }
 

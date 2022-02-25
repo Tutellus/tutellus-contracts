@@ -28,12 +28,14 @@ const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const ENERGY_MANAGER_ROLE = ethers.utils.id('ENERGY_MANAGER_ROLE')
 const ENERGY_ID = ethers.utils.id('ENERGY');
 const ONE_ETHER = parseEther('1')
+const RATE = parseEther('0.01')
 const TWO_ETHER = parseEther('2')
 const SIX_ETHER = parseEther('6')
 const RAY = parseEther('1000000000')
 
 const SECONDS = 1
 const SECONDS_PER_YEAR = 365 * 24 * 60 * 60
+const DECIMALS_ERROR = 9
 
 const getAddresses = async () => {
 const addresses = await Promise.all([
@@ -60,24 +62,40 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function getCompoundedInterest(
+// function getCompoundedInterest(
+//     from,
+//     to,
+//     rate
+// ) {
+//     const seconds = to.sub(from)
+//     const secondsMinusOne = seconds.sub(1)
+//     const secondsMinusTwo = seconds.sub(2)
+
+//     const ratePerSecond = rate.div(SECONDS_PER_YEAR)
+
+//     const basePowerTwo = ratePerSecond.mul(ratePerSecond).div(RAY)
+//     const basePowerThree = basePowerTwo.mul(ratePerSecond).div(RAY)
+
+//     const secondTerm = basePowerTwo.mul(seconds.mul(secondsMinusOne)).mul(ONE_ETHER).div(TWO_ETHER)
+//     const thirdTerm = basePowerThree.mul(seconds.mul(secondsMinusOne.mul(secondsMinusTwo))).mul(ONE_ETHER).div(SIX_ETHER)
+
+//     return ratePerSecond.mul(seconds).add(secondTerm).add(thirdTerm).mul(ONE_ETHER).div(RAY)
+// }
+
+function getLinearInterest(
     from,
     to,
     rate
 ) {
-    const seconds = to - from
-    const secondsMinusOne = seconds - 1
-    const secondsMinusTwo = seconds - 2
+    const timeDiff = BigNumber.from(to - from);
+    return timeDiff.mul(rate).div(SECONDS_PER_YEAR).mul(ONE_ETHER).div(RAY)
+}
 
-    const ratePerSecond = rate.div(SECONDS_PER_YEAR)
-
-    const basePowerTwo = ratePerSecond.mul(ratePerSecond).div(RAY)
-    const basePowerThree = basePowerTwo.mul(ratePerSecond).div(RAY)
-
-    const secondTerm = basePowerTwo.mul(seconds * secondsMinusOne).mul(ONE_ETHER).div(TWO_ETHER)
-    const thirdTerm = basePowerThree.mul(seconds * secondsMinusOne * secondsMinusTwo).mul(ONE_ETHER).div(SIX_ETHER)
-
-    return ratePerSecond.mul(seconds).add(secondTerm).add(thirdTerm).mul(ONE_ETHER).div(RAY)
+const advanceBlockInSeconds = async (seconds) => {
+    const latest = BigNumber.from((await time.latest()).toString());
+    const timestamp = latest.add(seconds);
+    await ethers.provider.send("evm_setNextBlockTimestamp", [timestamp.toNumber()])
+    await time.advanceBlock()
 }
 
 describe.only('Energy Token', function () {
@@ -138,34 +156,29 @@ describe.only('Energy Token', function () {
             const rate = await myEnergy.rate()
             await myEnergy.mint(owner, ONE_ETHER)
 
-            const balance0 = await myEnergy.totalSupply()
+            const balance0 = await myEnergy.balanceOf(owner);
             
-            await sleep(SECONDS * 1000)  
-            await time.advanceBlock()
+            await advanceBlockInSeconds(SECONDS_PER_YEAR)
 
-            const balance1 = await myEnergy.balanceOf(owner)
-            const cumulated = balance1.sub(balance0)
-            const expCumulated = balance0.mul(getCompoundedInterest(0, SECONDS, rate)).div(ONE_ETHER)
-            
-            expectApproxWeiDecimals(cumulated, expCumulated, 1)
+            const balance1 = await myEnergy.balanceOf(owner);
+            const diff = balance1.sub(balance0)
+            expectApproxWeiDecimals(diff, RATE, DECIMALS_ERROR);
         })
         it('Minting for two users', async () => {
 
             const rate = await myEnergy.rate()
 
             await myEnergy.mint(owner, ONE_ETHER)
-            await sleep(SECONDS * 1000) // 2 seconds
+            await advanceBlockInSeconds(SECONDS_PER_YEAR)
             await myEnergy.mint(person, TWO_ETHER)
 
-            const compound0 = (await myEnergy.totalSupply()).sub(ONE_ETHER).sub(TWO_ETHER)
+            const interest0 = (await myEnergy.totalSupply()).sub(ONE_ETHER).sub(TWO_ETHER)
 
-            await sleep(SECONDS * 1000) // 2 seconds
-            await time.advanceBlock()
+            await advanceBlockInSeconds(SECONDS_PER_YEAR)
 
-            const interestComp0 = compound0.mul(getCompoundedInterest(0, SECONDS, rate)).div(ONE_ETHER)
-            const compound1 = (await myEnergy.totalSupply()).sub(ONE_ETHER).sub(TWO_ETHER).sub(compound0).sub(interestComp0)
+            const interest1 = (await myEnergy.totalSupply()).sub(ONE_ETHER).sub(TWO_ETHER).sub(interest0)
 
-            expectApproxWeiDecimals(compound1, compound0.mul(BigNumber.from(ONE_ETHER).add(TWO_ETHER)).div(ONE_ETHER), 1) // three times
+            expectApproxWeiDecimals(interest1, interest0.mul(ONE_ETHER.add(TWO_ETHER)).div(ONE_ETHER), 16) // three times
         })
         it('Cant mint 0 tokens', async () => {
             await expectRevert(
@@ -219,17 +232,16 @@ describe.only('Energy Token', function () {
 
             const rate = await myEnergy.rate()
             await myEnergy.mint(owner, ONE_ETHER)
-            const SECONDS = 1
 
             const balance0 = await myEnergy.totalSupply()
             
-            await sleep(SECONDS * 1000)  
+            await advanceBlockInSeconds(SECONDS_PER_YEAR)
             await myEnergy.burn(owner, ONE_ETHER)
 
             const cumulated = await myEnergy.totalSupply()
-            const expCumulated = balance0.mul(getCompoundedInterest(0, SECONDS, rate)).div(ONE_ETHER)
+            const expCumulated = balance0.mul(getLinearInterest(0, SECONDS_PER_YEAR, rate)).div(ONE_ETHER)
             
-            expectApproxWeiDecimals(cumulated, expCumulated, 1)
+            expectApproxWeiDecimals(cumulated, expCumulated, DECIMALS_ERROR)
         })
         it('Burning all', async () => {
 
@@ -237,7 +249,7 @@ describe.only('Energy Token', function () {
             await myEnergy.mint(owner, ONE_ETHER)
             const SECONDS = 1
 
-            await sleep(SECONDS * 1000)  
+            await advanceBlockInSeconds(SECONDS)
             await myEnergy.burnAll(owner)
 
             const balance1 = await myEnergy.totalSupply()            
@@ -312,14 +324,13 @@ describe.only('Energy Token', function () {
 
             const balance0 = await myEnergy.totalSupply()
             
-            await sleep(SECONDS * 1000)  
-            await time.advanceBlock()
+            await advanceBlockInSeconds(SECONDS)
 
             const balance1 = await myEnergy.totalSupply()
             const cumulated = balance1.sub(balance0)
-            const expCumulated = balance0.mul(getCompoundedInterest(0, SECONDS, rate)).div(ONE_ETHER)
+            const expCumulated = balance0.mul(getLinearInterest(0, SECONDS, rate)).div(ONE_ETHER)
             
-            expectApproxWeiDecimals(cumulated, expCumulated, 1)
+            expectApproxWeiDecimals(cumulated, expCumulated, DECIMALS_ERROR)
         })
     })
     describe('Scales', () => {
