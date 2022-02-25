@@ -24,6 +24,9 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
     mapping(bytes32=>Snapshots) private _eventTotalSupplySnapshots;
     mapping(bytes32=>mapping(address=>Snapshots)) private _eventBalanceOfSnapshots;
 
+    event EventMint(bytes32 eventId, address account, uint256 amount);
+    event EventBurn(bytes32 eventId, address account, uint256 amount);
+
     function initialize (
     ) public initializer {
       __ERC20VariableSnapshot_init('Tutellus Energy', 'eTUT',  1e25); // 0.01 RAY = 1% yearly default
@@ -94,17 +97,16 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       uint256 amount
     ) public {
       require(account != address(0), "TutellusEnergy: mint to the zero address");
-      _beforeEventTokenTransfer(eventId, address(0), account, amount);
+
+      _updateSnapshot(_eventBalanceOfSnapshots[eventId][account], eventBalanceOf(eventId, account));
+      _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
 
       require(amount != 0, 'Cant mint 0 tokens');
 
       _eventBalanceOf[eventId][account] += amount;
       _eventTotalSupply[eventId] += amount;
 
-      // emit Transfer(address(0), account, amount);
-      // emit Mint(msg.sender, account, amount);
-
-      // _afterTokenTransfer(address(0), account, amount);
+      emit EventMint(eventId, account, amount);
     }
 
     function burnEvent (
@@ -114,7 +116,8 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
     ) public {
       require(account != address(0), "TutellusEnergy: burn from the zero address");
 
-      _beforeEventTokenTransfer(eventId, account, address(0), amount);
+      _updateSnapshot(_eventBalanceOfSnapshots[eventId][account], eventBalanceOf(eventId, account));
+      _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
 
       require(amount != 0, 'Cant burn 0 tokens');
 
@@ -125,10 +128,7 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       }
       _eventTotalSupply[eventId] -= amount;
 
-      // emit Transfer(account, address(0), amount);
-      // emit Burn(msg.sender, account, amount);
-
-      // _afterTokenTransfer(account, address(0), amount);
+      emit EventBurn(eventId, account, amount);
     }
 
     function _beforeTokenTransfer (
@@ -140,23 +140,6 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       override
     {
         super._beforeTokenTransfer(from, to, amount);
-    }
-
-    function _beforeEventTokenTransfer (
-      bytes32 eventId,
-      address from,
-      address to,
-      uint256 amount
-    ) internal whenNotPaused onlyRole(ENERGY_MINTER_ROLE)
-    {
-      if (from == address(0)) {
-        _updateSnapshot(_eventBalanceOfSnapshots[eventId][to], eventBalanceOf(eventId, to));
-        _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
-      }
-      if (to == address(0)) {
-        _updateSnapshot(_eventBalanceOfSnapshots[eventId][from], eventBalanceOf(eventId, from));
-        _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
-      }
     }
 
     function mintStatic (
@@ -236,5 +219,5 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
      * This empty reserved space is put in place to allow future versions to add new
      * variables without shifting down storage in the inheritance chain.
      */
-    // uint256[45] private __gap;
+    uint256[50] private __gap;
   }
