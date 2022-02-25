@@ -30,8 +30,12 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       __AccessControlProxyPausable_init(msg.sender);
     }
 
-    function snapshot () public onlyRole(ENERGY_MANAGER_ROLE) {
-      _snapshot();
+    function snapshot () public onlyRole(ENERGY_MANAGER_ROLE) returns (uint256) {
+      return _snapshot();
+    }
+
+    function getCurrentSnapshotId () public view returns (uint256) {
+      return _getCurrentSnapshotId();
     }
 
     function setRate (
