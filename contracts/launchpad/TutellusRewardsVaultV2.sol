@@ -8,15 +8,16 @@ import '../utils/UUPSUpgradeableByRole.sol';
 
 contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRole {
 
-  bytes32 public constant _REWARDS_MANAGER_ROLE = keccak256('REWARDS_MANAGER_ROLE');
+  bytes32 internal constant _REWARDS_MANAGER_ROLE = keccak256('REWARDS_MANAGER_ROLE');
 
   mapping(address=>uint256) internal _releasedOffsetOf;
   mapping(address=>uint256) public distributed;
   mapping(address=>uint256) public allocation;
   
-  address[] internal _accounts;
+  address[] public accounts;
   uint256 internal _lastUpdate;
   uint256 public rewardPerBlock;
+  uint256 public totalAccounts;
   
   function initialize() public initializer {
     __AccessControlProxyPausable_init(msg.sender);
@@ -25,14 +26,15 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
   }
 
   function add(address account, uint256[] memory allocations) public onlyRole(_REWARDS_MANAGER_ROLE) {
-    _accounts.push(account);
+    accounts.push(account);
+    totalAccounts = accounts.length;
     setAllocations(allocations);
     emit NewAddress(account, allocations[allocations.length - 1]);
   }
 
   function setRewardPerBlock(uint256 value) public onlyRole(_REWARDS_MANAGER_ROLE) {
-    for(uint256 i=0; i < _accounts.length; i++) {
-      address account = _accounts[i];
+    for(uint256 i=0; i < accounts.length; i++) {
+      address account = accounts[i];
       _releasedOffsetOf[account] = released(account);
     }
     _lastUpdate = block.number;
@@ -41,10 +43,10 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
   }
 
   function setAllocations(uint256[] memory allocations) public onlyRole(_REWARDS_MANAGER_ROLE) {
-    require(allocations.length == _accounts.length, 'TutellusRewardsVaultV2: allocation array must have same length as number of accounts');
+    require(allocations.length == accounts.length, 'TutellusRewardsVaultV2: allocation array must have same length as number of accounts');
     uint256 sum = 0;
-    for(uint256 i=0; i < _accounts.length; i++) {
-      address account = _accounts[i];
+    for(uint256 i=0; i < accounts.length; i++) {
+      address account = accounts[i];
       _releasedOffsetOf[account] = released(account);
       allocation[account] = allocations[i];
       sum += allocation[account];

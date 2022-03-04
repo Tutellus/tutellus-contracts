@@ -10,7 +10,9 @@ interface ITutellusRewardsVaultV2 {
     event NewDistribution(address sender, address account, uint256 amount);
 
     function initialize (  ) external;
-    
+
+    function accounts ( uint256 ) external view returns (address);
+
     function add(address account, uint256[] memory allocation) external;
 
     function setAllocations(uint256[] memory allocations) external;
@@ -26,4 +28,6 @@ interface ITutellusRewardsVaultV2 {
     function allocation(address) external view returns (uint256);
 
     function rewardPerBlock() external view returns (uint256);
+
+    function totalAccounts (  ) external view returns (uint256);
 }
