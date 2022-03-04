@@ -6,7 +6,7 @@ const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
 const { formatEther, parseEther } = require('ethers/lib/utils')
 const { BigNumber, constants, utils } = require('ethers')
-const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('./utils')
+const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('../utils')
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
 const Manager = artifacts.require('TutellusManager')
@@ -26,6 +26,7 @@ let owner, person, person2
 
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const ENERGY_MANAGER_ROLE = ethers.utils.id('ENERGY_MANAGER_ROLE')
+const SNAPSHOT_ROLE = ethers.utils.id('SNAPSHOT_ROLE')
 const ENERGY_ID = ethers.utils.id('ENERGY');
 const ONE_ETHER = parseEther('1')
 const TWO_ETHER = parseEther('2')
@@ -140,6 +141,7 @@ describe('Energy Token', function () {
 
             const energy = await myManager.get(ENERGY_ID)
             expect(energy).not.eq(ZERO_ADDRESS)
+            
         })
     })
     describe('Mint', () => {
@@ -480,6 +482,7 @@ describe('Energy Token', function () {
             myEnergy = Energy.attach(energy)
             await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
             await myManager.grantRole(ENERGY_MANAGER_ROLE, owner)
+            await myManager.grantRole(SNAPSHOT_ROLE, owner)
         })
         it('Can read snapshot for event balance of (check snapshot)', async () => {
             await myEnergy.mintEvent(eventId, owner, ONE_ETHER) // In 1 will have 1

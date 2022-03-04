@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicensed
-pragma solidity 0.8.9;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
@@ -40,7 +40,7 @@ contract TutellusManager is AccessControlUpgradeable {
     }
 
     function deploy(bytes32 id, bytes memory bytecode, bytes memory initializeCalldata) public onlyRole(DEFAULT_ADMIN_ROLE) returns(address implementation) {
-        bool upgrade;
+        bool upgrading;
         assembly {
             implementation := create(0, add(bytecode, 32), mload(bytecode))
         }
@@ -48,19 +48,22 @@ contract TutellusManager is AccessControlUpgradeable {
         address proxyAddress = get[id];
 
         if (proxyAddress != address(0)) {
-            UUPSUpgradeable proxy = UUPSUpgradeable(payable(proxyAddress));
-            if (initializeCalldata.length > 0) {
-                proxy.upgradeToAndCall(implementation, initializeCalldata);
-            } else {
-                proxy.upgradeTo(implementation);
-            }
-            
-            upgrade = true;
+            upgrade(id, implementation, initializeCalldata);
+            upgrading = true;
         } else {
             _deployProxy(id, implementation, initializeCalldata);
         }
 
-        emit Deployment(id, get[id], implementation, upgrade);
+        emit Deployment(id, get[id], implementation, upgrading);
+    }
+
+    function upgrade(bytes32 id, address implementation, bytes memory initializeCalldata) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        UUPSUpgradeable proxy = UUPSUpgradeable(payable(get[id]));
+        if (initializeCalldata.length > 0) {
+            proxy.upgradeToAndCall(implementation, initializeCalldata);
+        } else {
+            proxy.upgradeTo(implementation);
+        }
     }
 
     function _deployProxy(bytes32 id, address implementation, bytes memory initializeCalldata) private {

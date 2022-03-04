@@ -12,8 +12,9 @@ import '../utils/ERC20VariableSnapshotUpgradeable.sol';
 
 contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRole {
 
-    bytes32 public constant ENERGY_MANAGER_ROLE = keccak256('ENERGY_MANAGER_ROLE');
-    bytes32 public constant ENERGY_MINTER_ROLE = keccak256('ENERGY_MINTER_ROLE');
+    bytes32 private constant _ENERGY_MANAGER_ROLE = keccak256('ENERGY_MANAGER_ROLE');
+    bytes32 private constant _ENERGY_MINTER_ROLE = keccak256('ENERGY_MINTER_ROLE');
+    bytes32 private constant _SNAPSHOT_ROLE = keccak256('SNAPSHOT_ROLE');
 
     mapping(address=>uint256) public staticBalanceOf;
     uint256 public staticTotalSupply;
@@ -33,7 +34,7 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       __AccessControlProxyPausable_init(msg.sender);
     }
 
-    function snapshot () public onlyRole(ENERGY_MANAGER_ROLE) returns (uint256) {
+    function snapshot () public onlyRole(_SNAPSHOT_ROLE) returns (uint256) {
       return _snapshot();
     }
 
@@ -43,7 +44,7 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
 
     function setRate (
       uint256 newRate
-    ) public onlyRole(ENERGY_MANAGER_ROLE) {
+    ) public onlyRole(_ENERGY_MANAGER_ROLE) {
       _setRate(newRate);
     }
 
@@ -136,7 +137,7 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       address to,
       uint256 amount
     ) internal
-      whenNotPaused onlyRole(ENERGY_MINTER_ROLE)
+      whenNotPaused onlyRole(_ENERGY_MINTER_ROLE)
       override
     {
         super._beforeTokenTransfer(from, to, amount);
