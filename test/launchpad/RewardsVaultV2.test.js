@@ -137,6 +137,28 @@ describe('RewardsVaultV2', function () {
       expect(expOwnerReleased.eq(ownerReleased)).eq(true)
       expect(expPersonReleased.eq(personReleased)).eq(true)
     })
+    it('Can read correct released (complex)', async () => {
+      await myRewardsVault.setRewardPerBlock(parseEther('1')) 
+      await myRewardsVault.setRewardPerBlock(parseEther('2')) // o: 0.2 p: 0.8
+      await myRewardsVault.setAllocations([parseEther('50'), parseEther('50')]) // o: 0.6 p: 2.4
+      await myRewardsVault.setRewardPerBlock(parseEther('3')) // o: 1.6 p: 3.4
+      await time.advanceBlock() // o: 3.1 p: 4.9
+      // totalReleased : 8
+
+      const [ownerReleased, personReleased, totalReleased] = await Promise.all([
+        myRewardsVault.released(owner),
+        myRewardsVault.released(person),
+        myRewardsVault.totalReleased(),
+      ])
+      
+      const expOwnerReleased = parseEther('3.1')
+      const expPersonReleased = parseEther('4.9')
+      const expTotalReleased = parseEther('8')
+
+      expect(expOwnerReleased.eq(ownerReleased)).eq(true)
+      expect(expPersonReleased.eq(personReleased)).eq(true)
+      expect(expTotalReleased.eq(totalReleased)).eq(true)
+    })
   })
   describe('Distribute tokens', () => {
     beforeEach(async () => {

@@ -10,49 +10,55 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
 
   bytes32 internal constant _REWARDS_MANAGER_ROLE = keccak256('REWARDS_MANAGER_ROLE');
 
-  mapping(address=>uint256) internal _releasedOffsetOf;
+  mapping(uint256=>address) public accounts;
   mapping(address=>uint256) public distributed;
   mapping(address=>uint256) public allocation;
+  mapping(address=>uint256) private _releasedOffset;
   
-  address[] public accounts;
-  uint256 internal _lastUpdate;
   uint256 public rewardPerBlock;
   uint256 public totalAccounts;
-  
+
+  uint256 internal _lastUpdate;
+  uint256 internal _lastReleasedOffset;
+  uint256 internal _globalOffset;
+
   function initialize() public initializer {
     __AccessControlProxyPausable_init(msg.sender);
     _lastUpdate = block.number;
-    emit Init(_lastUpdate);
+    _lastReleasedOffset = 0;
+    emit Init(_lastUpdate, _lastReleasedOffset);
   }
 
   function add(address account, uint256[] memory allocations) public onlyRole(_REWARDS_MANAGER_ROLE) {
-    accounts.push(account);
-    totalAccounts = accounts.length;
+    accounts[totalAccounts] = account;
+    totalAccounts++;
     setAllocations(allocations);
     emit NewAddress(account, allocations[allocations.length - 1]);
   }
 
   function setRewardPerBlock(uint256 value) public onlyRole(_REWARDS_MANAGER_ROLE) {
-    for(uint256 i=0; i < accounts.length; i++) {
-      address account = accounts[i];
-      _releasedOffsetOf[account] = released(account);
-    }
+    _globalOffset = totalReleased();
     _lastUpdate = block.number;
     rewardPerBlock = value;
     emit NewRewardPerBlock(rewardPerBlock);
   }
 
+  function totalReleased() public view returns (uint256) {
+    return _globalOffset + _releasedLastUpdate();
+  }
+
   function setAllocations(uint256[] memory allocations) public onlyRole(_REWARDS_MANAGER_ROLE) {
-    require(allocations.length == accounts.length, 'TutellusRewardsVaultV2: allocation array must have same length as number of accounts');
+    require(allocations.length == totalAccounts, 'TutellusRewardsVaultV2: allocation array must have same length as number of accounts');
     uint256 sum = 0;
-    for(uint256 i=0; i < accounts.length; i++) {
+    uint256 releasedAfterOffset = totalReleased() - _lastReleasedOffset;
+    _lastReleasedOffset = totalReleased();
+    for(uint256 i=0; i < totalAccounts; i++) {
       address account = accounts[i];
-      _releasedOffsetOf[account] = released(account);
+      _releasedOffset[account] += releasedAfterOffset * allocation[account] / 100 ether;
       allocation[account] = allocations[i];
       sum += allocation[account];
       emit NewAllocation(account, allocation[account]);
     }
-    _lastUpdate = block.number;
     require(sum == 100 ether, 'TutellusRewardsVaultV2: total allocation must be 100 ether');
   }
 
@@ -61,7 +67,8 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
   }
 
   function released(address account) public view returns (uint256) {
-    return _releasedOffsetOf[account] + (_releasedLastUpdate() * allocation[account] / 100 ether);
+    uint256 releasedAfterOffset = (totalReleased() - _lastReleasedOffset) * allocation[account] / 100 ether;
+    return releasedAfterOffset + _releasedOffset[account];
   }
 
   function _releasedLastUpdate() internal view returns (uint256) {

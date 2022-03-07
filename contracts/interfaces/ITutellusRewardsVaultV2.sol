@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 interface ITutellusRewardsVaultV2 {
 
-    event Init(uint _lastUpdate);
+    event Init(uint256 _lastUpdate, uint256 _lastReleasedOffset);
     event NewAddress(address account, uint256 allocation);
     event NewAllocation(address account, uint256 allocation);
     event NewRewardPerBlock(uint256 rewardPerBlock);
@@ -18,6 +18,8 @@ interface ITutellusRewardsVaultV2 {
     function setAllocations(uint256[] memory allocations) external;
 
     function available(address account) external view returns (uint256);
+
+    function totalReleased() external view returns (uint256);
 
     function released(address account) external view returns (uint256);
 
