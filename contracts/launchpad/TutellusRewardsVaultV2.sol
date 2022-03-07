@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 import '../interfaces/ITutellusERC20.sol';
 import '../interfaces/ITutellusManager.sol';
@@ -25,7 +25,6 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
   function initialize() public initializer {
     __AccessControlProxyPausable_init(msg.sender);
     _lastUpdate = block.number;
-    _lastReleasedOffset = 0;
     emit Init(_lastUpdate, _lastReleasedOffset);
   }
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface ITutellusRewardsVaultV2 {
 
@@ -11,25 +11,25 @@ interface ITutellusRewardsVaultV2 {
 
     function initialize (  ) external;
 
-    function accounts ( uint256 ) external view returns (address);
+    function accounts ( uint256 ) external view returns ( address );
 
-    function add(address account, uint256[] memory allocation) external;
+    function add ( address account, uint256[] memory allocation ) external;
 
-    function setAllocations(uint256[] memory allocations) external;
+    function setAllocations ( uint256[] memory allocations ) external;
 
-    function available(address account) external view returns (uint256);
+    function available ( address account ) external view returns ( uint256 );
 
-    function totalReleased() external view returns (uint256);
+    function totalReleased (  ) external view returns ( uint256 );
 
-    function released(address account) external view returns (uint256);
+    function released ( address account ) external view returns ( uint256 );
 
-    function distribute(address account, uint256 amount) external;
+    function distribute ( address account, uint256 amount ) external;
 
-    function distributed(address) external view returns (uint256);
+    function distributed ( address ) external view returns ( uint256 );
 
-    function allocation(address) external view returns (uint256);
+    function allocation ( address ) external view returns ( uint256 );
 
-    function rewardPerBlock() external view returns (uint256);
+    function rewardPerBlock (  ) external view returns ( uint256 );
 
-    function totalAccounts (  ) external view returns (uint256);
+    function totalAccounts (  ) external view returns ( uint256 );
 }
