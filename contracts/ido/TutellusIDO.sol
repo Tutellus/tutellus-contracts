@@ -43,6 +43,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
 
     function prefund(uint prefundAmount_) public {
         // TBD: allow anyone prefund or filter?
+        // TBD: allow prefund to thirds
         address prefunder_ = _msgSender();
         require(prefundAmount_ >= minPrefund, "TutellusIDO: insufficient prefund");
         _prefund(prefundAmount_, prefunder_);
