@@ -2,17 +2,17 @@ const bre = require("hardhat");
 const ethers = bre.ethers;
 
 const IDO_USDT = ethers.utils.id("IDO_USDT");
-const IDO_ADDR = "0xb52DAeeEA7a3F1BC8574768e09238d6Ab4B0f362";
+const IDO_ADDR = "0x01F8779256d144B218E7E93439044CFDDa02830c";
 const PREFUND_AMOUNTS = [
-    ethers.utils.parseEther("14000"),
-    ethers.utils.parseEther("20000"),
-    ethers.utils.parseEther("11000"),
-    ethers.utils.parseEther("8000"),
-    ethers.utils.parseEther("12000"),
-    ethers.utils.parseEther("7000"),
-    ethers.utils.parseEther("8000"),
-    ethers.utils.parseEther("12000"),
-    ethers.utils.parseEther("7000"),
+    ethers.utils.parseEther("14000"), //0x07
+    ethers.utils.parseEther("10000"), //0x07
+    ethers.utils.parseEther("1000"), //0x07
+    ethers.utils.parseEther("8000"), //0x72
+    ethers.utils.parseEther("7500"), //0x72
+    ethers.utils.parseEther("1400"), //0x72
+    ethers.utils.parseEther("8000"), //0x0e
+    ethers.utils.parseEther("1300"), //0x0e
+    ethers.utils.parseEther("7000"), //0x0e
 ]
 
 async function main() {
