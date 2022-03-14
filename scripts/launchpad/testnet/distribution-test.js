@@ -108,11 +108,12 @@ async function main() {
     console.log("Manager: ", myManager.address)
     const myTUT = await TutellusERC20.deploy("Tutellus token", "TUT", ethers.utils.parseEther('200000000'), myManager.address)
     await myTUT.deployed()
-    await myManager.grantRole(MINTER_ROLE, accounts[0].address)
+    let response = await myManager.grantRole(MINTER_ROLE, accounts[0].address)
+    await response.wait()
     await myTUT.mint(accounts[0].address, ethers.utils.parseEther('100000000'))
     console.log("TUT: ", myTUT.address)
     const initializeCalldata = FactionManager.interface.encodeFunctionData('initialize', [])
-    let response = await myManager.deploy(ENERGY_AUX_ID, TutellusEnergy.bytecode, initializeCalldata)
+    response = await myManager.deploy(ENERGY_AUX_ID, TutellusEnergy.bytecode, initializeCalldata)
     await response.wait()
     const energyAddr = await myManager.get(ENERGY_AUX_ID)
     console.log("eTUT: ", energyAddr)
@@ -125,6 +126,7 @@ async function main() {
     const myLaunchpadStakingImp = await LaunchpadStaking.deploy()
     console.log('Deploying Faction Manager Implementation...')
     const myFactionManagerImp = await FactionManager.deploy()
+    await myFactionManagerImp.deployed()
 
     console.log('Extracting addresses...')
     const launchpadStakingImp = myLaunchpadStakingImp.address
@@ -225,11 +227,13 @@ async function main() {
     const TutellusIDOFactory = await ethers.getContractFactory(
         "TutellusIDOFactory"
     );
-    await myManager.deploy(
+    response = await myManager.deploy(
         LAUNCHPAD_IDO_FACTORY,
         TutellusIDOFactory.bytecode,
         initializeCalldata
     );
+
+    await response.wait()
 
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
     const myIdoFactory = TutellusIDOFactory.attach(idoFactoryAddr);
