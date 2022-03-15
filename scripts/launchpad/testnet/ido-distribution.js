@@ -1,19 +1,26 @@
 const { ethers } = require('ethers');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-const GRAPH_URL = 'https://api.thegraph.com/subgraphs/name/gperezalba/launchpad'
+const GRAPH_URL = 'https://api.thegraph.com/subgraphs/id/QmV4TKCXawYRb8xUHHudvmG3RUXcezQq8rzRwxYGV5zW9n'
 const ZERO_BN = ethers.utils.parseEther('0')
 const ONE_BN = ethers.utils.parseEther('1')
 const HUNDRED_BN = ethers.utils.parseEther('100')
 const SUPERTUTELLIAN_LIMIT_BN = ethers.utils.parseEther('1500')
-const N_TOPS = 1
+const N_TOPS = 3
 let N_TOPS_LEFT = N_TOPS
-const IDO = '0x01F8779256d144B218E7E93439044CFDDa02830c'
+const IDO = '0x4d60BaE3cd9Bb2b8D92eD65d2776a05A2E7b23A5'
 
 const FACTION_TO_RANKING = {
-    '0x07c5159843a958fc71baf890fe7145df06430f1ad3c3c8511dd37924fc4f08a8': -1,
-    '0x72f929da653bc165dcca2c0b934092fec6fa3a17347ffce347de5cea411a9abc': -1,
+    '0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae': -1,
+    '0x771dccb6a31b3e1604e08ac8b9186bf28341bbadf563d1030aefdd5dca42a071': -1,
     '0x0e81077977837f8edfe8400a2d3179a5cd6638e46487625a742c2f8dc9f53ce4': -1
+}
+
+// names probably wrong
+const FACTION_TO_NAME = {
+    '0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae': 'NAKAMOTOS',
+    '0x771dccb6a31b3e1604e08ac8b9186bf28341bbadf563d1030aefdd5dca42a071': 'VUTERINS',
+    '0x7e1ee7b85790db7769a1da3114adec489e4583fc3a62d944b2f861d832e62bc5': 'ALTCOINERS'
 }
 
 const ALLOCATION_PERCENTAGES = [
@@ -52,6 +59,7 @@ const ALLOCATION_LEFT = [
 ]
 
 let TOTAL_ALLOCATION_LEFT = ZERO_BN
+let TOTAL_ALLOCATION = ZERO_BN
 
 const PREFUNDS_LEFT = [
     [ZERO_BN, ZERO_BN, ZERO_BN],
@@ -67,20 +75,19 @@ const RATIOS = [
 
 let TOTAL_PREFUNDS_LEFT = ZERO_BN
 
-let MIN_INDEX_LOTTERY_SUPERTUTELLIAN = 0
-let MAX_INDEX_LOTTERY_SUPERTUTELLIAN = 0
-let MIN_INDEX_LOTTERY_TUTELLIAN = 0
-let MAX_INDEX_LOTTERY_TUTELLIAN = 0
+const SUPERTUTELLIAN_LOTTERY = []
+const TUTELLIAN_LOTTERY = []
 
 async function main() {
     const ido = await getIDO()
     const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount)
     const prefundedBN = ethers.BigNumber.from(ido.prefunded)
+    console.log('Needed: ', ethers.utils.formatEther(fundingAmountBN))
+    console.log('Available: ', ethers.utils.formatEther(prefundedBN))
 
     if (fundingAmountBN.gt(prefundedBN)) {
         console.log('Funding is over prefunded amount')
     } else {
-
         // Get all IDO prefunders by IDO
         let prefunders = await getPrefunders()
 
@@ -88,7 +95,7 @@ async function main() {
         await setWinnerFaction(prefunders)
 
         // Sort prefunders by factions (and by energy inside factions)
-        prefunders = await sortPrefunders(prefunders)
+        prefunders = sortPrefundersByEnergy(prefunders)
 
         // Classify prefunders in slots (and calc total prefund by slot)
         const prefundersArray = classifyPrefunders(prefunders)
@@ -96,8 +103,9 @@ async function main() {
         // Calculate aggregated amounts of slots
         calculateSlotTotals(fundingAmountBN)
 
-        lotteryDraw(prefundersArray)
+        lotteryDraw()
 
+        sortPrefundersByRowAndColumn(prefundersArray)
         // Calculate amounts of each prefunder
         const [distribution, withdraw] = computeDistribution(prefundersArray)
 
@@ -112,10 +120,16 @@ async function main() {
         console.log(withdraw)
         for (let i = 0; i < prefundersArray.length; i++) {
             console.log(prefundersArray[i].account)
+            console.log(prefundersArray[i].row)
+            console.log(prefundersArray[i].column)
             console.log(ethers.utils.formatEther(prefundersArray[i].prefunded))
             console.log(ethers.utils.formatEther(prefundersArray[i].allocated))
             console.log(ethers.utils.formatEther(prefundersArray[i].lottery))
+            console.log(ethers.utils.formatEther(prefundersArray[i].left))
         }
+        console.log(ethers.utils.formatEther(TOTAL_ALLOCATION))
+        console.log(ethers.utils.formatEther(TOTAL_ALLOCATION_LEFT))
+        console.log(ethers.utils.formatEther(TOTAL_PREFUNDS_LEFT))
     }
 }
 // We recommend this pattern to be able to use async/await everywhere
@@ -149,20 +163,12 @@ function classifyPrefunders(prefunders) {
             } else {
                 PREFUNDS[1][column] = PREFUNDS[1][column].add(prefunder.prefunded)
                 obj.row = 1
-                if (MIN_INDEX_LOTTERY_SUPERTUTELLIAN == 0) MIN_INDEX_LOTTERY_SUPERTUTELLIAN = i
+                SUPERTUTELLIAN_LOTTERY.push(obj)
             }
         } else {
-            if (MAX_INDEX_LOTTERY_SUPERTUTELLIAN == 0) {
-                MAX_INDEX_LOTTERY_SUPERTUTELLIAN = i - 1
-                MIN_INDEX_LOTTERY_TUTELLIAN = i
-                MAX_INDEX_LOTTERY_TUTELLIAN = prefunders.length - 1
-            }
-            if (isWinner(prefunder)) {
-                PREFUNDS[2][column] = PREFUNDS[2][column].add(prefunder.prefunded)
-                obj.row = 2
-            } else {
-                obj.allocated = ZERO_BN
-            }
+            obj.row = 2
+            PREFUNDS[2][column] = PREFUNDS[2][column].add(prefunder.prefunded)
+            TUTELLIAN_LOTTERY.push(obj)
         }
 
         prefundersArray.push(obj)
@@ -179,9 +185,14 @@ function calculateSlotTotals(fundingAmountBN) {
             ALLOCATION_RAW[i][j] = fundingAmountBN.mul(ALLOCATION_PERCENTAGES[i][j]).div(HUNDRED_BN)
 
             // Derivate amount available to lottery by slot
+            if (i == 0) {
+                RATIOS[i][j] = ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j])
+            }
+
             if (i == 1) {
                 LOTTERY[i][j] = ALLOCATION[i][j].div(ethers.BigNumber.from('2'))
                 ALLOCATION[i][j] = ALLOCATION[i][j].sub(LOTTERY[i][j])
+                RATIOS[i][j] = ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j])
             }
 
             if (i == 2) {
@@ -197,35 +208,48 @@ function calculateSlotTotals(fundingAmountBN) {
                 // Remaining prefund in this slot
                 PREFUNDS_LEFT[i][j] = PREFUNDS[i][j].sub(ALLOCATION_RAW[i][j]) //removable, just to print
                 TOTAL_PREFUNDS_LEFT = TOTAL_PREFUNDS_LEFT.add(PREFUNDS_LEFT[i][j])
-                RATIOS[i][j] = ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j])
             }
         }
     }
 }
 
-function lotteryDraw(prefundersArray) {
+function lotteryDraw() {
 
     for (let i = 0; i < 3; i++) {
-        let availableSupertutellianSlot = PREFUNDS[1][i]
+        let availableSupertutellianSlot = PREFUNDS[1][i].div(ethers.BigNumber.from('2'))
         while((!LOTTERY[1][i].isZero()) && (!availableSupertutellianSlot.isZero())) {
-            const prefunderIndex = randomIntFromInterval(MIN_INDEX_LOTTERY_SUPERTUTELLIAN, MAX_INDEX_LOTTERY_SUPERTUTELLIAN)
-            const prefunderAvailable = prefundersArray[prefunderIndex].prefunded.div(ethers.BigNumber.from('2')).sub(prefundersArray[prefunderIndex].lottery)
-            const maxAmount = prefunderAvailable.gt(LOTTERY[1][i]) ? LOTTERY[1][i] : prefunderAvailable
-            const amount = randomIntFromInterval(0, parseFloat(ethers.utils.formatEther(maxAmount)))
+            const prefunderIndex = randomIntFromInterval(0, SUPERTUTELLIAN_LOTTERY.length - 1)
+            const maxAvailable = availableSupertutellianSlot.gt(LOTTERY[1][i]) ? LOTTERY[1][i] : availableSupertutellianSlot
+            const prefunderAvailable = SUPERTUTELLIAN_LOTTERY[prefunderIndex].prefunded.div(ethers.BigNumber.from('2')).sub(SUPERTUTELLIAN_LOTTERY[prefunderIndex].lottery)
+            const maxAmount = prefunderAvailable.gt(maxAvailable) ? maxAvailable : prefunderAvailable
+            let amount
+            if (maxAmount.lt(ONE_BN)) {
+                amount = parseFloat(ethers.utils.formatEther(maxAmount))
+            } else {
+                amount = randomIntFromInterval(0, parseFloat(ethers.utils.formatEther(maxAmount)))
+            }
             const amountBN = ethers.utils.parseEther(amount.toString())
-            prefundersArray[prefunderIndex].lottery = prefundersArray[prefunderIndex].lottery.add(amountBN)
+            SUPERTUTELLIAN_LOTTERY[prefunderIndex].lottery = SUPERTUTELLIAN_LOTTERY[prefunderIndex].lottery.add(amountBN)
+            if (SUPERTUTELLIAN_LOTTERY[prefunderIndex].lottery.gte(SUPERTUTELLIAN_LOTTERY[prefunderIndex].prefunded)) SUPERTUTELLIAN_LOTTERY.splice(prefunderIndex, 1)
             LOTTERY[1][i] = LOTTERY[1][i].sub(amountBN)
             availableSupertutellianSlot = availableSupertutellianSlot.sub(amountBN)
         }
 
         let availableTutellianSlot = PREFUNDS[2][i]
         while((!LOTTERY[2][i].isZero()) && (!availableTutellianSlot.isZero())) {
-            const prefunderIndex = randomIntFromInterval(MIN_INDEX_LOTTERY_TUTELLIAN, MAX_INDEX_LOTTERY_TUTELLIAN)
-            const prefunderAvailable = prefundersArray[prefunderIndex].prefunded.sub(prefundersArray[prefunderIndex].lottery)
-            const maxAmount = prefunderAvailable.gt(LOTTERY[2][i]) ? LOTTERY[2][i] : prefunderAvailable
-            const amount = randomIntFromInterval(0, parseFloat(ethers.utils.formatEther(maxAmount)))
-            const amountBN = ethers.utils.parseEther(amount.toString())
-            prefundersArray[prefunderIndex].lottery = prefundersArray[prefunderIndex].lottery.add(amountBN)
+            const prefunderIndex = randomIntFromInterval(0, TUTELLIAN_LOTTERY.length - 1)
+            const maxAvailable = availableTutellianSlot.gt(LOTTERY[2][i]) ? LOTTERY[2][i] : availableTutellianSlot
+            const prefunderAvailable = TUTELLIAN_LOTTERY[prefunderIndex].prefunded.sub(TUTELLIAN_LOTTERY[prefunderIndex].lottery)
+            const maxAmount = prefunderAvailable.gt(maxAvailable) ? maxAvailable : prefunderAvailable
+            let amountBN
+            if (maxAmount.lt(ONE_BN)) {
+                amountBN = maxAmount
+            } else {
+                const amount = randomIntFromInterval(0, parseFloat(ethers.utils.formatEther(maxAmount)))
+                amountBN = ethers.utils.parseEther(amount.toString())
+            }
+            TUTELLIAN_LOTTERY[prefunderIndex].lottery = TUTELLIAN_LOTTERY[prefunderIndex].lottery.add(amountBN)
+            if (TUTELLIAN_LOTTERY[prefunderIndex].lottery.gte(TUTELLIAN_LOTTERY[prefunderIndex].prefunded)) TUTELLIAN_LOTTERY.splice(prefunderIndex, 1)
             LOTTERY[2][i] = LOTTERY[2][i].sub(amountBN)
             availableTutellianSlot = availableTutellianSlot.sub(amountBN)
         }
@@ -240,9 +264,11 @@ function computeDistribution(prefundersArray) {
     if (TOTAL_PREFUNDS_LEFT.gte(TOTAL_ALLOCATION_LEFT)) {
         // Enough to distribute
         console.log('Prefunds left enough to cover allocation left')
+        console.log('Allocation left', ethers.utils.formatEther(TOTAL_ALLOCATION_LEFT))
+        console.log('Prefunds available', ethers.utils.formatEther(TOTAL_PREFUNDS_LEFT))
 
         for (let i = 0; i < prefundersArray.length; i++) {
-            if (RATIOS[prefundersArray[i].row][prefundersArray[i].column].isZero()) {
+            if (RATIOS[prefundersArray[i].row][prefundersArray[i].column].gte(ONE_BN)) {
                 increasePrefunderAllocation(prefundersArray[i], prefundersArray[i].prefunded)
             } else {
                 if (prefundersArray[i].row == 1) {
@@ -253,39 +279,14 @@ function computeDistribution(prefundersArray) {
                 }
             }
 
-            if ((prefundersArray[i].left.gt(ZERO_BN)) && (TOTAL_PREFUNDS_LEFT.gt(ZERO_BN))) {
-                let extraAmount = prefundersArray[i].left.gt(TOTAL_PREFUNDS_LEFT) ? TOTAL_PREFUNDS_LEFT : prefundersArray[i].left
+            if ((prefundersArray[i].left.gt(ZERO_BN)) && (TOTAL_ALLOCATION_LEFT.gt(ZERO_BN))) {
+                let extraAmount = prefundersArray[i].left.gt(TOTAL_ALLOCATION_LEFT) ? TOTAL_ALLOCATION_LEFT : prefundersArray[i].left
                 increasePrefunderAllocation(prefundersArray[i], extraAmount)
-                TOTAL_PREFUNDS_LEFT = TOTAL_PREFUNDS_LEFT.sub(extraAmount)
+                TOTAL_ALLOCATION_LEFT = TOTAL_ALLOCATION_LEFT.sub(extraAmount)
             }
 
             distribution[prefundersArray[i].account] = prefundersArray[i].allocated.toString()
             withdraw[prefundersArray[i].account] = prefundersArray[i].left.toString()
-
-
-            // // If prefund is over allocation in slot calculate portion
-            // if (!RATIOS[prefundersArray[i].row][prefundersArray[i].column].isZero()) {
-            //     prefundersArray[i].allocated = prefundersArray[i].prefunded.mul(RATIOS[prefundersArray[i].row][prefundersArray[i].column]).div(ONE_BN)
-            // }
-
-            // distribution[prefundersArray[i].account] = prefundersArray[i].allocated.toString()
-            // prefundersArray[i].left = prefundersArray[i].left.sub(prefundersArray[i].allocated)
-
-            // if (prefundersArray[i].prefunded.gt(prefundersArray[i].allocated)) {
-            //     // Calculate remaining amount of prefunded (after regular distribution)
-            //     withdraw[prefundersArray[i].account] = prefundersArray[i].prefunded.sub(prefundersArray[i].allocated).toString()
-
-            //     // Calculate extra distribution if there's remaining allocation
-            //     let extraAmount = ethers.BigNumber.from(withdraw[prefundersArray[i].account])
-            //     if (extraAmount.gt(TOTAL_PREFUNDS_LEFT)) extraAmount = TOTAL_PREFUNDS_LEFT
-            //     TOTAL_PREFUNDS_LEFT = TOTAL_PREFUNDS_LEFT.sub(extraAmount)
-            //     withdraw[prefundersArray[i].account] = ethers.BigNumber.from(withdraw[prefundersArray[i].account]).sub(extraAmount).toString()
-
-            //     // (Re)calculate remaining amount of prefunded (after extra distribution)
-            //     if (prefundersArray[i].prefunded.gt(prefundersArray[i].allocated)) {
-            //         withdraw[prefundersArray[i].account] = ethers.utils.formatEther(prefundersArray[i].prefunded.sub(prefundersArray[i].allocated).toString())
-            //     }
-            // }
         }
     } else {
         // Not enough to distribute
@@ -301,6 +302,7 @@ function increasePrefunderAllocation(prefunder, amount) {
     if (prefunder.left === undefined) prefunder.left = prefunder.prefunded
     prefunder.allocated = prefunder.allocated.add(amount)
     prefunder.left = prefunder.left.sub(amount)
+    TOTAL_ALLOCATION = TOTAL_ALLOCATION.add(amount)
 }
 
 async function getIDO() {
@@ -308,13 +310,19 @@ async function getIDO() {
     return (await querySubgraph(query)).ido
 }
 
-async function sortPrefunders(prefunds) {
-    //sort by factions
-    prefunds.sort((a, b) => FACTION_TO_RANKING[a.faction] - FACTION_TO_RANKING[b.faction])
-    //sort by energy inside faction
+function sortPrefundersByEnergy(prefunds) {
+    //sort by energy
+    prefunds.sort((a, b) => parseFloat(b.energyHolder.balance.toString()) - parseFloat(a.energyHolder.balance.toString()))
+    return prefunds
+}
+
+function sortPrefundersByRowAndColumn(prefunds) {
+    //sort by column
+    prefunds.sort((a, b) => a.column - b.column)
+    //sort by row
     prefunds.sort(function (a, b) {
-        if (FACTION_TO_RANKING[a.faction] === FACTION_TO_RANKING[b.faction]) {
-            return parseFloat(b.energyHolder.balance.toString()) - parseFloat(a.energyHolder.balance.toString())
+        if (a.column === b.column) {
+            return a.row - b.row
         }
         return 0
     })
@@ -368,10 +376,6 @@ function isTop() {
     return true
 }
 
-function isWinner(account) {
-    return true
-}
-
 function randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
@@ -391,7 +395,9 @@ async function setWinnerFaction(prefunders) {
 
     factions.sort((a, b) => parseFloat(b.energy.toString()) - parseFloat(a.energy.toString()))
 
+    console.log('Factions ranking:')
     for (let i = 0; i < factions.length; i++) {
         FACTION_TO_RANKING[factions[i].id] = i
+        console.log(FACTION_TO_NAME[factions[i].id])
     }
 }

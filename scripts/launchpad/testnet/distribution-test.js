@@ -16,11 +16,12 @@ const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
+const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 
 const FACTIONS = [
-    NAKAMOTOS_STAKING_ID,
-    VUTERINS_STAKING_ID,
-    ALTCOINERS_STAKING_ID
+    NAKAMOTOS_FACTION,
+    VUTERINS_FACTION,
+    ALTCOINERS_FACTION
 ]
 
 const MNEMONICS = [
@@ -44,51 +45,51 @@ const MIN_TUT_AMOUNT = ethers.utils.parseEther('50000')
 const MIN_USDT_AMOUNT = ethers.utils.parseEther('50000')
 
 const STAKING_AMOUNTS = [
-    ethers.utils.parseEther("2001"), //mnemonic1-path0
+    [ethers.utils.parseEther("2001"), //mnemonic1-path0
     ethers.utils.parseEther("1601"), //mnemonic1-path1
-    ethers.utils.parseEther("701"), //mnemonic1-path2
-    ethers.utils.parseEther("702"), //mnemonic2-path0
+    ethers.utils.parseEther("701")], //mnemonic1-path2
+    [ethers.utils.parseEther("702"), //mnemonic2-path0
     ethers.utils.parseEther("2002"), //mnemonic2-path1
-    ethers.utils.parseEther("1602"), //mnemonic2-path2
-    ethers.utils.parseEther("1603"), //mnemonic3-path0
+    ethers.utils.parseEther("1602")], //mnemonic2-path2
+    [ethers.utils.parseEther("1603"), //mnemonic3-path0
     ethers.utils.parseEther("703"), //mnemonic3-path1
-    ethers.utils.parseEther("2003"), //mnemonic3-path2
-    ethers.utils.parseEther("2004"), //mnemonic4-path0
+    ethers.utils.parseEther("2003")], //mnemonic3-path2
+    [ethers.utils.parseEther("2004"), //mnemonic4-path0
     ethers.utils.parseEther("1604"), //mnemonic4-path1
-    ethers.utils.parseEther("704"), //mnemonic4-path2
-    ethers.utils.parseEther("705"), //mnemonic5-path0
+    ethers.utils.parseEther("704")], //mnemonic4-path2
+    [ethers.utils.parseEther("705"), //mnemonic5-path0
     ethers.utils.parseEther("2005"), //mnemonic5-path1
-    ethers.utils.parseEther("1605"), //mnemonic5-path2
-    ethers.utils.parseEther("1606"), //mnemonic6-path0
+    ethers.utils.parseEther("1605")], //mnemonic5-path2
+    [ethers.utils.parseEther("1606"), //mnemonic6-path0
     ethers.utils.parseEther("706"), //mnemonic6-path1
-    ethers.utils.parseEther("2006"), //mnemonic6-path2
-    ethers.utils.parseEther("2007"), //mnemonic7-path0
+    ethers.utils.parseEther("2006")], //mnemonic6-path2
+    [ethers.utils.parseEther("2007"), //mnemonic7-path0
     ethers.utils.parseEther("1607"), //mnemonic7-path1
-    ethers.utils.parseEther("707") //mnemonic7-path2
+    ethers.utils.parseEther("707")] //mnemonic7-path2
 ]
 
 const PREFUND_AMOUNTS = [
-    ethers.utils.parseEther("3501"), //mnemonic1-path0
-    ethers.utils.parseEther("10001"), //mnemonic1-path1
-    ethers.utils.parseEther("7001"), //mnemonic1-path2
-    ethers.utils.parseEther("2502"), //mnemonic2-path0
-    ethers.utils.parseEther("11002"), //mnemonic2-path1
-    ethers.utils.parseEther("2002"), //mnemonic2-path2
-    ethers.utils.parseEther("1003"), //mnemonic3-path0
-    ethers.utils.parseEther("3003"), //mnemonic3-path1
-    ethers.utils.parseEther("1403"), //mnemonic3-path2
-    ethers.utils.parseEther("4004"), //mnemonic4-path0
-    ethers.utils.parseEther("4004"), //mnemonic4-path1
-    ethers.utils.parseEther("4504"), //mnemonic4-path2
-    ethers.utils.parseEther("5005"), //mnemonic5-path0
-    ethers.utils.parseEther("2005"), //mnemonic5-path1
-    ethers.utils.parseEther("3005"), //mnemonic5-path2
-    ethers.utils.parseEther("10006"), //mnemonic6-path0
-    ethers.utils.parseEther("9006"), //mnemonic6-path1
-    ethers.utils.parseEther("9006"), //mnemonic6-path2
-    ethers.utils.parseEther("2007"), //mnemonic7-path0
-    ethers.utils.parseEther("3007"), //mnemonic7-path1
-    ethers.utils.parseEther("1007") //mnemonic7-path2
+    [ethers.utils.parseEther("4501"), //mnemonic1-path0
+    ethers.utils.parseEther("11001"), //mnemonic1-path1
+    ethers.utils.parseEther("8001")], //mnemonic1-path2
+    [ethers.utils.parseEther("6502"), //mnemonic2-path0
+    ethers.utils.parseEther("12002"), //mnemonic2-path1
+    ethers.utils.parseEther("3002")], //mnemonic2-path2
+    [ethers.utils.parseEther("3003"), //mnemonic3-path0
+    ethers.utils.parseEther("4003"), //mnemonic3-path1
+    ethers.utils.parseEther("3403")], //mnemonic3-path2
+    [ethers.utils.parseEther("4004"), //mnemonic4-path0
+    ethers.utils.parseEther("5004"), //mnemonic4-path1
+    ethers.utils.parseEther("6004")], //mnemonic4-path2
+    [ethers.utils.parseEther("7005"), //mnemonic5-path0
+    ethers.utils.parseEther("3005"), //mnemonic5-path1
+    ethers.utils.parseEther("4005")], //mnemonic5-path2
+    [ethers.utils.parseEther("11006"), //mnemonic6-path0
+    ethers.utils.parseEther("10006"), //mnemonic6-path1
+    ethers.utils.parseEther("10006")], //mnemonic6-path2
+    [ethers.utils.parseEther("4007"), //mnemonic7-path0
+    ethers.utils.parseEther("5007"), //mnemonic7-path1
+    ethers.utils.parseEther("3007")] //mnemonic7-path2
 ]
 
 async function main() {
@@ -104,23 +105,31 @@ async function main() {
 
     const myManager = await TutellusManager.deploy()
     await myManager.deployed()
-    await myManager.initialize()
+    const resp1 = await myManager.initialize()
+    await resp1.wait()
     console.log("Manager: ", myManager.address)
     const myTUT = await TutellusERC20.deploy("Tutellus token", "TUT", ethers.utils.parseEther('200000000'), myManager.address)
     await myTUT.deployed()
-    let response = await myManager.grantRole(MINTER_ROLE, accounts[0].address)
-    await response.wait()
-    await myTUT.mint(accounts[0].address, ethers.utils.parseEther('100000000'))
+    const resp2 = await myManager.grantRole(MINTER_ROLE, accounts[0].address)
+    await resp2.wait()
+    const resp3 = await myTUT.mint(accounts[0].address, ethers.utils.parseEther('100000000'))
+    await resp3.wait()
     console.log("TUT: ", myTUT.address)
     const initializeCalldata = FactionManager.interface.encodeFunctionData('initialize', [])
-    response = await myManager.deploy(ENERGY_AUX_ID, TutellusEnergy.bytecode, initializeCalldata)
-    await response.wait()
+    const resp4 = await myManager.deploy(ENERGY_AUX_ID, TutellusEnergy.bytecode, initializeCalldata)
+    await resp4.wait()
     const energyAddr = await myManager.get(ENERGY_AUX_ID)
     console.log("eTUT: ", energyAddr)
-    const response2 = await myManager.setId(ENERGY_AUX_ID, ethers.constants.AddressZero)
-    const response3 = await myManager.setId(ENERGY_ID, energyAddr)
-    await response2.wait()
-    await response3.wait()
+    const resp5 = await myManager.setId(ENERGY_AUX_ID, ethers.constants.AddressZero)
+    const resp6 = await myManager.setId(ENERGY_ID, energyAddr)
+    await resp5.wait()
+    await resp6.wait()
+
+    const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
+    const resp30 = await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
+    await resp30.wait()
+    const rewardsAddr = await myManager.get(LAUNCHPAD_REWARDS_ID)
+    await myTUT.mint(rewardsAddr, ethers.utils.parseEther('50000'))
 
     console.log('Deploying Launchpad Staking Implementation...')
     const myLaunchpadStakingImp = await LaunchpadStaking.deploy()
@@ -136,26 +145,25 @@ async function main() {
     const initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myTUT.address])
 
     console.log('Deploying Faction Manager Proxy with Implementation...')
-    const responseManager = await myManager.deployProxyWithImplementation(FACTION_MANAGER, factionManagerImp, initializeCalldata)
+    const resp7 = await myManager.deployProxyWithImplementation(FACTION_MANAGER, factionManagerImp, initializeCalldata)
 
     console.log('Deploying Nakamotos Proxies with Implementation...')
     // NAKAMOTOS
-    response = await myManager.deployProxyWithImplementation(NAKAMOTOS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+    const resp8 = await myManager.deployProxyWithImplementation(NAKAMOTOS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
 
     console.log('Deploying Vuterins Proxies with Implementation...')
     // VUTERINS
-    const response4 = await myManager.deployProxyWithImplementation(VUTERINS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+    const resp9 = await myManager.deployProxyWithImplementation(VUTERINS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
 
     console.log('Deploying Altcoiners Proxies with Implementation...')
     // ALTCOINERS
-    const response5 = await myManager.deployProxyWithImplementation(ALTCOINERS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+    const resp10 = await myManager.deployProxyWithImplementation(ALTCOINERS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
 
     await Promise.all([
-        responseManager.wait(),
-        response.wait(),
-        response2.wait(),
-        response4.wait(),
-        response5.wait(),
+        resp7.wait(),
+        resp8.wait(),
+        resp9.wait(),
+        resp10.wait()
     ])
 
     console.log('Proxies deployment completed...')
@@ -182,34 +190,34 @@ async function main() {
 
     console.log('Granting energy minter roles...')
 
-    const response7 = await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
-    const response9 = await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsStaking)
-    const response11 = await myManager.grantRole(ENERGY_MINTER_ROLE, altcoinersStaking)
+    const resp11 = await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
+    const resp12 = await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsStaking)
+    const resp13 = await myManager.grantRole(ENERGY_MINTER_ROLE, altcoinersStaking)
 
     console.log('Granting faction manager role...')
-    const response13 = await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
+    const resp14 = await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
 
     console.log('Granting faction admin role...')
-    const response14 = await myManager.grantRole(FACTIONS_ADMIN_ROLE, accounts[0].address)
+    const resp15 = await myManager.grantRole(FACTIONS_ADMIN_ROLE, accounts[0].address)
 
     await Promise.all([
-        response7.wait(),
-        response9.wait(),
-        response11.wait(),
-        response13.wait(),
-        response14.wait(),
+        resp11.wait(),
+        resp12.wait(),
+        resp13.wait(),
+        resp14.wait(),
+        resp15.wait(),
     ])
 
     console.log('Roles granted.')
     console.log('Updating factions...')
-    const response15 = await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, ethers.constants.AddressZero)
-    const response16 = await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, ethers.constants.AddressZero)
-    const response17 = await myFactionManager.updateFaction(ALTCOINERS_FACTION, altcoinersStaking, ethers.constants.AddressZero)
+    const resp16 = await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, ethers.constants.AddressZero)
+    const resp17 = await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, ethers.constants.AddressZero)
+    const resp18 = await myFactionManager.updateFaction(ALTCOINERS_FACTION, altcoinersStaking, ethers.constants.AddressZero)
 
     await Promise.all([
-        response15.wait(),
-        response16.wait(),
-        response17.wait(),
+        resp16.wait(),
+        resp17.wait(),
+        resp18.wait(),
     ])
 
     console.log('Factions updated...')
@@ -219,21 +227,22 @@ async function main() {
 
     const myUsdt = await Token.deploy("Tutellus IDO USDT", "TUT-USDT")
 
-    await myManager.setId(
+    const resp19 = await myManager.setId(
         IDO_USDT,
         myUsdt.address
     );
+    await resp19.wait()
 
     const TutellusIDOFactory = await ethers.getContractFactory(
         "TutellusIDOFactory"
     );
-    response = await myManager.deploy(
+    const resp20 = await myManager.deploy(
         LAUNCHPAD_IDO_FACTORY,
         TutellusIDOFactory.bytecode,
         initializeCalldata
     );
 
-    await response.wait()
+    await resp20.wait()
 
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
     const myIdoFactory = TutellusIDOFactory.attach(idoFactoryAddr);
@@ -244,8 +253,8 @@ async function main() {
         "initialize",
         [myManager.address, FUNDING_AMOUNT, MIN_PREFUND]
     );
-    const idoResponse = await myIdoFactory.createProxy(idoInitializeCalldata);
-    const receipt = await idoResponse.wait()
+    const resp21 = await myIdoFactory.createProxy(idoInitializeCalldata);
+    const receipt = await resp21.wait()
     const myIdo = TutellusIDO.attach(receipt.events[1].args.proxy)
 
     console.log(
@@ -260,17 +269,17 @@ async function main() {
             // ETH balance
             const ethBalance = await ethers.provider.getBalance(wallet.address)
             if (ethBalance.lt(MIN_ETH_AMOUNT)) {
-                let response = await accounts[0].sendTransaction({
+                const resp22 = await accounts[0].sendTransaction({
                     to: wallet.address,
                     value: MIN_ETH_AMOUNT.sub(ethBalance)
                 })
-                await response.wait()
+                await resp22.wait()
             }
             // TUT balance
             const tutBalance = await myTUT.balanceOf(wallet.address)
             if (tutBalance.lt(MIN_TUT_AMOUNT)) {
-                let response = await myTUT.transfer(wallet.address, MIN_TUT_AMOUNT.sub(tutBalance))
-                await response.wait()
+                const resp23 = await myTUT.transfer(wallet.address, MIN_TUT_AMOUNT.sub(tutBalance))
+                await resp23.wait()
             }
 
             // Staking
@@ -278,29 +287,32 @@ async function main() {
             const walletFaction = await myFactionManager.factionOf(wallet.address)
             const faction = await myFactionManager.faction(FACTIONS[j])
 
-            if (walletFaction !== ethers.constants.HashZero) {
-                response = await myTUT.connect(wallet).approve(faction.stakingContract, ethers.constants.MaxUint256)
-                await response.wait()
-                response = await myTUT.connect(accounts[0]).transfer(wallet.address, STAKING_AMOUNTS[i+j])
-                await response.wait()
-                response = await myFactionManager.connect(wallet).stake(FACTIONS[j], wallet.address, STAKING_AMOUNTS[i+j])
-                await response.wait()
+            if ((walletFaction == ethers.constants.HashZero) || (walletFaction == FACTIONS[j])) {
+                const resp24 = await myTUT.connect(wallet).approve(faction.stakingContract, ethers.constants.MaxUint256)
+                await resp24.wait()
+                const resp25 = await myTUT.connect(accounts[0]).transfer(wallet.address, STAKING_AMOUNTS[i][j])
+                await resp25.wait()
+                const resp26 = await myFactionManager.connect(wallet).stake(FACTIONS[j], wallet.address, STAKING_AMOUNTS[i][j])
+                await resp26.wait()
             }
 
             // Prefund IDO
-
+            // const myManager = await ethers.getContractAt('TutellusManager', '0x4780f2f52a5FDF8Fb6f7D4328490A193bD0C16BF')
+            // const usdtAddress = await myManager.get(IDO_USDT)
+            // const myUsdt = await ethers.getContractAt('Token', usdtAddress)
+            // const myIdo = await ethers.getContractAt('TutellusIDO', '0x4d60BaE3cd9Bb2b8D92eD65d2776a05A2E7b23A5')
             const usdtBalance = await myUsdt.balanceOf(wallet.address)
             const prefunded = await myIdo.getPrefunded(wallet.address)
             if (usdtBalance.lt(MIN_USDT_AMOUNT)) {
-                let response = await myUsdt.connect(wallet).approve(myIdo.address, ethers.constants.MaxUint256)
-                await response.wait()
-                response = await myUsdt.transfer(wallet.address, PREFUND_AMOUNTS[i+j].sub(prefunded).sub(usdtBalance))
-                await response.wait()
+                // const resp27 = await myUsdt.connect(wallet).approve(myIdo.address, ethers.constants.MaxUint256)
+                // await resp27.wait()
+                const resp28 = await myUsdt.transfer(wallet.address, PREFUND_AMOUNTS[i][j].sub(prefunded).sub(usdtBalance))
+                await resp28.wait()
             }
 
-            if (prefunded.lt(PREFUND_AMOUNTS[i+j])) {
-                let response = await myIdo.connect(wallet).prefund(PREFUND_AMOUNTS[i+j].sub(prefunded))
-                await response.wait()
+            if (prefunded.lt(PREFUND_AMOUNTS[i][j])) {
+                const resp29 = await myIdo.connect(wallet).prefund(PREFUND_AMOUNTS[i][j].sub(prefunded))
+                await resp29.wait()
             }
         }
 
