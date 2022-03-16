@@ -1,14 +1,17 @@
 const { ethers } = require('ethers');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fs = require('fs')
+const path = require('path')
+const IDO = '0x4d60BaE3cd9Bb2b8D92eD65d2776a05A2E7b23A5'
+const jsonPath = '../../../examples/testnet/launchpad/' + IDO.toLowerCase() + '.json'
 
-const GRAPH_URL = 'https://api.thegraph.com/subgraphs/id/QmV4TKCXawYRb8xUHHudvmG3RUXcezQq8rzRwxYGV5zW9n'
+const GRAPH_URL = 'https://api.thegraph.com/subgraphs/id/QmQeUJnHHnUGXQ2q4t7QPWncsEVBBzxKqfErw1WTEwfTrs'
 const ZERO_BN = ethers.utils.parseEther('0')
 const ONE_BN = ethers.utils.parseEther('1')
 const HUNDRED_BN = ethers.utils.parseEther('100')
 const SUPERTUTELLIAN_LIMIT_BN = ethers.utils.parseEther('1500')
 const N_TOPS = 3
 let N_TOPS_LEFT = N_TOPS
-const IDO = '0x4d60BaE3cd9Bb2b8D92eD65d2776a05A2E7b23A5'
 
 const FACTION_TO_RANKING = {
     '0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae': -1,
@@ -107,7 +110,7 @@ async function main() {
 
         sortPrefundersByRowAndColumn(prefundersArray)
         // Calculate amounts of each prefunder
-        const [distribution, withdraw] = computeDistribution(prefundersArray)
+        const json = computeDistribution(prefundersArray)
 
         console.log(ethers.utils.formatEther(ALLOCATION[0][0]), '  ', ethers.utils.formatEther(ALLOCATION[0][1]), '  ', ethers.utils.formatEther(ALLOCATION[0][2]), '  ')
         console.log(ethers.utils.formatEther(ALLOCATION[1][0]), '  ', ethers.utils.formatEther(ALLOCATION[1][1]), '  ', ethers.utils.formatEther(ALLOCATION[1][2]), '  ')
@@ -116,8 +119,8 @@ async function main() {
         console.log(ethers.utils.formatEther(PREFUNDS[0][0]), '  ', ethers.utils.formatEther(PREFUNDS[0][1]), '  ', ethers.utils.formatEther(PREFUNDS[0][2]), '  ')
         console.log(ethers.utils.formatEther(PREFUNDS[1][0]), '  ', ethers.utils.formatEther(PREFUNDS[1][1]), '  ', ethers.utils.formatEther(PREFUNDS[1][2]), '  ')
         console.log(ethers.utils.formatEther(PREFUNDS[2][0]), '  ', ethers.utils.formatEther(PREFUNDS[2][1]), '  ', ethers.utils.formatEther(PREFUNDS[2][2]), '  ')
-        console.log(distribution)
-        console.log(withdraw)
+        console.log(json)
+
         for (let i = 0; i < prefundersArray.length; i++) {
             console.log(prefundersArray[i].account)
             console.log(prefundersArray[i].row)
@@ -130,6 +133,8 @@ async function main() {
         console.log(ethers.utils.formatEther(TOTAL_ALLOCATION))
         console.log(ethers.utils.formatEther(TOTAL_ALLOCATION_LEFT))
         console.log(ethers.utils.formatEther(TOTAL_PREFUNDS_LEFT))
+
+        fs.writeFileSync(path.join(__dirname, jsonPath), JSON.stringify(json, null, 4))
     }
 }
 // We recommend this pattern to be able to use async/await everywhere
@@ -155,6 +160,7 @@ function classifyPrefunders(prefunders) {
         obj.lottery = ZERO_BN
         obj.left = ethers.BigNumber.from(prefunder.prefunded)
         obj.column = column
+        obj.energy = prefunder.energyHolder.balance
 
         if (isSupertutellian(prefunder)) {
             if (isTop()) {
@@ -258,8 +264,7 @@ function lotteryDraw() {
 }
 
 function computeDistribution(prefundersArray) {
-    const distribution = {}
-    const withdraw = {}
+    const json = {}
 
     if (TOTAL_PREFUNDS_LEFT.gte(TOTAL_ALLOCATION_LEFT)) {
         // Enough to distribute
@@ -285,8 +290,11 @@ function computeDistribution(prefundersArray) {
                 TOTAL_ALLOCATION_LEFT = TOTAL_ALLOCATION_LEFT.sub(extraAmount)
             }
 
-            distribution[prefundersArray[i].account] = prefundersArray[i].allocated.toString()
-            withdraw[prefundersArray[i].account] = prefundersArray[i].left.toString()
+            const values = {}
+            values['allocation'] = prefundersArray[i].allocated.toString()
+            values['withdraw'] = prefundersArray[i].left.toString()
+            values['energy'] = prefundersArray[i].energy.toString()
+            json[prefundersArray[i].account] = values
         }
     } else {
         // Not enough to distribute
@@ -294,7 +302,7 @@ function computeDistribution(prefundersArray) {
         console.log(ethers.utils.formatEther(TOTAL_ALLOCATION_LEFT.sub(TOTAL_PREFUNDS_LEFT)), ' USDT left')
     }
 
-    return [distribution, withdraw]
+    return json
 }
 
 function increasePrefunderAllocation(prefunder, amount) {
