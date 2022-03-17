@@ -2,10 +2,10 @@ const { ethers } = require('ethers');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const fs = require('fs')
 const path = require('path')
-const IDO = '0x4d60BaE3cd9Bb2b8D92eD65d2776a05A2E7b23A5'
+const IDO = '0x14092dCA812377a4Be8ADbfA19A164564b1508F5'
 const jsonPath = '../../../examples/testnet/launchpad/' + IDO.toLowerCase() + '.json'
 
-const GRAPH_URL = 'https://api.thegraph.com/subgraphs/id/QmQeUJnHHnUGXQ2q4t7QPWncsEVBBzxKqfErw1WTEwfTrs'
+const GRAPH_URL = 'https://api.thegraph.com/subgraphs/name/gperezalba/launchpad'
 const ZERO_BN = ethers.utils.parseEther('0')
 const ONE_BN = ethers.utils.parseEther('1')
 const HUNDRED_BN = ethers.utils.parseEther('100')

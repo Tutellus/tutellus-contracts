@@ -226,6 +226,10 @@ async function main() {
     const Token = await ethers.getContractFactory("Token");
 
     const myUsdt = await Token.deploy("Tutellus IDO USDT", "TUT-USDT")
+    await myUsdt.deployed()
+    await myUsdt.mint(accounts[0].address, ethers.utils.parseEther('10000000'))
+    const myIdoToken = await Token.deploy("Tutellus IDO 1", "IDO1")
+    await myIdoToken.deployed()
 
     const resp19 = await myManager.setId(
         IDO_USDT,
@@ -251,7 +255,7 @@ async function main() {
     const MIN_PREFUND = ethers.utils.parseEther("1000");
     const idoInitializeCalldata = TutellusIDO.interface.encodeFunctionData(
         "initialize",
-        [myManager.address, FUNDING_AMOUNT, MIN_PREFUND]
+        [myManager.address, FUNDING_AMOUNT, MIN_PREFUND, myIdoToken.address, myUsdt.address]
     );
     const resp21 = await myIdoFactory.createProxy(idoInitializeCalldata);
     const receipt = await resp21.wait()
@@ -275,10 +279,13 @@ async function main() {
                 })
                 await resp22.wait()
             }
+
+            // const myTUT = await ethers.getContractAt('TutellusERC20', '0x63C642064e4cf93614b1549BA277986acCe5210e')
+            // const myFactionManager = await ethers.getContractAt('TutellusFactionManager', '0x8713e5e61310b1917da556c45DA7534B8B9028d4')
             // TUT balance
             const tutBalance = await myTUT.balanceOf(wallet.address)
-            if (tutBalance.lt(MIN_TUT_AMOUNT)) {
-                const resp23 = await myTUT.transfer(wallet.address, MIN_TUT_AMOUNT.sub(tutBalance))
+            if (tutBalance.lt(STAKING_AMOUNTS[i][j].mul(ethers.BigNumber.from('2')))) {
+                const resp23 = await myTUT.transfer(wallet.address, STAKING_AMOUNTS[i][j].mul(ethers.BigNumber.from('2')))
                 await resp23.wait()
             }
 
@@ -290,22 +297,20 @@ async function main() {
             if ((walletFaction == ethers.constants.HashZero) || (walletFaction == FACTIONS[j])) {
                 const resp24 = await myTUT.connect(wallet).approve(faction.stakingContract, ethers.constants.MaxUint256)
                 await resp24.wait()
-                const resp25 = await myTUT.connect(accounts[0]).transfer(wallet.address, STAKING_AMOUNTS[i][j])
-                await resp25.wait()
                 const resp26 = await myFactionManager.connect(wallet).stake(FACTIONS[j], wallet.address, STAKING_AMOUNTS[i][j])
                 await resp26.wait()
             }
 
             // Prefund IDO
-            // const myManager = await ethers.getContractAt('TutellusManager', '0x4780f2f52a5FDF8Fb6f7D4328490A193bD0C16BF')
+            // const myManager = await ethers.getContractAt('TutellusManager', '0x12d4Ba2CBE39d0237d57612599992d9Ab05CaD8c')
             // const usdtAddress = await myManager.get(IDO_USDT)
             // const myUsdt = await ethers.getContractAt('Token', usdtAddress)
-            // const myIdo = await ethers.getContractAt('TutellusIDO', '0x4d60BaE3cd9Bb2b8D92eD65d2776a05A2E7b23A5')
+            // const myIdo = await ethers.getContractAt('TutellusIDO', '0x4A57165b6Fc8D2fdaC74dE5EDC7CF55dbf174d8b')
             const usdtBalance = await myUsdt.balanceOf(wallet.address)
             const prefunded = await myIdo.getPrefunded(wallet.address)
-            if (usdtBalance.lt(MIN_USDT_AMOUNT)) {
-                // const resp27 = await myUsdt.connect(wallet).approve(myIdo.address, ethers.constants.MaxUint256)
-                // await resp27.wait()
+            if (usdtBalance.lt(PREFUND_AMOUNTS[i][j].sub(prefunded).sub(usdtBalance))) {
+                const resp27 = await myUsdt.connect(wallet).approve(myIdo.address, ethers.constants.MaxUint256)
+                await resp27.wait()
                 const resp28 = await myUsdt.transfer(wallet.address, PREFUND_AMOUNTS[i][j].sub(prefunded).sub(usdtBalance))
                 await resp28.wait()
             }

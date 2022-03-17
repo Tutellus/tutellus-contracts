@@ -8,11 +8,11 @@ import "../interfaces/ITutellusManager.sol";
 
 contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
 
-    bytes32 public constant IDO_USDT = keccak256("IDO_USDT");
-
     uint public prefunded;
     uint public fundingAmount;
     uint public minPrefund;
+    address public idoToken;
+    address public prefundToken;
     bytes32 public merkleRoot;
     string public uri;
 
@@ -23,12 +23,20 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     event Withdraw(address indexed funder, uint amount);
     event RemovePrefunder(address indexed funder);
     event UpdateMerkleRoot(bytes32 merkleRoot, string uri);
-    event Claim(uint256 index, address account, uint256 amount);
+    event Claim(uint256 index, address account, uint256 amount, uint256 allocation, uint256 withdraw, uint256 energy);
 
-    function initialize(address rolemanager_ , uint fundingAmount_, uint minPrefund_) public initializer {
+    function initialize(
+        address rolemanager_,
+        uint fundingAmount_,
+        uint minPrefund_,
+        address idoToken_,
+        address prefundToken_
+    ) public initializer {
         __AccessControlProxyPausable_init(rolemanager_);
         fundingAmount = fundingAmount_;
         minPrefund = minPrefund_;
+        idoToken = idoToken_;
+        prefundToken = prefundToken_;
     }
 
     function getPrefunded(address prefunder_) public view returns(uint) {
@@ -62,24 +70,23 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         require(_prefunds[prefunder_] >= minPrefund, "TutellusIDO: try withdrawAll");
     }
 
-    function claim(uint index_, address account_, uint amount_, bytes32[] calldata merkleProof_) public {
-        uint claimableAmount_ = amount_ - _claimed[account_];
-        require(claimableAmount_ > 0, "TutellusIDO: nothing to claim");
-        _claimed[account_] += claimableAmount_;
-        _verifyMerkle(index_, account_, amount_, merkleProof_);
-        address token_ = ITutellusManager(config).get(IDO_USDT);
-        _transfer(token_, account_, amount_);
-        emit Claim(index_, account_, amount_);
+    function claim(uint index_, address account_, uint allocation_, uint withdraw_, uint energy_, bytes32[] calldata merkleProof_) public {
+        // TBD: handle vesting
+        // uint claimableAmount_ = amount_ - _claimed[account_];
+        // require(claimableAmount_ > 0, "TutellusIDO: nothing to claim");
+        // _claimed[account_] += claimableAmount_;
+        _verifyMerkle(index_, account_, allocation_, withdraw_, energy_, merkleProof_);
+        _transfer(idoToken, account_, allocation_);
+        _transfer(prefundToken, account_, withdraw_);
+        emit Claim(index_, account_, allocation_, allocation_, withdraw_, energy_); //TBD: use claimableAmount in 3rd param
     }
 
     function sync() public onlyRole(DEFAULT_ADMIN_ROLE) {
-        address token_ = ITutellusManager(config).get(IDO_USDT);
-        _sync(token_, msg.sender, prefunded);
+        _sync(prefundToken, msg.sender, prefunded);
     }
 
     function _prefund(uint prefundAmount_, address prefunder_) internal {
-        address token_ = ITutellusManager(config).get(IDO_USDT);
-        _transferFrom(token_, prefunder_, address(this), prefundAmount_);
+        _transferFrom(prefundToken, prefunder_, address(this), prefundAmount_);
         prefunded += prefundAmount_;
         _prefunds[prefunder_] += prefundAmount_;
         emit Prefund(prefunder_, _getFaction(prefunder_), prefundAmount_);
@@ -89,14 +96,13 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         require(_prefunds[prefunder_] >= amount_, "TutellusIDO: cant withdraw more than prefunded");
         prefunded -= amount_;
         _prefunds[prefunder_] -= amount_;
-        address token_ = ITutellusManager(config).get(IDO_USDT);
-        _transfer(token_, prefunder_, amount_);
+        _transfer(prefundToken, prefunder_, amount_);
 
         emit Withdraw(prefunder_, amount_);
     }
 
-    function _verifyMerkle(uint index_, address account_, uint amount_, bytes32[] calldata merkleProof_) internal view {
-        bytes32 node_ = keccak256(abi.encodePacked(index_, account_, amount_));
+    function _verifyMerkle(uint index_, address account_, uint allocation_, uint withdraw_, uint energy_, bytes32[] calldata merkleProof_) internal view {
+        bytes32 node_ = keccak256(abi.encodePacked(index_, account_, allocation_, withdraw_, energy_));
         require(MerkleProofUpgradeable.verify(merkleProof_, merkleRoot, node_), "TutellusIDO: Invalid merkle proof");
     }
 
