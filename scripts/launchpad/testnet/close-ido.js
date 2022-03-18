@@ -69,8 +69,10 @@ function verifyJson(needed, prefunded, prefunders, json) {
         sumWithdraw = sumWithdraw.add(json[prefunders[i].account]["withdraw"]);
     }
 
+    const left = needed.gt(sumAllocation) ? needed.sub(sumAllocation) : sumAllocation.sub(needed)
+
     return (
-        /*needed.eq(sumAllocation) && */sumAllocation.add(sumWithdraw).eq(prefunded)
+        left.lte(ethers.constants.WeiPerEther) && sumAllocation.add(sumWithdraw).eq(prefunded)
     );
 }
 

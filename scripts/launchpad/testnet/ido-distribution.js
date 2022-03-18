@@ -198,7 +198,7 @@ function calculateSlotTotals(fundingAmountBN) {
             if (i == 1) {
                 LOTTERY[i][j] = ALLOCATION[i][j].div(ethers.BigNumber.from('2'))
                 ALLOCATION[i][j] = ALLOCATION[i][j].sub(LOTTERY[i][j])
-                RATIOS[i][j] = ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j])
+                RATIOS[i][j] = ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j].div(ethers.BigNumber.from('2')))
             }
 
             if (i == 2) {
