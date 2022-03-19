@@ -1,43 +1,126 @@
 const { ethers } = require('hardhat');
 const {
-    expectRevert
+    expectRevert,
+    time
 } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
+const json = require('../examples/testnet/launchpad/test.json')
+const { getIdoTree } = require('../utils/idoTree');
+const TREE = getIdoTree(json)
+const CLAIMS = TREE.toJSON().claims
 
 const _BEACON_SLOT = '0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50';
 const DEFAULT_ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const IDO_FACTORY_ID = ethers.utils.id('IDO_FACTORY')
 const IDO_USDT_ID = ethers.utils.id('IDO_USDT')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
+const ENERGY_ID = ethers.utils.id('ENERGY')
+const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
+const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
+const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
+const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
+const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
+const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
+const NAKAMOTOS_STAKING_ID = ethers.utils.id('NAKAMOTOS_STAKING')
+const VUTERINS_STAKING_ID = ethers.utils.id('VUTERINS_STAKING')
+const ALTCOINERS_STAKING_ID = ethers.utils.id('ALTCOINERS_STAKING')
+const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
+const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
+const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
 const FUNDING_AMOUNT = ethers.utils.parseEther('10000')
 const MIN_PREFUND = ethers.utils.parseEther('100')
+let START_DATE, END_DATE
 
-let owner, funder
-let myManager, myFactory, myIDO, myUSDT
+let accounts
+let owner, funder, prefunder0, prefunder1, prefunder2, prefunder3
+let myManager, myFactory, myIDO, myUSDT, myTUT, myIdoToken
 
 describe('IDOFactory & IDO', function () {
     beforeEach(async () => {
-        [owner, funder] = await ethers.getSigners();
+        accounts = await ethers.getSigners();
+        [owner, funder, prefunder0, prefunder1, prefunder2, prefunder3] = accounts
 
         const TutellusManager = await ethers.getContractFactory('TutellusManager')
         const TutellusIDOFactory = await ethers.getContractFactory('TutellusIDOFactory')
         const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
         const TutellusERC20 = await ethers.getContractFactory('TutellusERC20')
+        const TutellusEnergy = await ethers.getContractFactory("TutellusEnergy");
+        const LaunchpadStaking = await ethers.getContractFactory("TutellusLaunchpadStaking");
+        const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
+        const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
+        const Token = await ethers.getContractFactory("Token");
 
         myManager = await TutellusManager.deploy()
         await myManager.deployed()
         await myManager.initialize()
 
-        const initiallizeCalldata = await TutellusIDOFactory.interface.encodeFunctionData('initialize', [])
+        myTUT = await TutellusERC20.deploy("Tutellus token", "TUT", ethers.utils.parseEther('200000000'), myManager.address)
+        await myManager.grantRole(MINTER_ROLE, owner.address)
+        await myTUT.mint(owner.address, ethers.utils.parseEther('100000'))
+
+        const initializeCalldata = TutellusEnergy.interface.encodeFunctionData('initialize', [])
+        await myManager.deploy(ENERGY_ID, TutellusEnergy.bytecode, initializeCalldata)
+        await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
+        const rewardsAddr = await myManager.get(LAUNCHPAD_REWARDS_ID)
+        await myTUT.mint(rewardsAddr, ethers.utils.parseEther('50000'))
+
         const factoryImp = await TutellusIDOFactory.deploy()
         await factoryImp.deployed()
-        await myManager.deployProxyWithImplementation(IDO_FACTORY_ID, factoryImp.address, initiallizeCalldata)
+        await myManager.deployProxyWithImplementation(IDO_FACTORY_ID, factoryImp.address, initializeCalldata)
         const factoryAddress = await myManager.get(IDO_FACTORY_ID)
         myFactory = await ethers.getContractAt('TutellusIDOFactory', factoryAddress)
-        myUSDT = await TutellusERC20.deploy('name', 'symbol', ethers.constants.MaxUint256, myManager.address)
+        const myLaunchpadStakingImp = await LaunchpadStaking.deploy()
+        const myFactionManagerImp = await FactionManager.deploy()
+        await myFactionManagerImp.deployed()
+        const launchpadStakingImp = myLaunchpadStakingImp.address
+        const factionManagerImp = myFactionManagerImp.address
+        const initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myTUT.address])
+        await myManager.deployProxyWithImplementation(FACTION_MANAGER, factionManagerImp, initializeCalldata)
+        // NAKAMOTOS
+        await myManager.deployProxyWithImplementation(NAKAMOTOS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+        // VUTERINS
+        await myManager.deployProxyWithImplementation(VUTERINS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+        // ALTCOINERS
+        await myManager.deployProxyWithImplementation(ALTCOINERS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+
+        const contracts = await Promise.all([
+            myManager.get(FACTION_MANAGER),
+            myManager.get(NAKAMOTOS_STAKING_ID),
+            myManager.get(VUTERINS_STAKING_ID),
+            myManager.get(ALTCOINERS_STAKING_ID),
+        ])
+
+        const [factionManager, nakamotosStaking, vuterinsStaking, altcoinersStaking] = contracts
+        const myFactionManager = FactionManager.attach(factionManager)
+        await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
+        await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsStaking)
+        await myManager.grantRole(ENERGY_MINTER_ROLE, altcoinersStaking)
+        await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
+        await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner.address)
+        await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, ethers.constants.AddressZero)
+        await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, ethers.constants.AddressZero)
+        await myFactionManager.updateFaction(ALTCOINERS_FACTION, altcoinersStaking, ethers.constants.AddressZero)
+
+        myUSDT = await Token.deploy('name', 'symbol')
         await myUSDT.deployed()
+        myIdoToken = await Token.deploy("Tutellus IDO 1", "IDO1")
+        await myIdoToken.deployed()
         await myManager.setId(IDO_USDT_ID, myUSDT.address)
-        const idoCalldata = await TutellusIDO.interface.encodeFunctionData('initialize', [myManager.address, FUNDING_AMOUNT, MIN_PREFUND]);
+        block = await ethers.provider.getBlock()
+        START_DATE = block.timestamp + 1000000
+        END_DATE = block.timestamp + 2000000
+        const idoCalldata = await TutellusIDO.interface.encodeFunctionData(
+            'initialize',
+            [
+                myManager.address,
+                FUNDING_AMOUNT,
+                MIN_PREFUND,
+                myIdoToken.address,
+                myUSDT.address,
+                START_DATE,
+                END_DATE
+            ]
+        );
         const response = await myFactory.createProxy(idoCalldata)
         const receipt = await response.wait()
         myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
@@ -45,14 +128,26 @@ describe('IDOFactory & IDO', function () {
         await myManager.grantRole(MINTER_ROLE, owner.address)
         await myUSDT.mint(owner.address, ethers.utils.parseEther('1000000'))
         await myUSDT.mint(funder.address, ethers.utils.parseEther('1000000'))
-
+        await myUSDT.mint(myIDO.address, ethers.utils.parseEther('1000000'))
+        await myIdoToken.mint(myIDO.address, ethers.utils.parseEther('1000000'))
     });
 
     describe('Factory', function () {
 
         it('can create an IDO (proxy to beacon)', async () => {
             const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
-            const idoCalldata = await TutellusIDO.interface.encodeFunctionData('initialize', [myManager.address, FUNDING_AMOUNT, MIN_PREFUND]);
+            const idoCalldata = await TutellusIDO.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myIdoToken.address,
+                    myUSDT.address,
+                    START_DATE,
+                    END_DATE
+                ]
+            );
             const response = await myFactory.createProxy(idoCalldata)
             const receipt = await response.wait()
             myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
@@ -64,7 +159,18 @@ describe('IDOFactory & IDO', function () {
 
         it('only DEFAULT_ADMIN_ROLE can create an IDO', async () => {
             const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
-            const idoCalldata = await TutellusIDO.interface.encodeFunctionData('initialize', [myManager.address, FUNDING_AMOUNT, MIN_PREFUND]);
+            const idoCalldata = await TutellusIDO.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myIdoToken.address,
+                    myUSDT.address,
+                    START_DATE,
+                    END_DATE
+                ]
+            );
             await expectRevert(
                 (await myFactory.connect(funder)).createProxy(idoCalldata),
                 'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
@@ -81,7 +187,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
-            await (await myIDO.connect(funder)).prefund(prefundAmount)
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
 
             const funderBalancePost = await myUSDT.balanceOf(funder.address)
@@ -96,10 +202,10 @@ describe('IDOFactory & IDO', function () {
             const prefundAmount = ethers.utils.parseEther('10')
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
             await expectRevert(
-                (await myIDO.connect(funder)).prefund(prefundAmount),
+                (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
                 'TutellusIDO: insufficient prefund'
             )
-            await (await myIDO.connect(funder)).prefund(MIN_PREFUND)
+            await (await myIDO.connect(funder)).prefund(funder.address, MIN_PREFUND)
             const prefunded = await myIDO.getPrefunded(funder.address)
             expect(prefunded.toString()).to.equal(MIN_PREFUND.toString())
         });
@@ -108,10 +214,10 @@ describe('IDOFactory & IDO', function () {
             const prefundAmount = ethers.utils.parseEther('10')
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
             await expectRevert(
-                (await myIDO.connect(funder)).prefund(prefundAmount),
+                (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
                 'TutellusIDO: insufficient prefund'
             )
-            await (await myIDO.connect(funder)).prefund(MIN_PREFUND)
+            await (await myIDO.connect(funder)).prefund(funder.address, MIN_PREFUND)
             const prefunded = await myIDO.getPrefunded(funder.address)
             expect(prefunded.toString()).to.equal(MIN_PREFUND.toString())
         });
@@ -127,7 +233,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
-            await (await myIDO.connect(funder)).prefund(prefundAmount)
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
             await (await myIDO.connect(funder)).withdraw(withdrawAmount)
             const prefundedAfterWithdraw = await myIDO.getPrefunded(funder.address)
@@ -147,7 +253,7 @@ describe('IDOFactory & IDO', function () {
             const withdrawAmountRight = ethers.utils.parseEther('4900')
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
-            await (await myIDO.connect(funder)).prefund(prefundAmount)
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             await expectRevert(
                 (await myIDO.connect(funder)).withdraw(withdrawAmountWrong),
                 'TutellusIDO: try withdrawAll'
@@ -161,7 +267,7 @@ describe('IDOFactory & IDO', function () {
             const withdrawAmountRight = ethers.utils.parseEther('4000')
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
-            await (await myIDO.connect(funder)).prefund(prefundAmount)
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             await expectRevert(
                 (await myIDO.connect(funder)).withdraw(withdrawAmountWrong),
                 'TutellusIDO: cant withdraw more than prefunded'
@@ -177,7 +283,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
-            await (await myIDO.connect(funder)).prefund(prefundAmount)
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
             await (await myIDO.connect(funder)).withdrawAll()
             const prefundedAfterWithdraw = await myIDO.getPrefunded(funder.address)
@@ -192,10 +298,43 @@ describe('IDOFactory & IDO', function () {
         });
     });
 
-    describe('IDO (claim)', function () {
+    describe.only('IDO (claim)', function () {
 
-        // it('can claim', async () => {
+        it('can claim', async () => {
+            let slot = (END_DATE - START_DATE) / 4
+            let divisionBN = ethers.BigNumber.from('4')
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            for (let i = 2; i < 6; i++) {
+                await ethers.provider.send("evm_setNextBlockTimestamp", [START_DATE + ((i-2) * slot)])
+                await myIDO.claim(
+                    CLAIMS[accounts[i].address].index,
+                    accounts[i].address,
+                    CLAIMS[accounts[i].address].allocation,
+                    CLAIMS[accounts[i].address].withdraw,
+                    CLAIMS[accounts[i].address].energy,
+                    CLAIMS[accounts[i].address].proof
+                )
+                let idoBalance = await myIdoToken.balanceOf(accounts[i].address)
+                expect(idoBalance.toString()).to.equal(ethers.BigNumber.from(json[accounts[i].address].allocation).mul(ethers.BigNumber.from((i-2).toString())).div(divisionBN).toString())
+                let usdtBalance = await myUSDT.balanceOf(accounts[i].address)
+                expect(usdtBalance.toString()).to.equal(json[accounts[i].address].withdraw)
+            }
 
-        // });
+            await ethers.provider.send("evm_setNextBlockTimestamp", [END_DATE + 1000000])
+            for (let i = 2; i < 6; i++) {
+                await myIDO.claim(
+                    CLAIMS[accounts[i].address].index,
+                    accounts[i].address,
+                    CLAIMS[accounts[i].address].allocation,
+                    CLAIMS[accounts[i].address].withdraw,
+                    CLAIMS[accounts[i].address].energy,
+                    CLAIMS[accounts[i].address].proof
+                )
+                let idoBalance = await myIdoToken.balanceOf(accounts[i].address)
+                expect(idoBalance.toString()).to.equal(ethers.BigNumber.from(json[accounts[i].address].allocation).toString())
+                let usdtBalance = await myUSDT.balanceOf(accounts[i].address)
+                expect(usdtBalance.toString()).to.equal(json[accounts[i].address].withdraw)
+            }
+        });
     });
 })
