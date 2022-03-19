@@ -1,4 +1,3 @@
-const { time } = require('@openzeppelin/test-helpers')
 const { parseEther } = require('ethers/lib/utils')
 const bre = require('hardhat')
 const ethers = bre.ethers
@@ -9,6 +8,7 @@ const VUTERINS_STAKING_ID = ethers.utils.id('VUTERINS_STAKING')
 const VUTERINS_FARMING_ID = ethers.utils.id('VUTERINS_FARMING')
 const ALTCOINERS_STAKING_ID = ethers.utils.id('ALTCOINERS_STAKING')
 const ALTCOINERS_FARMING_ID = ethers.utils.id('ALTCOINERS_FARMING')
+const LAUNCHPAD_REWARDS = ethers.utils.id('LAUNCHPAD_REWARDS');
 
 function sleep(milliseconds) {
   const date = Date.now();
@@ -38,7 +38,8 @@ async function main () {
   const Manager = await ethers.getContractFactory('TutellusManager');
   const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2');
   const myManager = Manager.attach('0x9b77Cb09d5E61D44fEf00e59Cfcc8Af67DAe9A45');
-  const myRewardsVault = RewardsVaultV2.attach('0x68180441ad7457121739727Debb5e839c47B1589');
+  const rvv2Addr = await myManager.get(LAUNCHPAD_REWARDS);
+  const myRewardsVault = RewardsVaultV2.attach(rvv2Addr);
 
   const ids = [
     NAKAMOTOS_STAKING_ID,
