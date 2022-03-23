@@ -34,11 +34,11 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
     mapping(bytes32=>bool) private _signed;
 
     /** Events */
-    event Mint(bytes32 poapId, bytes32 eventId, uint256 tokenId, address account, uint256 energy);
-    event Burn(bytes32 poapId, bytes32 eventId, uint256 tokenId, address account, uint256 energy);
-    event CreateEvent(bytes32 poapId, bytes32 eventId, string eventURI, bool perpetual, uint256 energy);
+    event MintPOAP(bytes32 poapId, bytes32 eventId, uint256 tokenId, address account, uint256 energy);
+    event BurnPOAP(bytes32 poapId, bytes32 eventId, uint256 tokenId, address account, uint256 energy);
+    event CreatePOAP(bytes32 poapId, bytes32 eventId, string uri, bool perpetual, uint256 energy);
 
-    function createEvent (
+    function createPOAP (
         bytes32 poapId,
         bytes32 eventId,
         string memory uri,
@@ -47,6 +47,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
     ) public onlyRole(_ADMIN_721_ROLE) {
         require(!poaps[poapId].valid, 'Tutellus721: poap valid');
         poaps[poapId] = POAP(eventId, uri, true, perpetual, energy);
+        emit CreatePOAP(poapId, eventId, uri, perpetual, energy);
     }
 
     function mint (
@@ -92,7 +93,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         poapOf[tokenId] = poapId;
         
         _safeMint(account, tokenId);
-        emit Mint(poapId, eventId, tokenId, account, energy);
+        emit MintPOAP(poapId, eventId, tokenId, account, energy);
     }
 
     function burn (
@@ -156,6 +157,6 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         }
         
         super._burn(tokenId);
-        emit Burn(poapId, eventId, tokenId, account, energy);
+        emit BurnPOAP(poapId, eventId, tokenId, account, energy);
     }
 }

@@ -23,8 +23,11 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
     uint40 public lastUpdateTimestamp;
     uint256 private _normalization;
 
-    event Mint(address sender, address account, uint256 amount);
-    event Burn(address sender, address account, uint256 amount);
+    // event Mint(address sender, address account, uint256 amount);
+    // event Burn(address sender, address account, uint256 amount);
+
+    event MintVariable(address sender, address account, uint256 amount);
+    event BurnVariable(address sender, address account, uint256 amount);
 
     function __ERC20Variable_init(string memory name_, string memory symbol_, uint256 rate_) internal onlyInitializing {
         __ERC20Variable_init_unchained(name_, symbol_, rate_);
@@ -290,7 +293,8 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
         _totalSupply += amountScaled;
         _balances[account] += amountScaled;
         emit Transfer(address(0), account, amount);
-        emit Mint(msg.sender, account, amount);
+        // emit Mint(msg.sender, account, amount);
+        emit MintVariable(msg.sender, account, amount);
 
         _afterTokenTransfer(address(0), account, amount);
     }
@@ -322,7 +326,8 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
         _totalSupply -= amountScaled;
 
         emit Transfer(account, address(0), amount);
-        emit Burn(msg.sender, account, amount);
+        // emit Burn(msg.sender, account, amount);
+        emit BurnVariable(msg.sender, account, amount);
 
         _afterTokenTransfer(account, address(0), amount);
     }

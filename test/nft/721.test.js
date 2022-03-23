@@ -174,7 +174,7 @@ describe('721 tokens', function () {
         it('Can create a new event', async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
                 myPOAP.uri,
@@ -198,7 +198,7 @@ describe('721 tokens', function () {
         it('Cant create an event with the same id', async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
                 myPOAP.uri,
@@ -206,7 +206,7 @@ describe('721 tokens', function () {
                 myPOAP.energy
             )
             await expectRevert(
-                myNFT.createEvent(
+                myNFT.createPOAP(
                     myPOAP.id,
                     myPOAP.eventId,
                     myPOAP2.uri,
@@ -221,28 +221,28 @@ describe('721 tokens', function () {
         beforeEach(async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
                 myPOAP.uri,
                 myPOAP.perpetual,
                 myPOAP.energy
             )
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP2.id,
                 myPOAP2.eventId,
                 myPOAP2.uri,
                 myPOAP2.perpetual,
                 myPOAP2.energy
             )
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP3.id,
                 myPOAP3.eventId,
                 myPOAP3.uri,
                 myPOAP3.perpetual,
                 myPOAP3.energy
             )
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP4.id,
                 myPOAP4.eventId,
                 myPOAP4.uri,
@@ -384,28 +384,28 @@ describe('721 tokens', function () {
         beforeEach(async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
                 myPOAP.uri,
                 myPOAP.perpetual,
                 myPOAP.energy
             )
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP2.id,
                 myPOAP2.eventId,
                 myPOAP2.uri,
                 myPOAP2.perpetual,
                 myPOAP2.energy
             )
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP3.id,
                 myPOAP3.eventId,
                 myPOAP3.uri,
                 myPOAP3.perpetual,
                 myPOAP3.energy
             )
-            await myNFT.createEvent(
+            await myNFT.createPOAP(
                 myPOAP4.id,
                 myPOAP4.eventId,
                 myPOAP4.uri,

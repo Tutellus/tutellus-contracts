@@ -39,6 +39,9 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
      * @dev Emitted by {_snapshot} when a snapshot identified by `id` is created.
      */
     event Snapshot(uint256 id, uint256 normalization, uint256 totalSupply);
+    
+    event MintStatic(address sender, address account, uint256 amount);
+    event BurnStatic(address sender, address account, uint256 amount);
 
     /**
      * @dev Creates a new snapshot and returns its snapshot id.
@@ -196,7 +199,8 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
       staticTotalSupply += amount;
       staticBalanceOf[account] += amount;
       emit Transfer(address(0), account, amount);
-      emit Mint(msg.sender, account, amount);
+    //   emit Mint(msg.sender, account, amount);
+      emit MintStatic(msg.sender, account, amount);
 
       _afterTokenTransfer(address(0), account, amount);
     }
@@ -217,7 +221,8 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
       staticTotalSupply -= amount;
 
       emit Transfer(account, address(0), amount);
-      emit Burn(msg.sender, account, amount);
+    //   emit Burn(msg.sender, account, amount);
+      emit BurnStatic(msg.sender, account, amount);
 
       _afterTokenTransfer(account, address(0), amount);
     }
