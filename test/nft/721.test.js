@@ -62,7 +62,7 @@ const setInstances = async (addresses) => {
     ])
 }
 
-const sign721 = async (contract, eventId, account) => {
+const sign721 = async (contract, poapId, account) => {
     const domain = {
         name: 'Tutellus721',
         version: '1',
@@ -72,13 +72,13 @@ const sign721 = async (contract, eventId, account) => {
 
     const types = {
         Mint: [
-            { name: 'eventId', type: 'bytes32' },
+            { name: 'poapId', type: 'bytes32' },
             { name: 'account', type: 'address' },
         ]
     }
 
     const value = {
-       eventId,
+        poapId,
        account
     }
 
@@ -90,26 +90,33 @@ const sign721 = async (contract, eventId, account) => {
     }
 }
 
-const myEvent = {
+const EVENT1 = utils.id('ido1')
+const EVENT2 = utils.id('ido2')
+
+const myPOAP = {
     id: utils.id('perpetual'),
+    eventId: EVENT1,
     energy: parseEther('0'),
     perpetual: true,
     uri: 'uri/perpetual'
 }
-const myEvent2 = {
+const myPOAP2 = {
     id: utils.id('perpetual-energy'),
+    eventId: EVENT1,
     energy: parseEther('1000'),
     perpetual: true,
     uri: 'uri/perpetual-energy'
 }
-const myEvent3 = {
+const myPOAP3 = {
     id: utils.id('non-perpetual'),
+    eventId: EVENT1,
     energy: parseEther('0'),
     perpetual: false,
     uri: 'uri/non-perpetual'
 }
-const myEvent4 = {
+const myPOAP4 = {
     id: utils.id('non-perpetual-energy'),
+    eventId: EVENT2,
     energy: parseEther('1000'),
     perpetual: false,
     uri: 'uri/non-perpetual-energy'
@@ -168,10 +175,11 @@ describe('721 tokens', function () {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createEvent(
-                myEvent.id,
-                myEvent.uri,
-                myEvent.perpetual,
-                myEvent.energy
+                myPOAP.id,
+                myPOAP.eventId,
+                myPOAP.uri,
+                myPOAP.perpetual,
+                myPOAP.energy
             )
             
             const {
@@ -179,31 +187,33 @@ describe('721 tokens', function () {
                 valid,
                 perpetual,
                 energy
-            } = await myNFT.events(myEvent.id)
+            } = await myNFT.poaps(myPOAP.id)
 
-            expect(uri).eq(myEvent.uri)
-            expect(perpetual).eq(myEvent.perpetual)
+            expect(uri).eq(myPOAP.uri)
+            expect(perpetual).eq(myPOAP.perpetual)
             expect(valid).eq(true)
-            expectEqEth(energy, myEvent.energy)
+            expectEqEth(energy, myPOAP.energy)
 
         })
         it('Cant create an event with the same id', async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createEvent(
-                myEvent.id,
-                myEvent.uri,
-                myEvent.perpetual,
-                myEvent.energy
+                myPOAP.id,
+                myPOAP.eventId,
+                myPOAP.uri,
+                myPOAP.perpetual,
+                myPOAP.energy
             )
             await expectRevert(
                 myNFT.createEvent(
-                    myEvent.id,
-                    myEvent2.uri,
-                    myEvent3.perpetual,
-                    myEvent4.energy
+                    myPOAP.id,
+                    myPOAP.eventId,
+                    myPOAP2.uri,
+                    myPOAP3.perpetual,
+                    myPOAP4.energy
                 ),
-                'Tutellus721: event valid'
+                'Tutellus721: poap valid'
             ) 
         })
     })
@@ -212,35 +222,39 @@ describe('721 tokens', function () {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createEvent(
-                myEvent.id,
-                myEvent.uri,
-                myEvent.perpetual,
-                myEvent.energy
+                myPOAP.id,
+                myPOAP.eventId,
+                myPOAP.uri,
+                myPOAP.perpetual,
+                myPOAP.energy
             )
             await myNFT.createEvent(
-                myEvent2.id,
-                myEvent2.uri,
-                myEvent2.perpetual,
-                myEvent2.energy
+                myPOAP2.id,
+                myPOAP2.eventId,
+                myPOAP2.uri,
+                myPOAP2.perpetual,
+                myPOAP2.energy
             )
             await myNFT.createEvent(
-                myEvent3.id,
-                myEvent3.uri,
-                myEvent3.perpetual,
-                myEvent3.energy
+                myPOAP3.id,
+                myPOAP3.eventId,
+                myPOAP3.uri,
+                myPOAP3.perpetual,
+                myPOAP3.energy
             )
             await myNFT.createEvent(
-                myEvent4.id,
-                myEvent4.uri,
-                myEvent4.perpetual,
-                myEvent4.energy
+                myPOAP4.id,
+                myPOAP4.eventId,
+                myPOAP4.uri,
+                myPOAP4.perpetual,
+                myPOAP4.energy
             )
         })
         it('Can mint a perpetual token without energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent.id,
+                myPOAP.id,
                 person,
                 signature,
                 signer
@@ -250,13 +264,13 @@ describe('721 tokens', function () {
                 myNFT.tokenURI(0)
             ]) 
             expect(ownerOf).eq(person)
-            expect(uri).eq(myEvent.uri)
+            expect(uri).eq(myPOAP.uri)
         })
         it('Can mint a perpetual token with energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent2.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP2.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent2.id,
+                myPOAP2.id,
                 person,
                 signature,
                 signer
@@ -268,14 +282,14 @@ describe('721 tokens', function () {
                 myEnergy.balanceOf(person)
             ])
             expect(ownerOf).eq(person)
-            expect(uri).eq(myEvent2.uri)
-            expectEqEth(energyBalance, myEvent2.energy)
+            expect(uri).eq(myPOAP2.uri)
+            expectEqEth(energyBalance, myPOAP2.energy)
         })
         it('Can mint a non-perpetual token without energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent3.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP3.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent3.id,
+                myPOAP3.id,
                 person,
                 signature,
                 signer
@@ -286,13 +300,13 @@ describe('721 tokens', function () {
                 myNFT.tokenURI(0)
             ])
             expect(ownerOf).eq(person)
-            expect(uri).eq(myEvent3.uri)
+            expect(uri).eq(myPOAP3.uri)
         })
         it('Can mint a non-perpetual token with energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent4.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP4.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent4.id,
+                myPOAP4.id,
                 person,
                 signature,
                 signer
@@ -301,18 +315,18 @@ describe('721 tokens', function () {
             const [ownerOf, uri, eventEnergyBalance] = await Promise.all([
                 myNFT.ownerOf(0),
                 myNFT.tokenURI(0),
-                myEnergy.eventBalanceOf(myEvent4.id, person)
+                myEnergy.eventBalanceOf(myPOAP4.eventId, person)
             ])
             expect(ownerOf).eq(person)
-            expect(uri).eq(myEvent4.uri)
-            expectEqEth(eventEnergyBalance, myEvent4.energy)
+            expect(uri).eq(myPOAP4.uri)
+            expectEqEth(eventEnergyBalance, myPOAP4.energy)
         })
         it('Cant mint a token with unauthorized signer', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP.id, person)
             // await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await expectRevert(
                 myNFT.mint(
-                    myEvent.id,
+                    myPOAP.id,
                     person,
                     signature,
                     signer
@@ -321,17 +335,17 @@ describe('721 tokens', function () {
             ) 
         })
         it('Cant mint the same token twice', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent.id,
+                myPOAP.id,
                 person,
                 signature,
                 signer
             )
             await expectRevert(
                 myNFT.mint(
-                    myEvent.id,
+                    myPOAP.id,
                     person,
                     signature,
                     signer
@@ -340,11 +354,11 @@ describe('721 tokens', function () {
             ) 
         })
         it('Cant mint a token with an invalid signature', async () => {
-            const { signature } = await sign721(myNFT, myEvent.id, person)
+            const { signature } = await sign721(myNFT, myPOAP.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, owner)
             await expectRevert(
                 myNFT.mint(
-                    myEvent.id,
+                    myPOAP.id,
                     person,
                     signature,
                     owner
@@ -362,7 +376,7 @@ describe('721 tokens', function () {
                     signature,
                     signer
                 ),
-                'Tutellus721: event not valid'
+                'Tutellus721: poap not valid'
             ) 
         })
     })
@@ -371,35 +385,39 @@ describe('721 tokens', function () {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createEvent(
-                myEvent.id,
-                myEvent.uri,
-                myEvent.perpetual,
-                myEvent.energy
+                myPOAP.id,
+                myPOAP.eventId,
+                myPOAP.uri,
+                myPOAP.perpetual,
+                myPOAP.energy
             )
             await myNFT.createEvent(
-                myEvent2.id,
-                myEvent2.uri,
-                myEvent2.perpetual,
-                myEvent2.energy
+                myPOAP2.id,
+                myPOAP2.eventId,
+                myPOAP2.uri,
+                myPOAP2.perpetual,
+                myPOAP2.energy
             )
             await myNFT.createEvent(
-                myEvent3.id,
-                myEvent3.uri,
-                myEvent3.perpetual,
-                myEvent3.energy
+                myPOAP3.id,
+                myPOAP3.eventId,
+                myPOAP3.uri,
+                myPOAP3.perpetual,
+                myPOAP3.energy
             )
             await myNFT.createEvent(
-                myEvent4.id,
-                myEvent4.uri,
-                myEvent4.perpetual,
-                myEvent4.energy
+                myPOAP4.id,
+                myPOAP4.eventId,
+                myPOAP4.uri,
+                myPOAP4.perpetual,
+                myPOAP4.energy
             )
         })
         it('Can burn a perpetual token without energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent.id,
+                myPOAP.id,
                 person,
                 signature,
                 signer
@@ -411,10 +429,10 @@ describe('721 tokens', function () {
             ) 
         })
         it('Can burn a perpetual token with energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent2.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP2.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent2.id,
+                myPOAP2.id,
                 person,
                 signature,
                 signer
@@ -433,10 +451,10 @@ describe('721 tokens', function () {
             expectEqEth(energyBalance, 0)
         })
         it('Can burn a non-perpetual token without energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent3.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP3.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent3.id,
+                myPOAP3.id,
                 person,
                 signature,
                 signer
@@ -449,10 +467,10 @@ describe('721 tokens', function () {
             ) 
         })
         it('Can burn a non-perpetual token with energy', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent4.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP4.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent4.id,
+                myPOAP4.id,
                 person,
                 signature,
                 signer
@@ -463,15 +481,15 @@ describe('721 tokens', function () {
                 'ERC721: owner query for nonexistent token'
             ) 
             const [eventEnergyBalance] = await Promise.all([
-                myEnergy.eventBalanceOf(myEvent4.id, person)
+                myEnergy.eventBalanceOf(myPOAP4.eventId, person)
             ])
             expectEqEth(eventEnergyBalance, 0)
         })
         it('Cant burn if not admin, approved, owner', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent4.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP4.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent4.id,
+                myPOAP4.id,
                 person,
                 signature,
                 signer
@@ -482,10 +500,10 @@ describe('721 tokens', function () {
             ) 
         })
         it('Can burn if admin', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent4.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP4.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent4.id,
+                myPOAP4.id,
                 person,
                 signature,
                 signer
@@ -497,15 +515,15 @@ describe('721 tokens', function () {
                 'ERC721: owner query for nonexistent token'
             ) 
             const [eventEnergyBalance] = await Promise.all([
-                myEnergy.eventBalanceOf(myEvent4.id, person)
+                myEnergy.eventBalanceOf(myPOAP4.id, person)
             ])
             expectEqEth(eventEnergyBalance, 0)
         })
         it('Can burn if approved', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent4.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP4.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent4.id,
+                myPOAP4.id,
                 person,
                 signature,
                 signer
@@ -517,15 +535,15 @@ describe('721 tokens', function () {
                 'ERC721: owner query for nonexistent token'
             ) 
             const [eventEnergyBalance] = await Promise.all([
-                myEnergy.eventBalanceOf(myEvent4.id, person)
+                myEnergy.eventBalanceOf(myPOAP4.id, person)
             ])
             expectEqEth(eventEnergyBalance, 0)
         })
         it('Cant transfer tokens', async () => {
-            const { signer, signature } = await sign721(myNFT, myEvent4.id, person)
+            const { signer, signature } = await sign721(myNFT, myPOAP4.id, person)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
-                myEvent4.id,
+                myPOAP4.id,
                 person,
                 signature,
                 signer
