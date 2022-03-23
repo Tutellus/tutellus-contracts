@@ -56,9 +56,6 @@ contract TutellusEnergy is ERC20SnapshotVariableAndStatic, UUPSUpgradeableByRole
       address account,
       uint256 amount
     ) public {
-      uint256 balance = balanceOf(account);
-      require(amount <= balance, 'TutellusEnergy: amount exceeds balance');
-      require(balance > 0, 'TutellusEnergy: cant burn 0 tokens');
       uint256 staticBalance = staticBalanceOf[account];
       if (amount > staticBalance) {
         uint256 remainder = amount - staticBalance;
@@ -181,10 +178,4 @@ contract TutellusEnergy is ERC20SnapshotVariableAndStatic, UUPSUpgradeableByRole
 
         return snapshotted ? value + totalSupplyAt(snapshotId) : eventTotalSupply(eventId);
     }
-
-    /**
-     * This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     */
-    uint256[50] private __gap;
   }

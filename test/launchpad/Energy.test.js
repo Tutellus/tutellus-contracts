@@ -187,7 +187,7 @@ describe('Energy Token', function () {
         it('Cant mint 0 tokens', async () => {
             await expectRevert(
                 myEnergy.mint(owner, '0'),
-                'Cant mint 0 tokens'
+                'ERC20SnapshotVariableAndStatic: cant mint 0 tokens'
             ) 
         })
     })
@@ -211,13 +211,13 @@ describe('Energy Token', function () {
         it('Cant mint 0 tokens', async () => {
             await expectRevert(
                 myEnergy.mint(owner, '0'),
-                'Cant mint 0 tokens'
+                'ERC20SnapshotVariableAndStatic: cant mint 0 tokens'
             ) 
         })
         it('Cant mint to zero address', async () => {
             await expectRevert(
                 myEnergy.mint(constants.AddressZero, ONE_ETHER),
-                'TutellusEnergy: mint to the zero address'
+                'ERC20SnapshotVariableAndStatic: mint to the zero address'
             ) 
         })
     })
@@ -264,13 +264,13 @@ describe('Energy Token', function () {
             expectEqEth(balance, 0)
             await expectRevert(
                 myEnergy.burn(owner, 0),
-                'TutellusEnergy: cant burn 0 tokens'
+                'ERC20SnapshotVariableAndStatic: cant burn 0 tokens'
             )
         })
         it('Cant burn more than balance', async () => {
             await expectRevert(
                 myEnergy.burn(owner, ONE_ETHER),
-                'TutellusEnergy: amount exceeds balance'
+                'ERC20VariableUpgradeable: burn amount exceeds balance'
             )
         })
         it('Cant burn all if no balance', async () => {
@@ -278,7 +278,7 @@ describe('Energy Token', function () {
             expectEqEth(balance, 0)
             await expectRevert(
                 myEnergy.burnAll(owner),
-                'TutellusEnergy: cant burn 0 tokens'
+                'ERC20SnapshotVariableAndStatic: cant burn 0 tokens'
             )
         })
     })
@@ -323,7 +323,7 @@ describe('Energy Token', function () {
         it('Cant burn amount that exceeds balance', async () => {
             await expectRevert(
                 myEnergy.burn(owner, ONE_ETHER),
-                'TutellusEnergy: amount exceeds balance'
+                'ERC20VariableUpgradeable: burn amount exceeds balance'
             )
         })
     })
@@ -592,8 +592,7 @@ describe('Energy Token', function () {
 
             await myEnergy.mint(person, TWO_ETHER);
             await myEnergy.mintEvent(eventId, owner, ONE_ETHER);
-            await myEnergy.mintVariable(owner, ONE_ETHER);
-            await myEnergy.mintVariable(person, TWO_ETHER);
+            await myEnergy.transfer(person, ONE_ETHER);
 
             await time.advanceBlock()
 

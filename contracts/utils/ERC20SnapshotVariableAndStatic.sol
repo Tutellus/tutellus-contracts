@@ -7,63 +7,33 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ArraysUpgradeable.sol";
 
 abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
-    function __ERC20SnapshotVariableAndStatic_init(string memory name_, string memory symbol_, uint256 rate_) internal onlyInitializing {
-        __ERC20Variable_init_unchained(name_, symbol_, rate_);
-        __ERC20SnapshotVariableAndStatic_init_unchained();
-    }
-
-    function __ERC20SnapshotVariableAndStatic_init_unchained() internal onlyInitializing {
-    }
-
-    mapping(address=>uint256) public staticBalanceOf;
-    uint256 public staticTotalSupply;
-
+    
     using ArraysUpgradeable for uint256[];
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
-    // Snapshotted values have arrays of ids and the value corresponding to that id. These could be an array of a
-    // Snapshot struct, but that would impede usage of functions that work on an array.
     struct Snapshots {
         uint256[] ids;
         uint256[] values;
     }
 
+    /** ERC20 storage */
+    mapping(address=>uint256) public staticBalanceOf;
+    uint256 public staticTotalSupply;
+
+    /** Snapshot storage */
     mapping(uint256 => uint256) private _snapshotNormalization;
     mapping(address => Snapshots) private _accountBalanceSnapshots;
     Snapshots private _totalSupplySnapshots;
-
-    // Snapshot ids increase monotonically, with the first value being 1. An id of 0 is invalid.
     CountersUpgradeable.Counter private _currentSnapshotId;
 
-    /**
-     * @dev Emitted by {_snapshot} when a snapshot identified by `id` is created.
-     */
+    /** Events */
+
     event Snapshot(uint256 id, uint256 normalization, uint256 totalSupply);
-    
     event MintStatic(address sender, address account, uint256 amount);
     event BurnStatic(address sender, address account, uint256 amount);
 
-    /**
-     * @dev Creates a new snapshot and returns its snapshot id.
-     *
-     * Emits a {Snapshot} event that contains the same id.
-     *
-     * {_snapshot} is `internal` and you have to decide how to expose it externally. Its usage may be restricted to a
-     * set of accounts, for example using {AccessControl}, or it may be open to the public.
-     *
-     * [WARNING]
-     * ====
-     * While an open way of calling {_snapshot} is required for certain trust minimization mechanisms such as forking,
-     * you must consider that it can potentially be used by attackers in two ways.
-     *
-     * First, it can be used to increase the cost of retrieval of values from snapshots, although it will grow
-     * logarithmically thus rendering this attack ineffective in the long term. Second, it can be used to target
-     * specific accounts and increase the cost of ERC20 transfers for them, in the ways specified in the Gas Costs
-     * section above.
-     *
-     * We haven't measured the actual numbers; if this is something you're interested in please reach out to us.
-     * ====
-     */
+    /** Snapshot methods */
+
     function _snapshot() internal virtual returns (uint256) {
         _currentSnapshotId.increment();
         uint256 currentId = _getCurrentSnapshotId();
@@ -78,61 +48,20 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
         return currentId;
     }
 
-    /**
-     * @dev Get the current snapshotId
-     */
     function _getCurrentSnapshotId() internal view virtual returns (uint256) {
         return _currentSnapshotId.current();
     }
 
-    function balanceOf (
-      address account
-    ) public view override returns (uint256) {
-      return super.balanceOf(account) + staticBalanceOf[account];
-    }
-
-    function totalSupply () public view override returns (uint256) {
-      return super.totalSupply() + staticTotalSupply;
-    }
-
-    /**
-     * @dev Retrieves the balance of `account` at the time `snapshotId` was created.
-     */
     function balanceOfAt(address account, uint256 snapshotId) public view virtual returns (uint256) {
         (bool snapshotted, uint256 value) = _valueAt(snapshotId, _accountBalanceSnapshots[account]);
 
         return snapshotted ? value : balanceOf(account);
     }
 
-    /**
-     * @dev Retrieves the total supply at the time `snapshotId` was created.
-     */
     function totalSupplyAt(uint256 snapshotId) public view virtual returns (uint256) {
         (bool snapshotted, uint256 value) = _valueAt(snapshotId, _totalSupplySnapshots);
 
         return snapshotted ? value : totalSupply();
-    }
-
-    // Update balance and/or total supply snapshots before the values are modified. This is implemented
-    // in the _beforeTokenTransfer hook, which is executed for _mint, _burn, and _transfer operations.
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override {
-        super._beforeTokenTransfer(from, to, amount);
-
-        if (from == address(0)) {
-            // mint
-            _updateAccountSnapshot(to);
-        } else if (to == address(0)) {
-            // burn
-            _updateAccountSnapshot(from);
-        } else {
-            // transfer
-            _updateAccountSnapshot(from);
-            _updateAccountSnapshot(to);
-        }
     }
 
     function _valueAt(uint256 snapshotId, Snapshots storage snapshots) internal view returns (bool, uint256) {
@@ -187,19 +116,21 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
         }
     }
 
+    /** ERC20 methods */
+
     function _mintStatic (
       address account,
       uint256 amount
     ) internal {
-      require(account != address(0), "TutellusEnergy: mint to the zero address");
+      require(account != address(0), "ERC20SnapshotVariableAndStatic: mint to the zero address");
       _beforeTokenTransfer(address(0), account, amount);
 
-      require(amount != 0, 'Cant mint 0 tokens');
+      require(amount > 0, "ERC20SnapshotVariableAndStatic: cant mint 0 tokens");
 
       staticTotalSupply += amount;
       staticBalanceOf[account] += amount;
       emit Transfer(address(0), account, amount);
-    //   emit Mint(msg.sender, account, amount);
+      // emit Mint(msg.sender, account, amount);
       emit MintStatic(msg.sender, account, amount);
 
       _afterTokenTransfer(address(0), account, amount);
@@ -209,28 +140,62 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
       address account,
       uint256 amount
     ) internal {
-      require(account != address(0), "TutellusEnergy: burn from the zero address");
+      require(account != address(0), "ERC20SnapshotVariableAndStatic: burn from the zero address");
 
       _beforeTokenTransfer(account, address(0), amount);
 
       uint256 accountBalance = staticBalanceOf[account];
-      require(accountBalance >= amount, "TutellusEnergy: burn amount exceeds balance");
+      require(accountBalance >= amount, "ERC20SnapshotVariableAndStatic: burn amount exceeds balance");
+      require(amount > 0, "ERC20SnapshotVariableAndStatic: cant burn 0 tokens");
       unchecked {
           staticBalanceOf[account] = accountBalance - amount;
       }
       staticTotalSupply -= amount;
 
       emit Transfer(account, address(0), amount);
-    //   emit Burn(msg.sender, account, amount);
+      // emit Burn(msg.sender, account, amount);
       emit BurnStatic(msg.sender, account, amount);
 
       _afterTokenTransfer(account, address(0), amount);
     }
 
-    /**
-     * This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[46] private __gap;
+    function balanceOf (
+      address account
+    ) public view override returns (uint256) {
+      return super.balanceOf(account) + staticBalanceOf[account];
+    }
+
+    function totalSupply () public view override returns (uint256) {
+      return super.totalSupply() + staticTotalSupply;
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal virtual override {
+        super._beforeTokenTransfer(from, to, amount);
+
+        if (from == address(0)) {
+            // mint
+            _updateAccountSnapshot(to);
+        } else if (to == address(0)) {
+            // burn
+            _updateAccountSnapshot(from);
+        } else {
+            // transfer
+            _updateAccountSnapshot(from);
+            _updateAccountSnapshot(to);
+        }
+    }
+
+    /** Setup */
+
+    function __ERC20SnapshotVariableAndStatic_init(string memory name_, string memory symbol_, uint256 rate_) internal onlyInitializing {
+        __ERC20Variable_init_unchained(name_, symbol_, rate_);
+        __ERC20SnapshotVariableAndStatic_init_unchained();
+    }
+
+    function __ERC20SnapshotVariableAndStatic_init_unchained() internal onlyInitializing {
+    }
 }
