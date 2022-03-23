@@ -312,18 +312,22 @@ describe('Energy Token', function () {
             const balance = await myEnergy.balanceOf(owner)
             expectEqEth(balance, 0)
         })
-
-        // it('Cant burn energy to the zero address', async () => {
-        //     await expectRevert(
-        //         myEnergy.burn(constants.AddressZero, ONE_ETHER),
-        //         'TutellusEnergy: burn from the zero address'
-        //     )
-        // })
-
         it('Cant burn amount that exceeds balance', async () => {
             await expectRevert(
                 myEnergy.burn(owner, ONE_ETHER),
                 'ERC20VariableUpgradeable: burn amount exceeds balance'
+            )
+        })
+        it('Cant burn amount that exceeds balance static', async () => {
+            await expectRevert(
+                myEnergy.burnStatic(owner, ONE_ETHER),
+                'ERC20SnapshotVariableAndStatic: burn amount exceeds balance'
+            )
+        })
+        it('Cant burn from zero address', async () => {
+            await expectRevert(
+                myEnergy.burnStatic(constants.AddressZero, ONE_ETHER),
+                'ERC20SnapshotVariableAndStatic: burn from the zero address'
             )
         })
     })
