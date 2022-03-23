@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import '../utils/UUPSUpgradeableByRole.sol';
-import '../utils/ERC20VariableSnapshotUpgradeable.sol';
+import '../utils/ERC20SnapshotVariableAndStatic.sol';
 
 /**
  * @title TutellusEnergy
@@ -10,14 +10,11 @@ import '../utils/ERC20VariableSnapshotUpgradeable.sol';
  * @author Tutellus 
  **/
 
-contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRole {
+contract TutellusEnergy is ERC20SnapshotVariableAndStatic, UUPSUpgradeableByRole {
 
     bytes32 private constant _ENERGY_MANAGER_ROLE = keccak256('ENERGY_MANAGER_ROLE');
     bytes32 private constant _ENERGY_MINTER_ROLE = keccak256('ENERGY_MINTER_ROLE');
     bytes32 private constant _SNAPSHOT_ROLE = keccak256('SNAPSHOT_ROLE');
-
-    mapping(address=>uint256) public staticBalanceOf;
-    uint256 public staticTotalSupply;
 
     mapping(bytes32=>mapping(address=>uint256)) private _eventBalanceOf;
     mapping(bytes32=>uint256) private _eventTotalSupply;
@@ -30,7 +27,7 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
 
     function initialize (
     ) public initializer {
-      __ERC20VariableSnapshot_init('Tutellus Energy', 'eTUT',  1e25); // 0.01 RAY = 1% yearly default
+      __ERC20SnapshotVariableAndStatic_init('Tutellus Energy', 'eTUT',  1e25); // 0.01 RAY = 1% yearly default
       __AccessControlProxyPausable_init(msg.sender);
     }
 
@@ -52,24 +49,40 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
       address account,
       uint256 amount
     ) public {
-      mintVariable(account, amount);
+      mintStatic(account, amount);
     }
 
     function burn (
       address account,
       uint256 amount
     ) public {
-      require(amount <= balanceOf(account), 'TutellusEnergy: amount exceeds balance');
-      uint256 variableBalance = super.balanceOf(account); 
-      if (amount > variableBalance) {
-        uint256 remainder = amount - variableBalance;
-        burnStatic(account, remainder);
-        if (variableBalance > 0) {
-          burnVariable(account, variableBalance);
+      uint256 balance = balanceOf(account);
+      require(amount <= balance, 'TutellusEnergy: amount exceeds balance');
+      require(balance > 0, 'TutellusEnergy: cant burn 0 tokens');
+      uint256 staticBalance = staticBalanceOf[account];
+      if (amount > staticBalance) {
+        uint256 remainder = amount - staticBalance;
+        burnVariable(account, remainder);
+        if (staticBalance > 0) {
+          burnStatic(account, staticBalance);
         }
       } else {
-        burnVariable(account, amount);
+        burnStatic(account, amount);
       }
+    }
+
+    function mintStatic (
+      address account,
+      uint256 amount
+    ) public {
+      _mintStatic(account, amount);
+    }
+
+    function burnStatic (
+      address account,
+      uint256 amount
+    ) public {
+      _burnStatic(account, amount);
     }
 
     function burnAll (
@@ -99,8 +112,8 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
     ) public {
       require(account != address(0), "TutellusEnergy: mint to the zero address");
 
-      _updateSnapshot(_eventBalanceOfSnapshots[eventId][account], eventBalanceOf(eventId, account));
-      _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
+      _updateSnapshot(_eventBalanceOfSnapshots[eventId][account], _eventBalanceOf[eventId][account]);
+      _updateSnapshot(_eventTotalSupplySnapshots[eventId], _eventTotalSupply[eventId]);
 
       require(amount != 0, 'Cant mint 0 tokens');
 
@@ -117,8 +130,8 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
     ) public {
       require(account != address(0), "TutellusEnergy: burn from the zero address");
 
-      _updateSnapshot(_eventBalanceOfSnapshots[eventId][account], eventBalanceOf(eventId, account));
-      _updateSnapshot(_eventTotalSupplySnapshots[eventId], eventTotalSupply(eventId));
+      _updateSnapshot(_eventBalanceOfSnapshots[eventId][account], _eventBalanceOf[eventId][account]);
+      _updateSnapshot(_eventTotalSupplySnapshots[eventId], _eventTotalSupply[eventId]);
 
       require(amount != 0, 'Cant burn 0 tokens');
 
@@ -143,50 +156,6 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function mintStatic (
-      address account,
-      uint256 amount
-    ) public {
-      require(account != address(0), "TutellusEnergy: mint to the zero address");
-      _beforeTokenTransfer(address(0), account, amount);
-
-      require(amount != 0, 'Cant mint 0 tokens');
-
-      staticTotalSupply += amount;
-      staticBalanceOf[account] += amount;
-      emit Transfer(address(0), account, amount);
-      emit Mint(msg.sender, account, amount);
-
-      _afterTokenTransfer(address(0), account, amount);
-    }
-
-    function burnStatic (
-      address account,
-      uint256 amount
-    ) public {
-      require(account != address(0), "TutellusEnergy: burn from the zero address");
-
-      _beforeTokenTransfer(account, address(0), amount);
-
-      uint256 accountBalance = staticBalanceOf[account];
-      require(accountBalance >= amount, "TutellusEnergy: burn amount exceeds balance");
-      unchecked {
-          staticBalanceOf[account] = accountBalance - amount;
-      }
-      staticTotalSupply -= amount;
-
-      emit Transfer(account, address(0), amount);
-      emit Burn(msg.sender, account, amount);
-
-      _afterTokenTransfer(account, address(0), amount);
-    }
-
-    function balanceOf (
-      address account
-    ) public view override returns (uint256) {
-      return super.balanceOf(account) + staticBalanceOf[account];
-    }
-
     function eventBalanceOf (
       bytes32 eventId,
       address account
@@ -195,13 +164,10 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
     }
 
     function eventBalanceOfAt(bytes32 eventId, address account, uint256 snapshotId) public view virtual returns (uint256) {
-        (bool snapshotted, uint256 value) = _valueAt(snapshotId, _eventBalanceOfSnapshots[eventId][account]);
 
-        return snapshotted ? value : eventBalanceOf(eventId, account);
-    }
+      (bool snapshotted, uint256 value) = _valueAt(snapshotId, _eventBalanceOfSnapshots[eventId][account]);
 
-    function totalSupply () public view override returns (uint256) {
-      return super.totalSupply() + staticTotalSupply;
+      return snapshotted ? value + balanceOfAt(account, snapshotId) : eventBalanceOf(eventId, account);
     }
 
     function eventTotalSupply (
@@ -213,7 +179,7 @@ contract TutellusEnergy is ERC20VariableSnapshotUpgradeable, UUPSUpgradeableByRo
     function eventTotalSupplyAt(bytes32 eventId, uint256 snapshotId) public view virtual returns (uint256) {
         (bool snapshotted, uint256 value) = _valueAt(snapshotId, _eventTotalSupplySnapshots[eventId]);
 
-        return snapshotted ? value : eventTotalSupply(eventId);
+        return snapshotted ? value + totalSupplyAt(snapshotId) : eventTotalSupply(eventId);
     }
 
     /**

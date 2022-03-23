@@ -72,12 +72,20 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
     }
 
     function scale(uint256 amount) public view returns (uint256) {
-      return amount.rayDiv(_getNormalization());
+      return _scaleTo(amount, _getNormalization());
     }
 
     function unscale(uint256 amount) public view returns (uint256) {
-      return amount.rayMul(_getNormalization());
-    } 
+      return _unscaleTo(amount, _getNormalization());
+    }
+
+    function _scaleTo(uint256 amount, uint256 normalization) internal pure returns (uint256) {
+        return amount.rayDiv(normalization);
+    }
+
+    function _unscaleTo(uint256 amount, uint256 normalization) internal pure returns (uint256) {
+        return amount.rayMul(normalization);
+    }
 
     function _getNormalization() internal view returns (uint256) {
       uint40 timestamp = lastUpdateTimestamp;

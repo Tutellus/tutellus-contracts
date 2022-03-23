@@ -137,7 +137,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     user.energyDebt += energyInterface.scale(energyMinted);
 
     ITutellusFactionManager(msg.sender).depositFrom(account, amount);
-    energyInterface.mint(account, energyMinted);
+    energyInterface.mintVariable(account, energyMinted);
 
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -161,7 +161,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     require(energyBurned <= energyBalance, 'TutellusLaunchpadStaking: need more energy to unstake');
 
     user.energyDebt -= energyShare;
-    energyInterface.burn(account, energyBurned);
+    energyInterface.burnVariable(account, energyBurned);
 
     _updateRewards(account);
 

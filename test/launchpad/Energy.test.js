@@ -158,7 +158,7 @@ describe('Energy Token', function () {
         it('Minting tokens, checking supply after time', async () => {
 
             const rate = await myEnergy.rate()
-            await myEnergy.mint(owner, ONE_ETHER)
+            await myEnergy.mintVariable(owner, ONE_ETHER)
 
             const balance0 = await myEnergy.balanceOf(owner);
             
@@ -191,7 +191,7 @@ describe('Energy Token', function () {
             ) 
         })
     })
-    describe('MintStatic', () => {
+    describe('Mint Static', () => {
         beforeEach(async () => {
             const Energy = await ethers.getContractFactory('TutellusEnergy')
             let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
@@ -203,25 +203,25 @@ describe('Energy Token', function () {
             await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
         })
         it('Minting tokens', async () => {
-            await myEnergy.mintStatic(owner, ONE_ETHER)
+            await myEnergy.mint(owner, ONE_ETHER)
             const balance = await myEnergy.balanceOf(owner)
             expectEqEth(balance, ONE_ETHER)
 
         })
         it('Cant mint 0 tokens', async () => {
             await expectRevert(
-                myEnergy.mintStatic(owner, '0'),
+                myEnergy.mint(owner, '0'),
                 'Cant mint 0 tokens'
             ) 
         })
         it('Cant mint to zero address', async () => {
             await expectRevert(
-                myEnergy.mintStatic(constants.AddressZero, ONE_ETHER),
+                myEnergy.mint(constants.AddressZero, ONE_ETHER),
                 'TutellusEnergy: mint to the zero address'
             ) 
         })
     })
-    describe('Burn', () => {
+    describe('Burn variable', () => {
         beforeEach(async () => {
             const Energy = await ethers.getContractFactory('TutellusEnergy')
             let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
@@ -235,7 +235,7 @@ describe('Energy Token', function () {
         it('Burning tokens after minting', async () => {
 
             const rate = await myEnergy.rate()
-            await myEnergy.mint(owner, ONE_ETHER)
+            await myEnergy.mintVariable(owner, ONE_ETHER)
 
             const balance0 = await myEnergy.totalSupply()
             
@@ -264,7 +264,7 @@ describe('Energy Token', function () {
             expectEqEth(balance, 0)
             await expectRevert(
                 myEnergy.burn(owner, 0),
-                'Cant burn 0 tokens'
+                'TutellusEnergy: cant burn 0 tokens'
             )
         })
         it('Cant burn more than balance', async () => {
@@ -278,11 +278,11 @@ describe('Energy Token', function () {
             expectEqEth(balance, 0)
             await expectRevert(
                 myEnergy.burnAll(owner),
-                'Cant burn 0 tokens'
+                'TutellusEnergy: cant burn 0 tokens'
             )
         })
     })
-    describe('BurnStatic', () => {
+    describe('Burn Static', () => {
         beforeEach(async () => {
             const Energy = await ethers.getContractFactory('TutellusEnergy')
             let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
@@ -294,36 +294,36 @@ describe('Energy Token', function () {
             await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
         })
         it('Burning tokens after minting', async () => {
-            await myEnergy.mintStatic(owner, ONE_ETHER)
+            await myEnergy.mint(owner, ONE_ETHER)
             await myEnergy.burn(owner, ONE_ETHER)
             const balance = await myEnergy.balanceOf(owner)
             expectEqEth(balance, 0)
         })
         it('Burning all', async () => {
-            await myEnergy.mintStatic(owner, ONE_ETHER)
+            await myEnergy.mint(owner, ONE_ETHER)
             await myEnergy.burnAll(owner)
             const balance = await myEnergy.balanceOf(owner)
             expectEqEth(balance, 0)
         })
         it('Burning all with variable', async () => {
+            await myEnergy.mintVariable(owner, ONE_ETHER)
             await myEnergy.mint(owner, ONE_ETHER)
-            await myEnergy.mintStatic(owner, ONE_ETHER)
             await myEnergy.burnAll(owner)
             const balance = await myEnergy.balanceOf(owner)
             expectEqEth(balance, 0)
         })
 
-        it('Cant burn energy to the zero address', async () => {
-            await expectRevert(
-                myEnergy.burnStatic(constants.AddressZero, ONE_ETHER),
-                'TutellusEnergy: burn from the zero address'
-            )
-        })
+        // it('Cant burn energy to the zero address', async () => {
+        //     await expectRevert(
+        //         myEnergy.burn(constants.AddressZero, ONE_ETHER),
+        //         'TutellusEnergy: burn from the zero address'
+        //     )
+        // })
 
         it('Cant burn amount that exceeds balance', async () => {
             await expectRevert(
-                myEnergy.burnStatic(owner, ONE_ETHER),
-                'TutellusEnergy: burn amount exceeds balance'
+                myEnergy.burn(owner, ONE_ETHER),
+                'TutellusEnergy: amount exceeds balance'
             )
         })
     })
@@ -350,7 +350,7 @@ describe('Energy Token', function () {
 
             expectEqEth(nullSupply, 0)
 
-            await myEnergy.mint(owner, ONE_ETHER)
+            await myEnergy.mintVariable(owner, ONE_ETHER)
             const SECONDS = 1
 
             const balance0 = await myEnergy.totalSupply()
@@ -378,7 +378,7 @@ describe('Energy Token', function () {
         })
         it('Scale supply', async () => {
 
-            await myEnergy.mint(owner, ONE_ETHER)                                
+            await myEnergy.mintVariable(owner, ONE_ETHER)                                
             await time.advanceBlock()
             
             const [scaledTotalSupply, totalSupply] = await Promise.all([
@@ -391,7 +391,7 @@ describe('Energy Token', function () {
         })
         it('Unscale scaled supply', async () => {
 
-            await myEnergy.mint(owner, ONE_ETHER)                                
+            await myEnergy.mintVariable(owner, ONE_ETHER)                                
             await time.advanceBlock()
             
             const [scaledTotalSupply, totalSupply] = await Promise.all([
@@ -429,9 +429,9 @@ describe('Energy Token', function () {
         })
         it('Minting multiple energies for event (check variable)', async () => {
             const rate = await myEnergy.rate()
-            await myEnergy.mintStatic(owner, ONE_ETHER)
-            await myEnergy.mintEvent(eventId, owner, ONE_ETHER)
             await myEnergy.mint(owner, ONE_ETHER)
+            await myEnergy.mintEvent(eventId, owner, ONE_ETHER)
+            await myEnergy.mintVariable(owner, ONE_ETHER)
             await advanceBlockInSeconds(SECONDS_PER_YEAR)
 
             const balance = await myEnergy.eventBalanceOf(eventId, owner)
