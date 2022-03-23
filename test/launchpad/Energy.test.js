@@ -484,6 +484,22 @@ describe('Energy Token', function () {
             await myManager.grantRole(ENERGY_MANAGER_ROLE, owner)
             await myManager.grantRole(SNAPSHOT_ROLE, owner)
         })
+        it('Can read variable snapshots correctly', async () => {
+            await myEnergy.mintVariable(owner, ONE_ETHER);
+            await myEnergy.mintVariable(person, TWO_ETHER);
+
+            await myEnergy.snapshot();
+
+            await myEnergy.mintVariable(owner, ONE_ETHER);
+            await myEnergy.mintVariable(person, TWO_ETHER);
+
+            await time.advanceBlock()
+
+            const totalSupply1 = await myEnergy.totalSupplyAt(1);
+            const ownerBalance1 = await myEnergy.balanceOfAt(owner, 1);
+            const personBalance1 = await myEnergy.balanceOfAt(person, 1);
+            expect(totalSupply1.eq(ownerBalance1.add(personBalance1))).eq(true)
+        })
         it('Can read snapshot for event balance of (check snapshot)', async () => {
             await myEnergy.mintEvent(eventId, owner, ONE_ETHER) // In 1 will have 1
             await myEnergy.snapshot()
@@ -565,6 +581,29 @@ describe('Energy Token', function () {
             expectEqEth(balancePerson21, 0)
             expectEqEth(balancePerson12, TWO_ETHER)
             expectEqEth(balancePerson22, ONE_ETHER)
+        })
+        it('Can read variable, static and event snapshots correctly', async () => {
+            await myEnergy.mint(owner, ONE_ETHER);
+            await myEnergy.mintEvent(eventId, person, ONE_ETHER);
+            await myEnergy.mintVariable(owner, ONE_ETHER);
+            await myEnergy.mintVariable(person, TWO_ETHER);
+
+            await myEnergy.snapshot();
+
+            await myEnergy.mint(person, TWO_ETHER);
+            await myEnergy.mintEvent(eventId, owner, ONE_ETHER);
+            await myEnergy.mintVariable(owner, ONE_ETHER);
+            await myEnergy.mintVariable(person, TWO_ETHER);
+
+            await time.advanceBlock()
+
+            const totalSupply1 = await myEnergy.totalSupplyAt(1);
+            const ownerBalance1 = await myEnergy.balanceOfAt(owner, 1);
+            const personBalance1 = await myEnergy.balanceOfAt(person, 1);
+            const eventSupply = await myEnergy.eventTotalSupplyAt(eventId, 1);
+
+            expect(totalSupply1.eq(ownerBalance1.add(personBalance1))).eq(true);
+            expect(eventSupply.eq(ONE_ETHER.add(totalSupply1))).eq(true)
         })
     })
 })
