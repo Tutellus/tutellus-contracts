@@ -170,8 +170,8 @@ describe('721 tokens', function () {
         myNFT = await NFT.at(nft)
     })
 
-    describe('Create event', () => {
-        it('Can create a new event', async () => {
+    describe('Create poap', () => {
+        it('Can create a new poap', async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
@@ -195,7 +195,7 @@ describe('721 tokens', function () {
             expectEqEth(energy, myPOAP.energy)
 
         })
-        it('Cant create an event with the same id', async () => {
+        it('Cant create an poap with the same id', async () => {
             await myManager.grantRole(ADMIN_721_ROLE, owner)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
@@ -351,6 +351,20 @@ describe('721 tokens', function () {
                     signer
                 ),
                 'Tutellus721: already signed'
+            ) 
+        })
+        it('Cant mint if disabled', async () => {
+            const { signer, signature } = await sign721(myNFT, myPOAP.id, person)
+            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myNFT.setValid(myPOAP.id, false);
+            await expectRevert(
+                myNFT.mint(
+                    myPOAP.id,
+                    person,
+                    signature,
+                    signer
+                ),
+                'Tutellus721: poap not valid'
             ) 
         })
         it('Cant mint a token with an invalid signature', async () => {

@@ -16,7 +16,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
     bytes32 public constant _AUTH_NFT_SIGNER = keccak256('AUTH_NFT_SIGNER');
     bytes32 private immutable _NEW_NFT_TYPEHASH = keccak256('Mint(bytes32 poapId,address account)');
     bytes32 private immutable _ENERGY = keccak256('ENERGY');
-    bytes32 private immutable _IDO = keccak256('IDO');
+    // bytes32 private immutable _IDO = keccak256('IDO');
 
     struct POAP {
         bytes32 eventId;
@@ -26,7 +26,7 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         uint256 energy;
     }
 
-    /** Event mappings */
+    /** POAP mappings */
     mapping(bytes32=>POAP) public poaps;
     mapping(uint256=>bytes32) public poapOf;
 
@@ -48,6 +48,13 @@ contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC7
         require(!poaps[poapId].valid, 'Tutellus721: poap valid');
         poaps[poapId] = POAP(eventId, uri, true, perpetual, energy);
         emit CreatePOAP(poapId, eventId, uri, perpetual, energy);
+    }
+
+    function setValid (
+        bytes32 poapId,
+        bool value
+    ) public onlyRole(_ADMIN_721_ROLE) {
+        poaps[poapId].valid = value;
     }
 
     function mint (
