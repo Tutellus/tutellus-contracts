@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
-import "../interfaces/ITutellusERC20.sol";
-import "../interfaces/ITutellusEnergy.sol";
-import "../interfaces/ITutellusRewardsVaultV2.sol";
-import "../interfaces/ITutellusManager.sol";
+import '../interfaces/ITutellusERC20.sol';
+import '../interfaces/ITutellusEnergy.sol';
+import '../interfaces/ITutellusRewardsVaultV2.sol';
+import '../interfaces/ITutellusManager.sol';
+import '../interfaces/ITutellusFactionManager.sol';
 import '../utils/UUPSUpgradeableByRole.sol';
 
 contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
-  bytes32 public constant FACTION_MANAGER_ROLE = keccak256("FACTION_MANAGER_ROLE");
-  bytes32 public constant LAUNCHPAD_ADMIN_ROLE = keccak256("LAUNCHPAD_ADMIN_ROLE");
-  bytes32 public constant LAUNCHPAD_REWARDS = keccak256("LAUNCHPAD_REWARDS");
+  bytes32 public constant LAUNCHPAD_ADMIN_ROLE = keccak256('LAUNCHPAD_ADMIN_ROLE');
+  bytes32 public constant LAUNCHPAD_REWARDS = keccak256('LAUNCHPAD_REWARDS');
 
   bool public autoreward;
 
@@ -57,6 +57,11 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   event SetFees(uint256 minFee, uint256 maxFee, uint feeInterval);
   event Migrate(address from, address to, address account, uint256 amount, bytes response);
 
+  modifier onlyFactionManager {
+    require(msg.sender == ITutellusManager(config).get(keccak256('FACTION_MANAGER')), 'TutellusLaunchpadStaking: only faction manager');
+    _;
+  }
+
   function initialize (address tkn) public initializer {
     __AccessControlProxyPausable_init(msg.sender);
     // minFee = 1e17;
@@ -75,7 +80,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   modifier update() {
-    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("LAUNCHPAD_REWARDS")));
+    ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(LAUNCHPAD_REWARDS));
     uint256 released = rewardsInterface.released(address(this)) - _released;
     _released += released;
     if(balance > 0) {
@@ -95,8 +100,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
   // Sets maximum and minimum fees, and fees interval
   function setFees(uint256 minFee_, uint256 maxFee_, uint feeInterval_) public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
-    require(minFee_ <= maxFee_, "TutellusLaunchpadStaking: mininum fee must be greater or equal than maximum fee");
-    require(maxFee_ <= 100 ether, "TutellusLaunchpadStaking: maxFee cannot exceed 100 ether");
+    require(minFee_ <= maxFee_, 'TutellusLaunchpadStaking: mininum fee must be greater or equal than maximum fee');
+    require(maxFee_ <= 100 ether, 'TutellusLaunchpadStaking: maxFee cannot exceed 100 ether');
     minFee = minFee_;
     maxFee = maxFee_;
     feeInterval = feeInterval_;
@@ -104,10 +109,9 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   // Deposits tokens for staking
-  function deposit(address account, uint256 amount) public update onlyRole(FACTION_MANAGER_ROLE) {
-    require(amount > 0, "TutellusLaunchpadStaking: amount must be over zero");
+  function deposit(address account, uint256 amount) public update onlyFactionManager {
+    require(amount > 0, 'TutellusLaunchpadStaking: amount must be over zero');
 
-    ITutellusERC20 tokenInterface = ITutellusERC20(token);
     ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
 
     Data storage user = data[account];
@@ -132,8 +136,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     uint256 energyMinted = amount * energyMultiplier / 1 ether;
     user.energyDebt += energyInterface.scale(energyMinted);
 
-    tokenInterface.transferFrom(account, address(this), amount);
-    energyInterface.mint(account, energyMinted);
+    ITutellusFactionManager(msg.sender).depositFrom(account, amount);
+    energyInterface.mintVariable(account, energyMinted);
 
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
@@ -141,11 +145,11 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   // Withdraws tokens from staking
-  function withdraw(address account, uint256 amount) public update onlyRole(FACTION_MANAGER_ROLE) returns (uint256) {
-    require(amount > 0, "TutellusLaunchpadStaking: amount must be over zero");
+  function withdraw(address account, uint256 amount) public update onlyFactionManager returns (uint256) {
+    require(amount > 0, 'TutellusLaunchpadStaking: amount must be over zero');
     Data storage user = data[account];
 
-    require(amount <= user.amount, "TutellusLaunchpadStaking: user has not enough staking balance");
+    require(amount <= user.amount, 'TutellusLaunchpadStaking: user has not enough staking balance');
 
     ITutellusERC20 tokenInterface = ITutellusERC20(token);
     ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
@@ -154,10 +158,10 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     uint256 energyBurned = energyInterface.unscale(energyShare);
     uint256 energyBalance = energyInterface.balanceOf(account);
 
-    require(energyBurned <= energyBalance, "TutellusLaunchpadStaking: need more energy to unstake");
+    require(energyBurned <= energyBalance, 'TutellusLaunchpadStaking: need more energy to unstake');
 
     user.energyDebt -= energyShare;
-    energyInterface.burn(account, energyBurned);
+    energyInterface.burnVariable(account, energyBurned);
 
     _updateRewards(account);
 
@@ -194,7 +198,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
     _updateRewards(account);
 
-    require(user.notClaimed > 0, "TutellusLaunchpadStaking: nothing to claim");
+    require(user.notClaimed > 0, 'TutellusLaunchpadStaking: nothing to claim');
 
     _reward(account);
 
@@ -240,7 +244,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
       Data memory user = data[account];
       uint256 rewards = user.notClaimed;
       if(balance > 0){
-        ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(keccak256("LAUNCHPAD_REWARDS")));
+        ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(ITutellusManager(config).get(LAUNCHPAD_REWARDS));
         uint256 released = rewardsInterface.released(address(this)) - _released;
         uint256 total = (released * 1 ether / balance);
         rewards += (accRewardsPerShare - user.rewardDebt + total) * user.amount / 1 ether;

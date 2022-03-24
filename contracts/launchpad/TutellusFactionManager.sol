@@ -4,10 +4,12 @@ pragma solidity ^0.8.9;
 import '../utils/UUPSUpgradeableByRole.sol';
 import '../interfaces/ITutellusLaunchpadStaking.sol';
 import '../interfaces/ITutellusFactionManager.sol';
+import '../interfaces/ITutellusERC20.sol';
+import '../interfaces/ITutellusManager.sol';
 
 contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRole {
 
-    bytes32 public constant FACTIONS_ADMIN_ROLE = keccak256('FACTIONS_ADMIN_ROLE');
+    bytes32 public constant _FACTIONS_ADMIN_ROLE = keccak256('FACTIONS_ADMIN_ROLE');
 
     struct Faction {
         address stakingContract;
@@ -17,6 +19,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
     mapping(bytes32=>Faction) public faction;
     mapping(address=>bytes32) public factionOf;
     mapping(address=>address) public authorized;
+    mapping(address=>bool) public isFactionContract;
 
     modifier isAuthorized (address account) {
         require(msg.sender == account || authorized[account] == msg.sender, 'TutellusFactionManager: account not authorized');
@@ -50,8 +53,10 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         authorized[msg.sender] = account;
     }
 
-    function updateFaction (bytes32 id, address stakingContract, address farmingContract) public onlyRole(FACTIONS_ADMIN_ROLE) {
+    function updateFaction (bytes32 id, address stakingContract, address farmingContract) public onlyRole(_FACTIONS_ADMIN_ROLE) {
         faction[id] = Faction(stakingContract, farmingContract);
+        isFactionContract[stakingContract] = true;
+        isFactionContract[farmingContract] = true;
     }
 
     function stake (bytes32 id, address account, uint256 amount) public isAuthorized(account) checkFaction(id, account) {
@@ -107,6 +112,12 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit FactionOut(id, account);
         emit FactionIn(to, account);
         emit Migrate(id, to, account);
+    }
+
+    function depositFrom (address account, uint256 amount) public {
+        require(isFactionContract[msg.sender], 'TutellusFactionManager: deposit only callable by faction contract');
+        ITutellusERC20 tokenInterace = ITutellusERC20(ITutellusManager(config).get(keccak256('ERC20')));
+        tokenInterace.transferFrom(account, msg.sender, amount);
     }
 
     function initialize () public initializer {

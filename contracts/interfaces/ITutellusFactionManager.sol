@@ -14,9 +14,9 @@ interface ITutellusFactionManager {
 
   event Migrate(bytes32 id, bytes32 to, address account);
 
-  function FACTIONS_ADMIN_ROLE (  ) external view returns ( bytes32 );
   function authorize ( address account ) external;
   function authorized ( address ) external view returns ( address );
+  function depositFrom ( address account, uint256 amount ) external;
   function faction ( bytes32 ) external view returns ( address stakingContract, address farmingContract );
   function factionOf ( address ) external view returns ( bytes32 );
   function migrateFaction ( address account, bytes32 to ) external;

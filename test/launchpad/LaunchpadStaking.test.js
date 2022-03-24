@@ -1,12 +1,13 @@
 const { artifacts, ethers } = require('hardhat')
+// const { expect } = require('chai');
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const { expectRevert, time, expectEvent } = require('@openzeppelin/test-helpers')
 const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
 const { formatEther, parseEther } = require('ethers/lib/utils')
-const { BigNumber } = require('ethers')
-const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('./utils')
+const { BigNumber, constants } = require('ethers')
+const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('../utils')
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
 const Manager = artifacts.require('TutellusManager')
@@ -21,16 +22,19 @@ let myRewardsVault
 let myHoldersVault
 let myTreasuryVault
 let myManager
+let myFactionManager
 let myEnergy
 let owner, person
 let myLaunchpadStaking
+let myLaunchpadFarming
 let myRewardsVaultV2
 
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const ENERGY_MANAGER_ROLE = ethers.utils.id('ENERGY_MANAGER_ROLE')
 const REWARDS_MANAGER_ROLE = ethers.utils.id('REWARDS_MANAGER_ROLE')
 const LAUNCHPAD_ADMIN_ROLE = ethers.utils.id('LAUNCHPAD_ADMIN_ROLE')
-const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
+const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
+const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
 const REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 const ENERGY_ID = ethers.utils.id('ENERGY');
@@ -39,6 +43,8 @@ const TWO_ETHER = parseEther('2')
 const SIX_ETHER = parseEther('6')
 const RAY = parseEther('1000000000')
 const NAKAMOTOS_STAKING_ID = ethers.utils.id('NAKAMOTOS_STAKING')
+const NAKAMOTOS_FARMING_ID = ethers.utils.id('NAKAMOTOS_FARMING')
+const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
 
 const SECONDS = 1
 const SECONDS_PER_YEAR = 365 * 24 * 60 * 60
@@ -62,30 +68,6 @@ const setInstances = async (addresses) => {
         HoldersVault.at(addresses[4]),
         TreasuryVault.at(addresses[5]),
     ])
-}
-
-function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function getCompoundedInterest(
-    from,
-    to,
-    rate
-) {
-    const seconds = to - from
-    const secondsMinusOne = seconds - 1
-    const secondsMinusTwo = seconds - 2
-
-    const ratePerSecond = rate.div(SECONDS_PER_YEAR)
-
-    const basePowerTwo = ratePerSecond.mul(ratePerSecond).div(RAY)
-    const basePowerThree = basePowerTwo.mul(ratePerSecond).div(RAY)
-
-    const secondTerm = basePowerTwo.mul(seconds * secondsMinusOne).mul(ONE_ETHER).div(TWO_ETHER)
-    const thirdTerm = basePowerThree.mul(seconds * secondsMinusOne * secondsMinusTwo).mul(ONE_ETHER).div(SIX_ETHER)
-
-    return ratePerSecond.mul(seconds).add(secondTerm).add(thirdTerm).mul(ONE_ETHER).div(RAY)
 }
 
 describe('Launchpad Staking', function () {
@@ -121,22 +103,29 @@ describe('Launchpad Staking', function () {
         const Energy = await ethers.getContractFactory('TutellusEnergy')
         const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
         let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
+
+        const FactionManager = await ethers.getContractFactory('TutellusFactionManager');
+        let initializeFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
         
         await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
         await myManager.deploy(REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
+        await myManager.deploy(FACTION_MANAGER, FactionManager.bytecode, initializeFactionManager)
 
         const energy = await myManager.get(ENERGY_ID)
         const rvv2 = await myManager.get(REWARDS_ID)
+        const factionManager = await myManager.get(FACTION_MANAGER)
         expect(energy).not.eq(ZERO_ADDRESS)
         myEnergy = Energy.attach(energy)
         myRewardsVaultV2 = RewardsVaultV2.attach(rvv2)
+        myFactionManager = FactionManager.attach(factionManager)
 
         await myManager.grantRole(MINTER_ROLE, owner)
         await myManager.grantRole(REWARDS_MANAGER_ROLE, owner)
-        await myManager.grantRole(FACTION_MANAGER_ROLE, owner)
+        await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
+        await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
+        await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
+        
         await myToken.mint(owner, parseEther('100000'))
-        await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
-        await myRewardsVaultV2.setRewardPerBlock('1')
     })
 
     describe('Deploy', () => {
@@ -145,12 +134,28 @@ describe('Launchpad Staking', function () {
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
     
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+
             expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            expect(launchpadFarming).not.eq(ZERO_ADDRESS)
+
             await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadFarming)
+
+            await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
             await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(launchpadFarming, [parseEther('20'), parseEther('80')])
+            await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
+
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+            myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            // Creating a faction
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
         })
     })
     describe('Deposit', () => {
@@ -159,23 +164,39 @@ describe('Launchpad Staking', function () {
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
     
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+
             expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            expect(launchpadFarming).not.eq(ZERO_ADDRESS)
+
             await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadFarming)
+
+            await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
             await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(launchpadFarming, [parseEther('20'), parseEther('80')])
+            await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
+
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+            myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            // Creating a faction
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
         })
         it('Can deposit and get energy', async () => {
-            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             const energyBalance = await myEnergy.balanceOf(owner)
             expect(etherToNumber(energyBalance)).eq(etherToNumber(ONE_ETHER))
         })
         it('Cant deposit 0 tokens', async() => {
             await expectRevert(
-                myLaunchpadStaking.deposit(owner, 0),
+                myFactionManager.stake(NAKAMOTOS_FACTION, owner, 0),
                 'TutellusLaunchpadStaking: amount must be over zero'
             )
         })
@@ -186,22 +207,36 @@ describe('Launchpad Staking', function () {
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
     
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+
             expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            expect(launchpadFarming).not.eq(ZERO_ADDRESS)
+
             await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
-            await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
-            await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadFarming)
+
+            await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
             await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(launchpadFarming, [parseEther('20'), parseEther('80')])
+            await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
+
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+            myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            // Creating a faction
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
         })
         it('Can withdraw all and reset energy', async () => {
-            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             await time.advanceBlock()
 
-            await myLaunchpadStaking.withdraw(owner, ONE_ETHER)
+            await myFactionManager.unstake(owner, ONE_ETHER)
 
             const burned = await myToken.burned()
 
@@ -218,12 +253,12 @@ describe('Launchpad Staking', function () {
                 BLOCKS
             )
 
-            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             await time.advanceBlock()
 
-            await myLaunchpadStaking.withdraw(owner, ONE_ETHER)
+            await myFactionManager.unstake(owner, ONE_ETHER)
 
             const burned = await myToken.burned()
 
@@ -233,20 +268,17 @@ describe('Launchpad Staking', function () {
             expect(etherToNumber(energyBalance)).eq(0)
         })
         it('Can deposit and withdraw twice (correct energy)', async () => {
-            await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
-            await sleep(1000)
+            await myToken.approve(myFactionManager.address, TWO_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await time.advanceBlock()
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
-
- 
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             const balance = await myLaunchpadStaking.getUserBalance(owner)
 
             expect(etherToNumber(balance)).eq(etherToNumber(TWO_ETHER))
 
-            await myLaunchpadStaking.withdraw(owner, ONE_ETHER)
-            await myLaunchpadStaking.withdraw(owner, ONE_ETHER)
+            await myFactionManager.unstake(owner, ONE_ETHER)
+            await myFactionManager.unstake(owner, ONE_ETHER)
 
             const postBalance = await myLaunchpadStaking.getUserBalance(owner)
             const energyBalance = await myEnergy.balanceOf(owner)
@@ -255,28 +287,40 @@ describe('Launchpad Staking', function () {
             expect(etherToNumber(energyBalance)).eq(0)
         })
         it('Cant withdraw 0 tokens', async() => {
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+
             await expectRevert(
-                myLaunchpadStaking.withdraw(owner, 0),
+                myFactionManager.unstakeLP(owner, 0),
                 'TutellusLaunchpadStaking: amount must be over zero'
             )
         })
         it('Cant withdraw more than balance', async() => {
-            await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await expectRevert(
-                myLaunchpadStaking.withdraw(owner, TWO_ETHER),
+                myFactionManager.unstake(owner, TWO_ETHER),
                 'TutellusLaunchpadStaking: user has not enough staking balance'
             )
         })
         it('Cant withdraw if not enought energy', async() => {
-            await myToken.approve(myLaunchpadStaking.address, TWO_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             await myEnergy.burnAll(owner)
 
             await expectRevert(
-                myLaunchpadStaking.withdraw(owner, ONE_ETHER),
+                myFactionManager.unstake(owner, ONE_ETHER),
                 'TutellusLaunchpadStaking: need more energy to unstake'
+            )
+        })
+        it('Cant withdraw if not from faction manager', async() => {
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+
+            await expectRevert(
+                myLaunchpadStaking.withdraw(owner, ONE_ETHER),
+                'TutellusLaunchpadStaking: only faction manager'
             )
         })
     })
@@ -286,16 +330,32 @@ describe('Launchpad Staking', function () {
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
     
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+
             expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            expect(launchpadFarming).not.eq(ZERO_ADDRESS)
+
             await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadFarming)
+
+            await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
             await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(launchpadFarming, [parseEther('20'), parseEther('80')])
+            await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
+
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+            myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            // Creating a faction
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
         })
         it('Can claim rewards', async () => {
-            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             await time.advanceBlock()
 
@@ -308,9 +368,8 @@ describe('Launchpad Staking', function () {
             await myLaunchpadStaking.claim(owner)
 
             const balancePost = await myToken.balanceOf(owner)
-
-            expect(etherToNumber(balancePrev) + etherToNumber(rewardPerBlock) + etherToNumber(pendingRewards)).eq(etherToNumber(balancePost))
-
+            const diff = balancePost.sub(balancePrev);
+            expect(diff.gt(0)).eq(true)
         })
         it('Cant claim rewards if no deposit', async () => {
             const pendingRewards = await myLaunchpadStaking.pendingRewards(owner)
@@ -327,13 +386,28 @@ describe('Launchpad Staking', function () {
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
     
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+
             expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            expect(launchpadFarming).not.eq(ZERO_ADDRESS)
+
             await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
-            await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadFarming)
+
+            await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
             await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(launchpadFarming, [parseEther('20'), parseEther('80')])
+            await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
+
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+            myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            // Creating a faction
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
         })
         it('Set fees to new depositors', async () => {
             const BLOCKS = 10
@@ -343,8 +417,8 @@ describe('Launchpad Staking', function () {
                 BLOCKS
             )
 
-            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             const [blocksLeft, currentBlock, maxFee] = await Promise.all([
                 myLaunchpadStaking.getBlocksLeft(owner),
@@ -378,15 +452,10 @@ describe('Launchpad Staking', function () {
         })
         it('Set a new energy multiplier', async () => {
             await myLaunchpadStaking.setEnergyMultiplier(TWO_ETHER)
-            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-
-            const LaunchpadStaking = artifacts.require('TutellusLaunchpadStaking')
-            const myLaunchpadStakingAux = await LaunchpadStaking.at(myLaunchpadStaking.address)
-            
-            const tx = await myLaunchpadStakingAux.deposit(owner, ONE_ETHER)
-            expectEvent(tx, 'Deposit', {
-                energyMinted: TWO_ETHER.toString()
-            })
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            const energyBalance = await myEnergy.balanceOf(owner)
+            expectEqEth(energyBalance, TWO_ETHER)
         })
     })
     describe('Autoreward', () => {
@@ -395,22 +464,37 @@ describe('Launchpad Staking', function () {
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
     
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
+            const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
+
             expect(launchpadStaking).not.eq(ZERO_ADDRESS)
+            expect(launchpadFarming).not.eq(ZERO_ADDRESS)
+
             await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadStaking)
-            await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
+            await myManager.grantRole(ENERGY_MINTER_ROLE, launchpadFarming)
+
+            await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
             await myRewardsVaultV2.add(launchpadStaking, [parseEther('100')])
+            await myRewardsVaultV2.add(launchpadFarming, [parseEther('20'), parseEther('80')])
+            await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
+
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
+            myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            // Creating a faction
+            await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
+            await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
         })
         it('Can claim rewards after withdraw if no autoreward', async () => {
             await myLaunchpadStaking.toggleAutoreward()
-
-            await myToken.approve(myLaunchpadStaking.address, ONE_ETHER)
-            await myLaunchpadStaking.deposit(owner, ONE_ETHER)
-            await myLaunchpadStaking.withdraw(owner, ONE_ETHER)
-
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myFactionManager.unstake(owner, ONE_ETHER)
+            
             const pendingRewards = await myLaunchpadStaking.pendingRewards(owner)
+
             expect(etherToNumber(pendingRewards)).gt(0)
             await myLaunchpadStaking.claim(owner)
         })

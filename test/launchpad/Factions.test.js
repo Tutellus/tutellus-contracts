@@ -5,7 +5,7 @@ const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
 const { formatEther, parseEther } = require('ethers/lib/utils')
 const { BigNumber, constants } = require('ethers')
-const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('./utils')
+const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('../utils')
 const Deployer = artifacts.require('TutellusDeployer')
 const Token = artifacts.require('TutellusERC20')
 const Manager = artifacts.require('TutellusManager')
@@ -120,7 +120,7 @@ describe('Factions', function () {
         await myManager.grantRole(REWARDS_MANAGER_ROLE, owner)
         await myToken.mint(owner, parseEther('100000'))
         await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
-        await myRewardsVaultV2.setRewardPerBlock('1')
+        await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
     })
     describe('Deploy', () => {
         it('Deploying Factions', async () => {
@@ -159,7 +159,7 @@ describe('Factions', function () {
 
             await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
             await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
-
+            await myToken.approve(myFactionManager.address, constants.MaxUint256)
         })
     })
     describe('Deposit', () => {
@@ -199,9 +199,9 @@ describe('Factions', function () {
 
             await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
             await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
+            await myToken.approve(myFactionManager.address, constants.MaxUint256)
         })
         it('Can stake into nakamotos and get energy', async () => {
-            await myToken.approve(nakamotosStaking, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             const energyBalance = await myEnergy.balanceOf(owner)
@@ -211,8 +211,6 @@ describe('Factions', function () {
             expect(faction).eq(NAKAMOTOS_FACTION)
         })
         it('Cant stake into multiple factions', async () => {
-            await myToken.approve(nakamotosStaking, ONE_ETHER)
-            await myToken.approve(vuterinsStaking, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await expectRevert(
                 myFactionManager.stake(VUTERINS_FACTION, owner, ONE_ETHER),
@@ -220,11 +218,17 @@ describe('Factions', function () {
             )
         })
         it('Cant stake from unauthorized party', async () => {
-            await myToken.approve(vuterinsStaking, ONE_ETHER)
             const myFactionManagerArtifact = await FactionManagerArtifact.at(factionManager)
             await expectRevert(
                 myFactionManagerArtifact.stake(VUTERINS_FACTION, owner, ONE_ETHER, { from: person }),
                 'TutellusFactionManager: account not authorized'
+            )
+        })
+        it('Cant deposit from non faction', async () => {
+            const myFactionManagerArtifact = await FactionManagerArtifact.at(factionManager)
+            await expectRevert(
+                myFactionManagerArtifact.depositFrom(owner, ONE_ETHER),
+                'TutellusFactionManager: deposit only callable by faction contract'
             )
         })
     })
@@ -265,11 +269,9 @@ describe('Factions', function () {
 
             await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
             await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
+            await myToken.approve(myFactionManager.address, constants.MaxUint256)
         })
         it('Can deposit into staking and farming and withdraw all', async () => {
-            await myToken.approve(nakamotosStaking, ONE_ETHER)
-            await myToken.approve(nakamotosFarming, TWO_ETHER)
-
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, TWO_ETHER)
 
@@ -285,7 +287,6 @@ describe('Factions', function () {
             expect(etherToNumber(energyBalance)).eq(0)
         })
         it('Can deposit and withdraw twice (correct energy)', async () => {
-            await myToken.approve(nakamotosStaking, TWO_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             await time.advanceBlock()
@@ -311,7 +312,6 @@ describe('Factions', function () {
             )
         })
         it('Cant withdraw more than balance', async() => {
-            await myToken.approve(nakamotosStaking, TWO_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await expectRevert(
                 myFactionManager.unstake(owner, TWO_ETHER),
@@ -356,11 +356,10 @@ describe('Factions', function () {
 
             await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
             await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
+            await myToken.approve(myFactionManager.address, constants.MaxUint256)
         })
         it('Can deposit into staking and migrate faction', async () => {
-            await myToken.approve(nakamotosStaking, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
-            await myToken.approve(vuterinsStaking, ONE_ETHER)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
             const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
@@ -384,9 +383,7 @@ describe('Factions', function () {
             expect(faction).eq(VUTERINS_FACTION)
         })
         it('Can deposit into staking and migrate faction from authorized party', async () => {
-            await myToken.approve(nakamotosStaking, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
-            await myToken.approve(vuterinsStaking, ONE_ETHER)
             await myFactionManager.authorize(person)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
@@ -411,9 +408,7 @@ describe('Factions', function () {
             expect(faction).eq(VUTERINS_FACTION)
         })
         it('Can deposit into farming and migrate faction', async () => {
-            await myToken.approve(nakamotosFarming, ONE_ETHER)
             await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, ONE_ETHER)
-            await myToken.approve(vuterinsFarming, ONE_ETHER)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
             const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
@@ -437,14 +432,9 @@ describe('Factions', function () {
             expect(faction).eq(VUTERINS_FACTION)
         })
         it('Can deposit into staking and farming and migrate faction', async () => {
-            await myToken.approve(nakamotosStaking, ONE_ETHER)
-            await myToken.approve(nakamotosFarming, TWO_ETHER)
 
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, TWO_ETHER)
-
-            await myToken.approve(vuterinsStaking, ONE_ETHER)
-            await myToken.approve(vuterinsFarming, TWO_ETHER)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
             const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
@@ -497,7 +487,6 @@ describe('Factions', function () {
             )
         })
         it('Cant migrate to a non existent faction', async () => {
-            await myToken.approve(nakamotosStaking, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await expectRevert(
                 myFactionManager.migrateFaction(owner, constants.HashZero),

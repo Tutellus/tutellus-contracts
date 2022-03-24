@@ -23,8 +23,11 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
     uint40 public lastUpdateTimestamp;
     uint256 private _normalization;
 
-    event Mint(address sender, address account, uint256 amount);
-    event Burn(address sender, address account, uint256 amount);
+    // event Mint(address sender, address account, uint256 amount);
+    // event Burn(address sender, address account, uint256 amount);
+
+    event MintVariable(address sender, address account, uint256 amount);
+    event BurnVariable(address sender, address account, uint256 amount);
 
     function __ERC20Variable_init(string memory name_, string memory symbol_, uint256 rate_) internal onlyInitializing {
         __ERC20Variable_init_unchained(name_, symbol_, rate_);
@@ -72,12 +75,20 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
     }
 
     function scale(uint256 amount) public view returns (uint256) {
-      return amount.rayDiv(_getNormalization());
+      return _scaleTo(amount, _getNormalization());
     }
 
     function unscale(uint256 amount) public view returns (uint256) {
-      return amount.rayMul(_getNormalization());
-    } 
+      return _unscaleTo(amount, _getNormalization());
+    }
+
+    function _scaleTo(uint256 amount, uint256 normalization) internal pure returns (uint256) {
+        return amount.rayDiv(normalization);
+    }
+
+    function _unscaleTo(uint256 amount, uint256 normalization) internal pure returns (uint256) {
+        return amount.rayMul(normalization);
+    }
 
     function _getNormalization() internal view returns (uint256) {
       uint40 timestamp = lastUpdateTimestamp;
@@ -86,7 +97,8 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
         return _normalization;
       }
 
-      return MathUtils.calculateCompoundedInterest(rate, timestamp).rayMul(_normalization);
+    //   return MathUtils.calculateCompoundedInterest(rate, timestamp).rayMul(_normalization);
+      return MathUtils.calculateLinearInterest(rate, timestamp).rayMul(_normalization);
     }
 
     function balanceOf(address account) public view virtual override returns (uint256) {
@@ -281,7 +293,8 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
         _totalSupply += amountScaled;
         _balances[account] += amountScaled;
         emit Transfer(address(0), account, amount);
-        emit Mint(msg.sender, account, amount);
+        // emit Mint(msg.sender, account, amount);
+        emit MintVariable(msg.sender, account, amount);
 
         _afterTokenTransfer(address(0), account, amount);
     }
@@ -313,7 +326,8 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
         _totalSupply -= amountScaled;
 
         emit Transfer(account, address(0), amount);
-        emit Burn(msg.sender, account, amount);
+        // emit Burn(msg.sender, account, amount);
+        emit BurnVariable(msg.sender, account, amount);
 
         _afterTokenTransfer(account, address(0), amount);
     }
