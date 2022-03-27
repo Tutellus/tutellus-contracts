@@ -10,6 +10,7 @@ const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
 const IDO_USDT = ethers.utils.id("IDO_USDT");
 const ENERGY_AUX_ID = ethers.utils.id('ENERGY_AUX')
 const ENERGY_ID = ethers.utils.id('ENERGY')
+const ERC20_ID = ethers.utils.id('ERC20')
 const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
 const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
 const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
@@ -17,6 +18,25 @@ const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
+const NFT_ID = ethers.utils.id('721');
+const ADMIN_721_ROLE = ethers.utils.id('ADMIN_721_ROLE')
+const AUTH_NFT_SIGNER = ethers.utils.id('AUTH_NFT_SIGNER')
+
+const EVENT1 = ethers.utils.id('ido1')
+const myPOAP = {
+    id: ethers.utils.id('perpetual'),
+    eventId: EVENT1,
+    energy: ethers.utils.parseEther('1000'),
+    perpetual: true,
+    uri: 'uri/perpetual'
+}
+const myPOAP2 = {
+    id: ethers.utils.id('non-perpetual'),
+    eventId: EVENT1,
+    energy: ethers.utils.parseEther('2000'),
+    perpetual: false,
+    uri: 'uri/non-perpetual'
+}
 
 const FACTIONS = [
     NAKAMOTOS_FACTION,
@@ -116,14 +136,17 @@ async function main() {
     await resp3.wait()
     console.log("TUT: ", myTUT.address)
     const initializeCalldata = FactionManager.interface.encodeFunctionData('initialize', [])
+    console.log(initializeCalldata)
     const resp4 = await myManager.deploy(ENERGY_AUX_ID, TutellusEnergy.bytecode, initializeCalldata)
     await resp4.wait()
     const energyAddr = await myManager.get(ENERGY_AUX_ID)
     console.log("eTUT: ", energyAddr)
     const resp5 = await myManager.setId(ENERGY_AUX_ID, ethers.constants.AddressZero)
     const resp6 = await myManager.setId(ENERGY_ID, energyAddr)
+    const resp60 = await myManager.setId(ERC20_ID, myTUT.address)
     await resp5.wait()
     await resp6.wait()
+    await resp60.wait()
 
     const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
     const resp30 = await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
@@ -254,7 +277,7 @@ async function main() {
     const FUNDING_AMOUNT = ethers.utils.parseEther("100000");
     const MIN_PREFUND = ethers.utils.parseEther("1000");
     const START_DATE = Date.now().toString()
-    const END_DATE = parseInt(START_DATE + 1000000);
+    const END_DATE = parseInt(START_DATE + 1000000).toString();
     const idoInitializeCalldata = TutellusIDO.interface.encodeFunctionData(
         "initialize",
         [myManager.address, FUNDING_AMOUNT, MIN_PREFUND, myIdoToken.address, myUsdt.address, START_DATE, END_DATE]
@@ -267,6 +290,35 @@ async function main() {
         "IDO: ",
         receipt.events[1].args.proxy
     );
+
+    const Tutellus721 = await ethers.getContractFactory('Tutellus721')
+    const resp40 = await myManager.deploy(NFT_ID, Tutellus721.bytecode, initializeCalldata)
+    await resp40.wait()
+    const NFTAddress = await myManager.get(NFT_ID)
+    const myNFT = Tutellus721.attach(NFTAddress)
+
+    const resp41 = await myManager.grantRole(ADMIN_721_ROLE, accounts[0].address)
+    await resp41.wait()
+    const resp410 = await myManager.grantRole(AUTH_NFT_SIGNER, accounts[0].address)
+    await resp410.wait()
+    const resp42 = await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
+    await resp42.wait()
+    const resp43 = await myNFT.createPOAP(
+        myPOAP.id,
+        myPOAP.eventId,
+        myPOAP.uri,
+        myPOAP.perpetual,
+        myPOAP.energy
+    )
+    await resp43.wait()
+    const resp44 = await myNFT.createPOAP(
+        myPOAP2.id,
+        myPOAP.eventId,
+        myPOAP2.uri,
+        myPOAP2.perpetual,
+        myPOAP2.energy
+    )
+    await resp44.wait()
 
     for (let i = 0; i < MNEMONICS.length; i++) {
         for (let j = 0; j < PATHS.length; j++) {
@@ -297,7 +349,7 @@ async function main() {
             const faction = await myFactionManager.faction(FACTIONS[j])
 
             if ((walletFaction == ethers.constants.HashZero) || (walletFaction == FACTIONS[j])) {
-                const resp24 = await myTUT.connect(wallet).approve(faction.stakingContract, ethers.constants.MaxUint256)
+                const resp24 = await myTUT.connect(wallet).approve(myFactionManager.address, ethers.constants.MaxUint256)
                 await resp24.wait()
                 const resp26 = await myFactionManager.connect(wallet).stake(FACTIONS[j], wallet.address, STAKING_AMOUNTS[i][j])
                 await resp26.wait()
@@ -321,6 +373,27 @@ async function main() {
                 const resp29 = await myIdo.connect(wallet).prefund(wallet.address, PREFUND_AMOUNTS[i][j].sub(prefunded))
                 await resp29.wait()
             }
+
+            // Mint POAPs
+            if (j == 0 || j == 2) {
+                const signature = await sign721(myNFT, myPOAP.id, wallet.address, accounts[0])
+                await myNFT.mint(
+                    myPOAP.id,
+                    wallet.address,
+                    signature,
+                    accounts[0].address
+                )
+            }
+
+            if (j == 1 || j == 2) {
+                const signature = await sign721(myNFT, myPOAP2.id, wallet.address, accounts[0])
+                await myNFT.mint(
+                    myPOAP2.id,
+                    wallet.address,
+                    signature,
+                    accounts[0].address
+                )
+            }
         }
 
         console.log("Iteration ", i)
@@ -335,3 +408,26 @@ main()
         console.error(error);
         process.exit(1);
     });
+
+const sign721 = (contract, poapId, account, wallet) => {
+    const domain = {
+        name: 'Tutellus721',
+        version: '1',
+        chainId: ethers.provider._network.chainId,
+        verifyingContract: contract.address
+    }
+
+    const types = {
+        Mint: [
+            { name: 'poapId', type: 'bytes32' },
+            { name: 'account', type: 'address' },
+        ]
+    }
+
+    const value = {
+        poapId,
+        account
+    }
+
+    return wallet._signTypedData(domain, types, value)
+}

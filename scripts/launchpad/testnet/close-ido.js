@@ -7,7 +7,7 @@ const fs = require("fs");
 const { readFile } = require("fs/promises");
 const path = require("path");
 const { getIdoTree } = require("../../../utils/idoTree");
-const IDO = "0x14092dCA812377a4Be8ADbfA19A164564b1508F5";
+const IDO = "0xb510cc1Ff1CEc64999A859282A71c73380106E68";
 const jsonPath =
     "../../../examples/testnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
@@ -47,6 +47,8 @@ async function main() {
         } catch (error) {
             console.error("ERROR", error);
         }
+    } else {
+        console.log("Invalid JSON")
     }
 }
 // We recommend this pattern to be able to use async/await everywhere
@@ -86,7 +88,7 @@ async function getPrefunders() {
     let query =
         '{ prefunders (where: {ido:"' +
         IDO.toLowerCase() +
-        '", active:true}, orderBy:prefunded, orderDirection:desc) { account faction prefunded energyHolder { balance } } }';
+        '", active:true}, orderBy:prefunded, orderDirection:desc) { account } }';
     return (await querySubgraph(query)).prefunders;
 }
 

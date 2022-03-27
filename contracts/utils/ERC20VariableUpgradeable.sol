@@ -28,6 +28,7 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
 
     event MintVariable(address sender, address account, uint256 amount);
     event BurnVariable(address sender, address account, uint256 amount);
+    event Init(uint256 rate, uint256 normalization, uint256 lastUpdateTimestamp);
 
     function __ERC20Variable_init(string memory name_, string memory symbol_, uint256 rate_) internal onlyInitializing {
         __ERC20Variable_init_unchained(name_, symbol_, rate_);
@@ -40,6 +41,7 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
 
         _normalization = WadRayMath.ray();
         lastUpdateTimestamp = uint40(block.timestamp);
+        emit Init(rate, _normalization, lastUpdateTimestamp);
     }
 
     /**
