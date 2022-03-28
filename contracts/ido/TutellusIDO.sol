@@ -103,7 +103,6 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     function claim(uint index_, address account_, uint allocation_, uint withdraw_, uint energy_, bytes32[] calldata merkleProof_) public {
         _verifyMerkle(index_, account_, allocation_, withdraw_, energy_, merkleProof_);
         uint claimableAmount_ = available(account_, allocation_);
-        uint _preClaimed = _claimed[account_];
         if (claimableAmount_ > 0) {
             _claimed[account_] += claimableAmount_;
             _transfer(idoToken, account_, claimableAmount_);

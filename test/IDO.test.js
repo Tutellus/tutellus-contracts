@@ -59,11 +59,12 @@ describe('IDOFactory & IDO', function () {
         await myTUT.mint(owner.address, ethers.utils.parseEther('100000'))
 
         const initializeCalldata = TutellusEnergy.interface.encodeFunctionData('initialize', [])
-        await myManager.deploy(ENERGY_ID, TutellusEnergy.bytecode, initializeCalldata)
+        const energyImp = await TutellusEnergy.deploy()
+        await energyImp.deployed()
+        await myManager.deployProxyWithImplementation(ENERGY_ID, energyImp.address, initializeCalldata)
         await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
         const rewardsAddr = await myManager.get(LAUNCHPAD_REWARDS_ID)
         await myTUT.mint(rewardsAddr, ethers.utils.parseEther('50000'))
-
         const factoryImp = await TutellusIDOFactory.deploy()
         await factoryImp.deployed()
         await myManager.deployProxyWithImplementation(IDO_FACTORY_ID, factoryImp.address, initializeCalldata)
@@ -198,6 +199,33 @@ describe('IDOFactory & IDO', function () {
             expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount).toString())
         });
 
+        it('cant prefund when closed', async () => {
+            const prefundAmount = ethers.utils.parseEther('5000')
+
+            const funderBalancePre = await myUSDT.balanceOf(funder.address)
+            const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
+
+            await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+
+            await expectRevert(
+                (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
+                'TutellusIDO: IDO is closed'
+            )
+
+            await myIDO.open()
+
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
+            const prefunded = await myIDO.getPrefunded(funder.address)
+
+            const funderBalancePost = await myUSDT.balanceOf(funder.address)
+            const idoBalancePost = await myUSDT.balanceOf(myIDO.address)
+
+            expect(prefunded.toString()).to.equal(prefundAmount.toString())
+            expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount).toString())
+            expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount).toString())
+        });
+
         it('can prefund exact min prefund amount', async () => {
             const prefundAmount = ethers.utils.parseEther('10')
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
@@ -235,6 +263,38 @@ describe('IDOFactory & IDO', function () {
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
+            await (await myIDO.connect(funder)).withdraw(withdrawAmount)
+            const prefundedAfterWithdraw = await myIDO.getPrefunded(funder.address)
+
+            const funderBalancePost = await myUSDT.balanceOf(funder.address)
+            const idoBalancePost = await myUSDT.balanceOf(myIDO.address)
+
+            expect(prefunded.toString()).to.equal(prefundAmount.toString())
+            expect(prefundedAfterWithdraw.toString()).to.equal(prefundAmount.sub(withdrawAmount).toString())
+            expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount.sub(withdrawAmount)).toString())
+            expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount.sub(withdrawAmount)).toString())
+        });
+
+        it('cant withdraw when closed', async () => {
+            const prefundAmount = ethers.utils.parseEther('5000')
+            const withdrawAmount = ethers.utils.parseEther('2000')
+
+            const funderBalancePre = await myUSDT.balanceOf(funder.address)
+            const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
+
+            await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
+            const prefunded = await myIDO.getPrefunded(funder.address)
+
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+
+            await expectRevert(
+                (await myIDO.connect(funder)).withdraw(withdrawAmount),
+                'TutellusIDO: IDO is closed'
+            )
+
+            await myIDO.open()
+
             await (await myIDO.connect(funder)).withdraw(withdrawAmount)
             const prefundedAfterWithdraw = await myIDO.getPrefunded(funder.address)
 
@@ -296,9 +356,41 @@ describe('IDOFactory & IDO', function () {
             expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount.sub(withdrawAmount)).toString())
             expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount.sub(withdrawAmount)).toString())
         });
+
+        it('cant withdrawAll when closed', async () => {
+            const prefundAmount = ethers.utils.parseEther('5000')
+            const withdrawAmount = ethers.utils.parseEther('5000')
+
+            const funderBalancePre = await myUSDT.balanceOf(funder.address)
+            const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
+
+            await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
+            const prefunded = await myIDO.getPrefunded(funder.address)
+
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+
+            await expectRevert(
+                (await myIDO.connect(funder)).withdrawAll(),
+                'TutellusIDO: IDO is closed'
+            )
+
+            await myIDO.open()
+
+            await (await myIDO.connect(funder)).withdrawAll()
+            const prefundedAfterWithdraw = await myIDO.getPrefunded(funder.address)
+
+            const funderBalancePost = await myUSDT.balanceOf(funder.address)
+            const idoBalancePost = await myUSDT.balanceOf(myIDO.address)
+
+            expect(prefunded.toString()).to.equal(prefundAmount.toString())
+            expect(prefundedAfterWithdraw.toString()).to.equal(prefundAmount.sub(withdrawAmount).toString())
+            expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount.sub(withdrawAmount)).toString())
+            expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount.sub(withdrawAmount)).toString())
+        });
     });
 
-    describe.only('IDO (claim)', function () {
+    describe('IDO (claim)', function () {
 
         it('can claim', async () => {
             let slot = (END_DATE - START_DATE) / 4
@@ -335,6 +427,50 @@ describe('IDOFactory & IDO', function () {
                 let usdtBalance = await myUSDT.balanceOf(accounts[i].address)
                 expect(usdtBalance.toString()).to.equal(json[accounts[i].address].withdraw)
             }
+        });
+
+        it('cant claim with wrong proof', async () => {
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await expectRevert(
+                myIDO.connect(funder).claim(
+                    CLAIMS[accounts[2].address].index,
+                    accounts[2].address,
+                    CLAIMS[accounts[2].address].allocation,
+                    CLAIMS[accounts[2].address].withdraw,
+                    CLAIMS[accounts[2].address].energy,
+                    CLAIMS[accounts[3].address].proof
+                ),
+                'TutellusIDO: Invalid merkle proof'
+            )
+        });
+    });
+
+    describe('IDO (other)', function () {
+
+        it('can sync', async () => {
+            const balanceIDO1 = await myUSDT.balanceOf(myIDO.address)
+            const balanceAdmin1 = await myUSDT.balanceOf(owner.address)
+            await myIDO.sync()
+            const balanceIDO2 = await myUSDT.balanceOf(myIDO.address) 
+            const balanceAdmin2 = await myUSDT.balanceOf(owner.address)
+            expect(balanceAdmin1.add(balanceIDO1).toString()).to.equal(balanceAdmin2.toString())
+            expect(balanceIDO2.add(balanceIDO1).toString()).to.equal(balanceIDO1.toString())
+        });
+
+        it('only default admin role can sync', async () => {
+            const balanceIDO1 = await myUSDT.balanceOf(myIDO.address)
+            const balanceAdmin1 = await myUSDT.balanceOf(owner.address)
+
+            await expectRevert(
+                (await myIDO.connect(funder)).sync(),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+            )
+
+            await myIDO.sync()
+            const balanceIDO2 = await myUSDT.balanceOf(myIDO.address) 
+            const balanceAdmin2 = await myUSDT.balanceOf(owner.address)
+            expect(balanceAdmin1.add(balanceIDO1).toString()).to.equal(balanceAdmin2.toString())
+            expect(balanceIDO2.add(balanceIDO1).toString()).to.equal(balanceIDO1.toString())
         });
     });
 })
