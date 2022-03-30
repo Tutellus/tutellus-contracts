@@ -1,6 +1,7 @@
 const { utils, BigNumber } = require('ethers')
 const assert = require('assert')
 const MerkelTree = require('./merkleTree')
+const { getAddress, isAddress } = require('ethers/lib/utils')
 const ERROR_INVALID_JSON = 'JSON not valid'
 
 const validAmount = amount => {
@@ -20,7 +21,7 @@ const toArray = (object = {}) => {
   const sortedKeys = Object.keys(object).sort()
   return sortedKeys.reduce((acu, key) => {
     acu.push({
-      account: key,
+      account: getAddress(key),
       amount: BigNumber.from(object[key])
     })
     return acu
@@ -42,13 +43,48 @@ const keccak256 = ({ index, account, amount }) => {
   )
 }
 
+const getSortedUniqueKeys = (jsonA, jsonB) => {
+  const allKeys = [
+    ...Object.keys(jsonA),
+    ...Object.keys(jsonB),
+  ];
+    // Unique and sorted
+  return [...new Set(allKeys)].sort();
+};
+
+const checksumJson = (json) => {
+  const keys = Object.keys(json);
+  const response = {};
+  keys.map(key => {
+    const fKey = getAddress(key);
+    if (isAddress(fKey)) {
+      response[fKey] = json[key];
+    }
+  })
+  return response;
+}
+
+exports.concatJson = (
+  jsonA,
+  jsonB,
+) => {
+  const cJsonA = checksumJson(jsonA);
+  const cJsonB = checksumJson(jsonB);
+  const sortedKeys = getSortedUniqueKeys(cJsonA, cJsonB);
+  return sortedKeys.reduce((acu, key) => {
+    acu[key] = BigNumber.from(cJsonA[key] || 0).add(BigNumber.from(cJsonB[key] || 0)).toString(); // eslint-disable-line no-param-reassign
+    return acu;
+  }, {});
+};
+
 exports.checkValidJSON = (balanceJSON) => {
   checkValidJSON(balanceJSON)
 }
 
 exports.getBalanceTree = (balanceJSON) => {
   checkValidJSON(balanceJSON)
-  const balanceArray = toArray(balanceJSON)
+  const cBalanceJSON = checksumJson(balanceJSON);
+  const balanceArray = toArray(cBalanceJSON)
   const nodesArray = toHexNode(balanceArray)
   const tree = MerkelTree(nodesArray)
 
