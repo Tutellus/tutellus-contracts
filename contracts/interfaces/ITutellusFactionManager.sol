@@ -16,7 +16,7 @@ interface ITutellusFactionManager {
 
   function authorize ( address account ) external;
   function authorized ( address ) external view returns ( address );
-  function depositFrom ( address account, uint256 amount ) external;
+  function depositFrom ( address account, uint256 amount, address token ) external;
   function faction ( bytes32 ) external view returns ( address stakingContract, address farmingContract );
   function factionOf ( address ) external view returns ( bytes32 );
   function migrateFaction ( address account, bytes32 to ) external;

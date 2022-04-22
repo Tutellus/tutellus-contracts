@@ -136,7 +136,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     uint256 energyMinted = amount * energyMultiplier / 1 ether;
     user.energyDebt += energyInterface.scale(energyMinted);
 
-    ITutellusFactionManager(msg.sender).depositFrom(account, amount);
+    ITutellusFactionManager(msg.sender).depositFrom(account, amount, token);
     energyInterface.mintVariable(account, energyMinted);
 
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);

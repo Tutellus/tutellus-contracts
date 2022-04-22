@@ -114,9 +114,9 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit Migrate(id, to, account);
     }
 
-    function depositFrom (address account, uint256 amount) public {
+    function depositFrom (address account, uint256 amount, address token) public {
         require(isFactionContract[msg.sender], 'TutellusFactionManager: deposit only callable by faction contract');
-        ITutellusERC20 tokenInterace = ITutellusERC20(ITutellusManager(config).get(keccak256('ERC20')));
+        ITutellusERC20 tokenInterace = ITutellusERC20(token);
         tokenInterace.transferFrom(account, msg.sender, amount);
     }
 
