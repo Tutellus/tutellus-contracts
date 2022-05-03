@@ -3,7 +3,7 @@ const ethers = bre.ethers;
 const { readFile } = require("fs/promises");
 const path = require("path");
 const { getIdoTree } = require("../../../utils/idoTree");
-const IDO = "0x14092dCA812377a4Be8ADbfA19A164564b1508F5";
+const IDO = "0x5431b9516bC59810132932Da4f3790e9541Ef132";
 const jsonPath =
     "../../../examples/testnet/launchpad/" + IDO.toLowerCase() + ".json";
 
@@ -28,7 +28,9 @@ async function main() {
     const tree = getIdoTree(json);
     const ido = await ethers.getContractAt("TutellusIDO", IDO);
     const claims = tree.toJSON().claims[wallet.address.toLowerCase()];
+    const available = await ido.available(wallet.address, claims.allocation)
     console.log("Allocation: ", ethers.utils.formatEther(claims.allocation))
+    console.log("Available: ", ethers.utils.formatEther(available))
     console.log("Withdraw: ", ethers.utils.formatEther(claims.withdraw))
     const idoTokenAddr = await ido.idoToken()
     const idoToken = await ethers.getContractAt("Token", idoTokenAddr);
