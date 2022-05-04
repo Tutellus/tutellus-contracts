@@ -2,8 +2,8 @@ const bre = require('hardhat');
 const ethers = bre.ethers;
 const { utils, constants } = ethers;
 
-const ID = utils.id('ENERGY');
-const CONTRACT_NAME = 'TutellusEnergy';
+const ID = utils.id('LAUNCHPAD_REWARDS');
+const CONTRACT_NAME = 'TutellusRewardsVaultV2';
 
 async function main () {
   bre.run('compile');

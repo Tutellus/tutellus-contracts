@@ -4,7 +4,7 @@ const { parseEther } = require('ethers/lib/utils');
 const { getBalanceTree, concatJson } = require('../../../utils/balanceTree');
 
 const json1 = {
-    '0x02704593f63718a9561137A9131AFcDCE02B6F25': parseEther('20000').toString(),
+    '0x30729B6910757042024304E56BEB015821462691': '1',
 }
 
 
