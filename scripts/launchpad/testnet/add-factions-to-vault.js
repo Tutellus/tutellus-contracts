@@ -35,9 +35,13 @@ const addAccount = async ({
 async function main () {
   bre.run('compile');
 
+  const accounts = await ethers.getSigners()
+
   const Manager = await ethers.getContractFactory('TutellusManager');
   const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2');
-  const myManager = Manager.attach('0x9b77Cb09d5E61D44fEf00e59Cfcc8Af67DAe9A45');
+  const myManager = Manager.attach('0x745140eaD6c19A7e30eA47aF3b58C5Cb5Caa1a07');
+  const resp = await myManager.grantRole(ethers.utils.id('REWARDS_MANAGER_ROLE'), accounts[0].address)
+  await resp.wait()
   const rvv2Addr = await myManager.get(LAUNCHPAD_REWARDS);
   const myRewardsVault = RewardsVaultV2.attach(rvv2Addr);
 

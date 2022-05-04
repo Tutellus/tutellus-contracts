@@ -4,6 +4,9 @@ const ethers = bre.ethers;
 const NAKAMOTOS_STAKING_ID = ethers.utils.id('NAKAMOTOS_STAKING')
 const VUTERINS_STAKING_ID = ethers.utils.id('VUTERINS_STAKING')
 const ALTCOINERS_STAKING_ID = ethers.utils.id('ALTCOINERS_STAKING')
+const NAKAMOTOS_FARMING_ID = ethers.utils.id('NAKAMOTOS_FARMING')
+const VUTERINS_FARMING_ID = ethers.utils.id('VUTERINS_FARMING')
+const ALTCOINERS_FARMING_ID = ethers.utils.id('ALTCOINERS_FARMING')
 const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
 const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
 const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
@@ -88,6 +91,30 @@ const STAKING_AMOUNTS = [
     ethers.utils.parseEther("707")] //mnemonic7-path2
 ]
 
+const FARMING_AMOUNTS = [
+    [ethers.utils.parseEther("0.2001"), //mnemonic1-path0
+    ethers.utils.parseEther("0.1601"), //mnemonic1-path1
+    ethers.utils.parseEther("0.701")], //mnemonic1-path2
+    [ethers.utils.parseEther("0.702"), //mnemonic2-path0
+    ethers.utils.parseEther("0.2002"), //mnemonic2-path1
+    ethers.utils.parseEther("0.1602")], //mnemonic2-path2
+    [ethers.utils.parseEther("0.1603"), //mnemonic3-path0
+    ethers.utils.parseEther("0.703"), //mnemonic3-path1
+    ethers.utils.parseEther("0.2003")], //mnemonic3-path2
+    [ethers.utils.parseEther("0.2004"), //mnemonic4-path0
+    ethers.utils.parseEther("0.1604"), //mnemonic4-path1
+    ethers.utils.parseEther("0.704")], //mnemonic4-path2
+    [ethers.utils.parseEther("0.705"), //mnemonic5-path0
+    ethers.utils.parseEther("0.2005"), //mnemonic5-path1
+    ethers.utils.parseEther("0.1605")], //mnemonic5-path2
+    [ethers.utils.parseEther("0.1606"), //mnemonic6-path0
+    ethers.utils.parseEther("0.706"), //mnemonic6-path1
+    ethers.utils.parseEther("0.2006")], //mnemonic6-path2
+    [ethers.utils.parseEther("0.2007"), //mnemonic7-path0
+    ethers.utils.parseEther("0.1607"), //mnemonic7-path1
+    ethers.utils.parseEther("0.707")] //mnemonic7-path2
+]
+
 const PREFUND_AMOUNTS = [
     [ethers.utils.parseEther("4501"), //mnemonic1-path0
     ethers.utils.parseEther("11001"), //mnemonic1-path1
@@ -122,6 +149,7 @@ async function main() {
     const TutellusEnergy = await ethers.getContractFactory("TutellusEnergy");
     const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
     const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
+    const Token = await ethers.getContractFactory("Token");
 
     const myManager = await TutellusManager.deploy()
     await myManager.deployed()
@@ -136,8 +164,9 @@ async function main() {
     await resp3.wait()
     console.log("TUT: ", myTUT.address)
     const initializeCalldata = FactionManager.interface.encodeFunctionData('initialize', [])
-    console.log(initializeCalldata)
-    const resp4 = await myManager.deploy(ENERGY_AUX_ID, TutellusEnergy.bytecode, initializeCalldata)
+    const energyImp = await TutellusEnergy.deploy()
+    await energyImp.deployed()
+    const resp4 = await myManager.deployProxyWithImplementation(ENERGY_AUX_ID, energyImp.address, initializeCalldata)
     await resp4.wait()
     const energyAddr = await myManager.get(ENERGY_AUX_ID)
     console.log("eTUT: ", energyAddr)
@@ -148,11 +177,25 @@ async function main() {
     await resp6.wait()
     await resp60.wait()
 
+    const myLP = await Token.deploy("Tutellus LP", "TUT-WBTC LP")
+    await myLP.deployed()
+    await myLP.mint(accounts[0].address, ethers.utils.parseEther('10000000'))
+
+    console.log(
+        "LP: ",
+        myLP.address
+    );
+
     const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
     const resp30 = await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
     await resp30.wait()
     const rewardsAddr = await myManager.get(LAUNCHPAD_REWARDS_ID)
     await myTUT.mint(rewardsAddr, ethers.utils.parseEther('50000'))
+
+    console.log(
+        "RewardsVaultV2: ",
+        rewardsAddr
+    );
 
     console.log('Deploying Launchpad Staking Implementation...')
     const myLaunchpadStakingImp = await LaunchpadStaking.deploy()
@@ -166,6 +209,7 @@ async function main() {
 
     console.log('Creating initialization calldata...')
     const initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myTUT.address])
+    const initializeCalldataFarming = LaunchpadStaking.interface.encodeFunctionData('initialize', [myLP.address])
 
     console.log('Deploying Faction Manager Proxy with Implementation...')
     const resp7 = await myManager.deployProxyWithImplementation(FACTION_MANAGER, factionManagerImp, initializeCalldata)
@@ -173,20 +217,26 @@ async function main() {
     console.log('Deploying Nakamotos Proxies with Implementation...')
     // NAKAMOTOS
     const resp8 = await myManager.deployProxyWithImplementation(NAKAMOTOS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+    const resp8b = await myManager.deployProxyWithImplementation(NAKAMOTOS_FARMING_ID, launchpadStakingImp, initializeCalldataFarming)
 
     console.log('Deploying Vuterins Proxies with Implementation...')
     // VUTERINS
     const resp9 = await myManager.deployProxyWithImplementation(VUTERINS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+    const resp9b = await myManager.deployProxyWithImplementation(VUTERINS_FARMING_ID, launchpadStakingImp, initializeCalldataFarming)
 
     console.log('Deploying Altcoiners Proxies with Implementation...')
     // ALTCOINERS
     const resp10 = await myManager.deployProxyWithImplementation(ALTCOINERS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+    const resp10b = await myManager.deployProxyWithImplementation(ALTCOINERS_FARMING_ID, launchpadStakingImp, initializeCalldataFarming)
 
     await Promise.all([
         resp7.wait(),
         resp8.wait(),
         resp9.wait(),
-        resp10.wait()
+        resp10.wait(),
+        resp8b.wait(),
+        resp9b.wait(),
+        resp10b.wait()
     ])
 
     console.log('Proxies deployment completed...')
@@ -196,17 +246,23 @@ async function main() {
         myManager.get(NAKAMOTOS_STAKING_ID),
         myManager.get(VUTERINS_STAKING_ID),
         myManager.get(ALTCOINERS_STAKING_ID),
+        myManager.get(NAKAMOTOS_FARMING_ID),
+        myManager.get(VUTERINS_FARMING_ID),
+        myManager.get(ALTCOINERS_FARMING_ID),
     ])
 
     console.log('Deploying Nakamotos Proxies with Implementation...')
 
-    const [factionManager, nakamotosStaking, vuterinsStaking, altcoinersStaking] = contracts
+    const [factionManager, nakamotosStaking, vuterinsStaking, altcoinersStaking, nakamotosFarming, vuterinsFarming, altcoinersFarming] = contracts
 
     console.log(
         'FactionManager:', factionManager,
         '\nNakamotosStaking:', nakamotosStaking,
         '\nVuterinsStaking:', vuterinsStaking,
         '\nAltcoinersStaking:', altcoinersStaking,
+        '\nNakamotosFarming:', nakamotosFarming,
+        '\nVuterinsFarming:', vuterinsFarming,
+        '\nAltcoinersFarming:', altcoinersFarming,
     )
 
     const myFactionManager = FactionManager.attach(factionManager)
@@ -216,6 +272,9 @@ async function main() {
     const resp11 = await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
     const resp12 = await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsStaking)
     const resp13 = await myManager.grantRole(ENERGY_MINTER_ROLE, altcoinersStaking)
+    const resp110 = await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosFarming)
+    const resp120 = await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsFarming)
+    const resp130 = await myManager.grantRole(ENERGY_MINTER_ROLE, altcoinersFarming)
 
     console.log('Granting faction manager role...')
     const resp14 = await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
@@ -227,15 +286,18 @@ async function main() {
         resp11.wait(),
         resp12.wait(),
         resp13.wait(),
+        resp110.wait(),
+        resp120.wait(),
+        resp130.wait(),
         resp14.wait(),
         resp15.wait(),
     ])
 
     console.log('Roles granted.')
     console.log('Updating factions...')
-    const resp16 = await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, ethers.constants.AddressZero)
-    const resp17 = await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, ethers.constants.AddressZero)
-    const resp18 = await myFactionManager.updateFaction(ALTCOINERS_FACTION, altcoinersStaking, ethers.constants.AddressZero)
+    const resp16 = await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
+    const resp17 = await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
+    const resp18 = await myFactionManager.updateFaction(ALTCOINERS_FACTION, altcoinersStaking, altcoinersFarming)
 
     await Promise.all([
         resp16.wait(),
@@ -246,11 +308,16 @@ async function main() {
     console.log('Factions updated...')
 
     const TutellusIDO = await ethers.getContractFactory("TutellusIDO");
-    const Token = await ethers.getContractFactory("Token");
 
     const myUsdt = await Token.deploy("Tutellus IDO USDT", "TUT-USDT")
     await myUsdt.deployed()
     await myUsdt.mint(accounts[0].address, ethers.utils.parseEther('10000000'))
+
+    console.log(
+        "USDT: ",
+        myUsdt.address
+    );
+
     const myIdoToken = await Token.deploy("Tutellus IDO 1", "IDO1")
     await myIdoToken.deployed()
 
@@ -263,9 +330,11 @@ async function main() {
     const TutellusIDOFactory = await ethers.getContractFactory(
         "TutellusIDOFactory"
     );
-    const resp20 = await myManager.deploy(
+    const idoFactoryImp = await TutellusIDOFactory.deploy()
+    await idoFactoryImp.deployed()
+    const resp20 = await myManager.deployProxyWithImplementation(
         LAUNCHPAD_IDO_FACTORY,
-        TutellusIDOFactory.bytecode,
+        idoFactoryImp.address,
         initializeCalldata
     );
 
@@ -276,7 +345,7 @@ async function main() {
     console.log("IDOFactory: ", idoFactoryAddr)
     const FUNDING_AMOUNT = ethers.utils.parseEther("100000");
     const MIN_PREFUND = ethers.utils.parseEther("1000");
-    const START_DATE = Date.now().toString()
+    const START_DATE = (Date.now()/1000).toString()
     const END_DATE = parseInt(START_DATE + 1000000).toString();
     const idoInitializeCalldata = TutellusIDO.interface.encodeFunctionData(
         "initialize",
@@ -292,10 +361,17 @@ async function main() {
     );
 
     const Tutellus721 = await ethers.getContractFactory('Tutellus721')
-    const resp40 = await myManager.deploy(NFT_ID, Tutellus721.bytecode, initializeCalldata)
+    const nftsImp = await Tutellus721.deploy()
+    await nftsImp.deployed()
+    const resp40 = await myManager.deployProxyWithImplementation(NFT_ID, nftsImp.address, initializeCalldata)
     await resp40.wait()
     const NFTAddress = await myManager.get(NFT_ID)
     const myNFT = Tutellus721.attach(NFTAddress)
+
+    console.log(
+        "POAPs: ",
+        NFTAddress
+    );
 
     const resp41 = await myManager.grantRole(ADMIN_721_ROLE, accounts[0].address)
     await resp41.wait()
@@ -343,6 +419,13 @@ async function main() {
                 await resp23.wait()
             }
 
+            // LP balance
+            const lpBalance = await myLP.balanceOf(wallet.address)
+            if (lpBalance.lt(FARMING_AMOUNTS[i][j].mul(ethers.BigNumber.from('2')))) {
+                const resp230 = await myLP.transfer(wallet.address, FARMING_AMOUNTS[i][j].mul(ethers.BigNumber.from('2')))
+                await resp230.wait()
+            }
+
             // Staking
 
             const walletFaction = await myFactionManager.factionOf(wallet.address)
@@ -353,6 +436,15 @@ async function main() {
                 await resp24.wait()
                 const resp26 = await myFactionManager.connect(wallet).stake(FACTIONS[j], wallet.address, STAKING_AMOUNTS[i][j])
                 await resp26.wait()
+            }
+
+            // Farming
+
+            if ((walletFaction == ethers.constants.HashZero) || (walletFaction == FACTIONS[j])) {
+                const resp240 = await myLP.connect(wallet).approve(myFactionManager.address, ethers.constants.MaxUint256)
+                await resp240.wait()
+                const resp260 = await myFactionManager.connect(wallet).stakeLP(FACTIONS[j], wallet.address, FARMING_AMOUNTS[i][j])
+                await resp260.wait()
             }
 
             // Prefund IDO
