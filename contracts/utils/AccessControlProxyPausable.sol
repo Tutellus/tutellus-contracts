@@ -25,7 +25,7 @@ abstract contract AccessControlProxyPausable is PausableUpgradeable {
         _;
     }
 
-    function hasRole(bytes32 role, address account) public view returns (bool) {
+    function hasRole(bytes32 role, address account) public view virtual returns (bool) {
         IAccessControlUpgradeable manager = IAccessControlUpgradeable(config);
         return manager.hasRole(role, account);
     }
