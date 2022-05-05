@@ -232,7 +232,7 @@ describe('Energy Token', function () {
             myEnergy = Energy.attach(energy)
             await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
         })
-        it.only('Burning tokens after minting', async () => {
+        it('Burning tokens after minting', async () => {
 
             const rate = await myEnergy.rate()
             await myEnergy.mintVariable(owner, ONE_ETHER)
