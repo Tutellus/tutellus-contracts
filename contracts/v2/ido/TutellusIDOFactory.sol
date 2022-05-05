@@ -17,7 +17,8 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
         address idoToken,
         address prefundToken,
         uint256 startDate,
-        uint256 endDate
+        uint256 endDate,
+        uint256 openDate
     );
 
     function initialize() public initializer {
@@ -55,10 +56,11 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
             address idoToken_,
             address prefundToken_,
             uint256 startDate_,
-            uint256 endDate_
+            uint256 endDate_,
+            uint256 openDate_
         ) = abi.decode(
                 initializeCalldata[4:],
-                (address, uint256, uint256, address, address, uint256, uint256)
+                (address, uint256, uint256, address, address, uint256, uint256, uint256)
             );
 
         emit NewIDO(
@@ -69,7 +71,8 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
             idoToken_,
             prefundToken_,
             startDate_,
-            endDate_
+            endDate_,
+            openDate_
         );
     }
 }
