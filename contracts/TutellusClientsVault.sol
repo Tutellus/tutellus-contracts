@@ -42,7 +42,7 @@ contract TutellusClientsVault is AccessControlProxyPausable {
         require(claimed > 0,"TutellusClientsVault: Nothing to claim.");
         _alreadyClaimed[account] += claimed;
         ITutellusERC20 tokenInterface = ITutellusERC20(token);
-        tokenInterface.transfer(account, amount);
+        tokenInterface.transfer(account, claimed);
         emit Claim(index, account, claimed);
     }
 
