@@ -20,7 +20,7 @@ async function main() {
     const response = await myManager.deploy(
         LAUNCHPAD_IDO_FACTORY,
         TutellusIDOFactory.bytecode,
-        initializeCalldata
+        '0x'
     );
     await response.wait();
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
