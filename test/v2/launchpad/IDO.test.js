@@ -119,7 +119,8 @@ describe('IDOFactory & IDO', function () {
                 myIdoToken.address,
                 myUSDT.address,
                 START_DATE,
-                END_DATE
+                END_DATE,
+                0
             ]
         );
         const response = await myFactory.createProxy(idoCalldata)
@@ -146,7 +147,8 @@ describe('IDOFactory & IDO', function () {
                     myIdoToken.address,
                     myUSDT.address,
                     START_DATE,
-                    END_DATE
+                    END_DATE,
+                    0
                 ]
             );
             const response = await myFactory.createProxy(idoCalldata)
@@ -169,7 +171,8 @@ describe('IDOFactory & IDO', function () {
                     myIdoToken.address,
                     myUSDT.address,
                     START_DATE,
-                    END_DATE
+                    END_DATE,
+                    0
                 ]
             );
             await expectRevert(
@@ -193,6 +196,52 @@ describe('IDOFactory & IDO', function () {
 
             const funderBalancePost = await myUSDT.balanceOf(funder.address)
             const idoBalancePost = await myUSDT.balanceOf(myIDO.address)
+
+            expect(prefunded.toString()).to.equal(prefundAmount.toString())
+            expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount).toString())
+            expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount).toString())
+        });
+
+        it('cant prefund if not open', async () => {
+            const prefundAmount = ethers.utils.parseEther('5000')
+
+            const openDate = parseInt(Date.now() / 1000) + 10000000
+            const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
+            const idoCalldata = await TutellusIDO.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myIdoToken.address,
+                    myUSDT.address,
+                    START_DATE,
+                    END_DATE,
+                    openDate
+                ]
+            );
+            const response = await myFactory.createProxy(idoCalldata)
+            const receipt = await response.wait()
+            const newIDO = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
+
+            const funderBalancePre = await myUSDT.balanceOf(funder.address)
+            const idoBalancePre = await myUSDT.balanceOf(newIDO.address)
+            
+            await myUSDT.connect(funder).approve(newIDO.address, ethers.constants.MaxUint256)
+
+            await expectRevert(
+                newIDO.connect(funder).prefund(funder.address, prefundAmount),
+                'TutellusIDO: IDO is not open'
+            )
+
+            await ethers.provider.send("evm_setNextBlockTimestamp", [openDate + 1])
+
+            await newIDO.connect(funder).prefund(funder.address, prefundAmount)
+
+            const prefunded = await newIDO.getPrefunded(funder.address)
+
+            const funderBalancePost = await myUSDT.balanceOf(funder.address)
+            const idoBalancePost = await myUSDT.balanceOf(newIDO.address)
 
             expect(prefunded.toString()).to.equal(prefundAmount.toString())
             expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount).toString())

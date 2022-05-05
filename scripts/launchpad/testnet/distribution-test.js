@@ -345,11 +345,11 @@ async function main() {
     console.log("IDOFactory: ", idoFactoryAddr)
     const FUNDING_AMOUNT = ethers.utils.parseEther("100000");
     const MIN_PREFUND = ethers.utils.parseEther("1000");
-    const START_DATE = (Date.now()/1000).toString()
-    const END_DATE = parseInt(START_DATE + 1000000).toString();
+    const START_DATE = parseInt(Date.now()/1000)
+    const END_DATE = START_DATE + 1000000
     const idoInitializeCalldata = TutellusIDO.interface.encodeFunctionData(
         "initialize",
-        [myManager.address, FUNDING_AMOUNT, MIN_PREFUND, myIdoToken.address, myUsdt.address, START_DATE, END_DATE]
+        [myManager.address, FUNDING_AMOUNT, MIN_PREFUND, myIdoToken.address, myUsdt.address, START_DATE, END_DATE, 0]
     );
     const resp21 = await myIdoFactory.createProxy(idoInitializeCalldata);
     const receipt = await resp21.wait()
