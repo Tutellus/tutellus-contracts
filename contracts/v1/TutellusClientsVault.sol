@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
-import "./utils/AccessControlProxyPausable.sol";
-import "./interfaces/ITutellusERC20.sol";
+import "contracts/utils/AccessControlProxyPausable.sol";
+import "contracts/interfaces/ITutellusERC20.sol";
 
 contract TutellusClientsVault is AccessControlProxyPausable {
 

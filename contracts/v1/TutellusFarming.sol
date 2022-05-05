@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "./utils/AccessControlProxyPausable.sol";
-import "./interfaces/IERC20.sol";
-import "./interfaces/ITutellusRewardsVault.sol";
+import "contracts/utils/AccessControlProxyPausable.sol";
+import "contracts/interfaces/IERC20.sol";
+import "contracts/interfaces/ITutellusRewardsVault.sol";
 
 contract TutellusFarming is AccessControlProxyPausable {
 

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.9;
 
-import '../interfaces/ITutellusERC20.sol';
-import '../interfaces/ITutellusEnergy.sol';
-import '../interfaces/ITutellusRewardsVaultV2.sol';
-import '../interfaces/ITutellusManager.sol';
-import '../interfaces/ITutellusFactionManager.sol';
-import '../utils/UUPSUpgradeableByRole.sol';
+import 'contracts/interfaces/ITutellusERC20.sol';
+import 'contracts/interfaces/ITutellusEnergy.sol';
+import 'contracts/interfaces/ITutellusRewardsVaultV2.sol';
+import 'contracts/interfaces/ITutellusManager.sol';
+import 'contracts/interfaces/ITutellusFactionManager.sol';
+import 'contracts/utils/UUPSUpgradeableByRole.sol';
 
 contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 

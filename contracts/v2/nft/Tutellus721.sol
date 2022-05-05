@@ -5,9 +5,9 @@ import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URISto
 import '@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/utils/cryptography/draft-EIP712Upgradeable.sol';
-import '../utils/UUPSUpgradeableByRole.sol';
-import '../interfaces/ITutellusEnergy.sol';
-import '../interfaces/ITutellusManager.sol';
+import 'contracts/utils/UUPSUpgradeableByRole.sol';
+import 'contracts/interfaces/ITutellusEnergy.sol';
+import 'contracts/interfaces/ITutellusManager.sol';
 
 contract Tutellus721 is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC721EnumerableUpgradeable, EIP712Upgradeable {
 

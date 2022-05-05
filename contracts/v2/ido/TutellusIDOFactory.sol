@@ -3,7 +3,7 @@ pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import "../utils/UUPSUpgradeableByRole.sol";
+import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "./TutellusIDO.sol";
 
 contract TutellusIDOFactory is UUPSUpgradeableByRole{

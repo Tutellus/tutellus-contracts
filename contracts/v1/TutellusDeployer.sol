@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "../utils/TutellusERC20.sol";
-import "./TutellusRoleManager.sol";
-import "../TutellusHoldersVault.sol";
-import "../TutellusRewardsVault.sol";
-import "../TutellusClientsVault.sol";
-import "../TutellusTreasuryVault.sol";
+import "contracts/utils/TutellusERC20.sol";
+import "contracts/v1/TutellusRoleManager.sol";
+import "contracts/v1/TutellusHoldersVault.sol";
+import "contracts/v1/TutellusRewardsVault.sol";
+import "contracts/v1/TutellusClientsVault.sol";
+import "contracts/v1/TutellusTreasuryVault.sol";
 
 contract TutellusDeployer {
 

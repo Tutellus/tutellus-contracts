@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.9;
 
-import '../utils/UUPSUpgradeableByRole.sol';
-import '../utils/ERC20SnapshotVariableAndStatic.sol';
+import 'contracts/utils/UUPSUpgradeableByRole.sol';
+import 'contracts/utils/ERC20SnapshotVariableAndStatic.sol';
 
 /**
  * @title TutellusEnergy

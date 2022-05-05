@@ -2,9 +2,9 @@
 pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
-import "../utils/CoinCharger.sol";
-import "../utils/UUPSUpgradeableByRole.sol";
-import "../interfaces/ITutellusManager.sol";
+import "contracts/utils/CoinCharger.sol";
+import "contracts/utils/UUPSUpgradeableByRole.sol";
+import "contracts/interfaces/ITutellusManager.sol";
 
 contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
 

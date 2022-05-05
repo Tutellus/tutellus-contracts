@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "./interfaces/ITutellusERC20.sol";
-import "./utils/AccessControlProxyPausable.sol";
+import "contracts/interfaces/ITutellusERC20.sol";
+import "contracts/utils/AccessControlProxyPausable.sol";
 
 contract TutellusHoldersVault is AccessControlProxyPausable {
 
