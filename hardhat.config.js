@@ -127,12 +127,13 @@ module.exports = {
       gasPrice: GAS_PRICE_DEFAULT,
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
       accounts: getAccounts()
-    }
+    },
     // hardhat: {
     //   chainId: 31337,
     //   forking: {
-    //     url: 'https://polygon-mainnet.g.alchemy.com/v2/' + process.env.ALCHEMY_API_KEY
-    //   }
+    //     url: 'https://speedy-nodes-nyc.moralis.io/' + process.env.MORALIS_API_KEY + '/eth/rinkeby/archive'
+    //   },
+    //   accounts: getAccounts()
     // },
     // localhost: {
     //   chainId: 31337
