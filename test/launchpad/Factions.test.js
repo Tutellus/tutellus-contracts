@@ -227,7 +227,7 @@ describe('Factions', function () {
         it('Cant deposit from non faction', async () => {
             const myFactionManagerArtifact = await FactionManagerArtifact.at(factionManager)
             await expectRevert(
-                myFactionManagerArtifact.depositFrom(owner, ONE_ETHER),
+                myFactionManagerArtifact.depositFrom(owner, ONE_ETHER, myToken.address),
                 'TutellusFactionManager: deposit only callable by faction contract'
             )
         })
