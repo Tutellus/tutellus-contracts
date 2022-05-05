@@ -4,8 +4,8 @@ const {
     time
 } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
-const json = require('../examples/testnet/launchpad/test.json')
-const { getIdoTree } = require('../utils/idoTree');
+const json = require('../../../examples/testnet/launchpad/test.json')
+const { getIdoTree } = require('../../../utils/idoTree');
 const TREE = getIdoTree(json)
 const CLAIMS = TREE.toJSON().claims
 

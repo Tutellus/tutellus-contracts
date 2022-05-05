@@ -5,7 +5,7 @@ const { artifacts } = require('hardhat')
 const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
 const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
 const { expect } = require('chai')
-const { fromEther } = require('../utils/shared')
+const { fromEther } = require('../../utils/shared')
 
 const Deployer = artifacts.require('TutellusDeployer')
 const HoldersVault = artifacts.require('TutellusHoldersVault')

@@ -10,7 +10,7 @@ const expectEvent = require('@openzeppelin/test-helpers/src/expectEvent')
 const Deployer = artifacts.require('TutellusDeployer')
 const ClientsVault = artifacts.require('TutellusClientsVault')
 
-const { getBalanceTree } = require('../utils/balanceTree')
+const { getBalanceTree } = require('../../utils/balanceTree')
 
 let myDeployer
 let myClientsVault
@@ -34,7 +34,7 @@ const setInstances = async (addresses) => {
   ])
 }
 
-const sample = require('../examples/example2.json')
+const sample = require('../../examples/example2.json')
 const uri = 'myuri.io'
 const sampleTree = getBalanceTree(sample)
 const account_ = '0x701fd5472DB41225f09e2Ada52Afb9557A7C359A'
