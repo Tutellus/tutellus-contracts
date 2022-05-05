@@ -38,7 +38,7 @@ contract TutellusClientsVaultV2 is UUPSUpgradeableByRole {
       uint256 claimed = leftToClaim(index, account, amount, merkleProof);
       require(claimed > 0,"TutellusClientsVault: Nothing to claim.");
       alreadyClaimed[account] += claimed;
-      address token = ITutellusManager(config).get("ERC20");
+      address token = ITutellusManager(config).get(keccak256("ERC20"));
       ITutellusERC20 tokenInterface = ITutellusERC20(token);
       tokenInterface.transfer(account, claimed);
       emit Claim(index, account, claimed);
