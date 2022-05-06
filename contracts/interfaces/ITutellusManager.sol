@@ -54,19 +54,27 @@ interface ITutellusManager is IAccessControlUpgradeable {
     /// @param id Hashed identifier linked to the proxy contract
     /// @param implementation Address of the existing implementation contract
     /// @param initializeCalldata Calldata for the initialization of the new contract (if necessary)
-    function deployProxyWithImplementation(bytes32 id, address implementation, bytes memory initializeCalldata) external;
+    function deployProxyWithImplementation(
+        bytes32 id,
+        address implementation,
+        bytes memory initializeCalldata
+    ) external;
 
     /// @dev Initializes the manager and sets necessary roles
     function initialize() external;
 
     /// @dev Locks immutably a link between an address and an id
     /// @param id Hashed identifier linked to the proxy contract
-    function lock(bytes32 id) external;
+    function lock(
+        bytes32 id
+    ) external;
 
     /// @dev Returns whether a hashed identifier is locked or not
     /// @param id Hashed identifier linked to the proxy contract
     /// @return isLocked A boolean: true if locked, false if not
-    function locked(bytes32 id) external returns ( bool isLocked );
+    function locked(
+        bytes32 id
+    ) external returns ( bool isLocked );
 
     /// @dev Returns the address linked to a hashed identifier
     /// @param id Hashed identifier
@@ -94,7 +102,11 @@ interface ITutellusManager is IAccessControlUpgradeable {
     /// @param id Hashed identifier linked to the proxy contract
     /// @param implementation Address of the existing implementation contract
     /// @param initializeCalldata Calldata for the initialization of the new contract (if necessary)
-    function upgrade(bytes32 id, address implementation, bytes memory initializeCalldata) external;
+    function upgrade(
+        bytes32 id,
+        address implementation,
+        bytes memory initializeCalldata
+    ) external;
 
     /// @dev Returns upgrader role hashed identifier
     /// @return role Hashed string of UPGRADER_ROLE

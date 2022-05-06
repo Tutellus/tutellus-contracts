@@ -21,7 +21,11 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
     /** PUBLIC METHODS */
 
     /// @inheritdoc ITutellusManager
-    function deploy(bytes32 id, bytes memory bytecode, bytes memory initializeCalldata) public onlyRole(DEFAULT_ADMIN_ROLE) returns(address implementation) {
+    function deploy(
+        bytes32 id,
+        bytes memory bytecode,
+        bytes memory initializeCalldata
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) returns(address implementation) {
         bool upgrading;
         assembly {
             implementation := create(0, add(bytecode, 32), mload(bytecode))
@@ -40,7 +44,11 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
     }
 
     /// @inheritdoc ITutellusManager
-    function deployProxyWithImplementation(bytes32 id, address implementation, bytes memory initializeCalldata) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function deployProxyWithImplementation(
+        bytes32 id,
+        address implementation,
+        bytes memory initializeCalldata
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!locked[id], "TutellusManager: id locked");
         _deployProxy(id, implementation, initializeCalldata);
 
@@ -56,13 +64,18 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
     }
 
     /// @inheritdoc ITutellusManager
-    function lock(bytes32 id) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function lock(
+        bytes32 id
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         locked[id] = true;
         emit Locked(id, get[id]);
     }
 
     /// @inheritdoc ITutellusManager
-    function setId(bytes32 id, address addr) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setId(
+        bytes32 id,
+        address addr
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!locked[id], "TutellusManager: id locked");
         get[id] = addr;
         idOf[addr] = id;
@@ -71,7 +84,11 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
     }
 
     /// @inheritdoc ITutellusManager
-    function upgrade(bytes32 id, address implementation, bytes memory initializeCalldata) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function upgrade(
+        bytes32 id,
+        address implementation,
+        bytes memory initializeCalldata
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         UUPSUpgradeable proxy = UUPSUpgradeable(payable(get[id]));
         if (initializeCalldata.length > 0) {
             proxy.upgradeToAndCall(implementation, initializeCalldata);
@@ -82,7 +99,11 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
 
     /** PRIVATE METHODS */
 
-    function _deployProxy(bytes32 id, address implementation, bytes memory initializeCalldata) private {
+    function _deployProxy(
+        bytes32 id,
+        address implementation,
+        bytes memory initializeCalldata
+    ) private {
         ERC1967Proxy proxy = new ERC1967Proxy(
             implementation,
             initializeCalldata
