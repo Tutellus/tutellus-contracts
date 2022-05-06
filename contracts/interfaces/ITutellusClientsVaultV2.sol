@@ -56,6 +56,6 @@ interface ITutellusClientsVaultV2 {
 
     /// @notice Returns the uri where claims json is located
     /// @return uri Uri, usually ipfs
-    function uri() external returns ( bytes32 uri );
+    function uri() external returns ( string memory uri );
   
 }
