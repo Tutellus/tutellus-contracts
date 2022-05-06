@@ -3,8 +3,8 @@ const bre = require('hardhat');
 const ethers = bre.ethers;
 const { utils, constants } = ethers;
 
-const ID = utils.id('721');
-const CONTRACT_NAME = 'Tutellus721';
+const ID = utils.id('WHITELIST');
+const CONTRACT_NAME = 'TutellusWhitelist';
 
 async function main () {
   bre.run('compile');

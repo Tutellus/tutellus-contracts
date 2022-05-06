@@ -4,7 +4,7 @@ const { utils, constants } = ethers;
 const { id } = utils;
 
 const ADMIN_ROLE = constants.HashZero;
-const ROLE = id('ENERGY_MANAGER_ROLE');
+const ROLE = id('WHITELIST_ADMIN_ROLE');
 const ADDRESS = '0x30729B6910757042024304E56BEB015821462691'
 
 async function main () {
