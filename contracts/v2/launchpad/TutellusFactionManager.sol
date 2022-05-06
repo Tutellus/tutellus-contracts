@@ -30,6 +30,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
             ITutellusWhitelist(whitelist).whitelisted(account),
             'TutellusFactionManager: address not whitelisted'
         );
+        _;
     }
 
     modifier isAuthorized (
@@ -108,21 +109,36 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit StakeLP(id, account, amount);
     }
 
-    function unstake (address account, uint256 amount) public isAuthorized(account) checkAfter(account) {
+    function unstake (
+        address account,
+        uint256 amount
+    ) public
+    isAuthorized(account)
+    checkAfter(account)
+    {
         bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant unstake');
         ITutellusLaunchpadStaking(faction[id].stakingContract).withdraw(account, amount);
         emit Unstake(id, account, amount);
     }
 
-    function unstakeLP (address account, uint256 amount) public isAuthorized(account) checkAfter(account) {
+    function unstakeLP (
+        address account,
+        uint256 amount
+    ) public
+    isAuthorized(account)
+    checkAfter(account)
+    {
         bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant unstakeLP');
         ITutellusLaunchpadStaking(faction[id].farmingContract).withdraw(account, amount);
         emit UnstakeLP(id, account, amount);
     }
 
-    function migrateFaction (address account, bytes32 to) public isAuthorized(account) {
+    function migrateFaction (
+        address account,
+        bytes32 to
+    ) public isAuthorized(account) {
         bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant migrate');
         require(faction[to].stakingContract != address(0) && faction[to].farmingContract != address(0), 'TutellusFactionManager: faction does not exist');
@@ -153,7 +169,11 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit Migrate(id, to, account);
     }
 
-    function depositFrom (address account, uint256 amount, address token) public {
+    function depositFrom (
+        address account,
+        uint256 amount,
+        address token
+    ) public {
         require(isFactionContract[msg.sender], 'TutellusFactionManager: deposit only callable by faction contract');
         ITutellusERC20 tokenInterace = ITutellusERC20(token);
         tokenInterace.transferFrom(account, msg.sender, amount);
