@@ -15,9 +15,6 @@ describe('Whitelist', function () {
         [owner, person, person2] = await ethers.getSigners();
         whitelist = [owner.address, person.address];
         tree = getWhitelistTree(whitelist).toJSON();
-        ownerClaim = tree.claims[owner.address];
-        personClaim = tree.claims[person.address];
-        person2Claim = tree.claims[person2.address];
     })
     beforeEach(async () => {
         // Manager deploy
@@ -26,7 +23,7 @@ describe('Whitelist', function () {
         await myManager.deployTransaction.wait();
         await myManager.initialize();
 
-        // Clients deploy
+        // Whitelist deploy
         const Whitelist = await ethers.getContractFactory('TutellusWhitelist');
         const initializeCalldata = Whitelist.interface.encodeFunctionData('initialize', []);
         await myManager.deploy(

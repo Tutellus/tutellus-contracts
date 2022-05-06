@@ -15,6 +15,7 @@ const TreasuryVault = artifacts.require('TutellusTreasuryVault')
 const ACPP = artifacts.require('AccessControlProxyPausable')
 const LaunchpadStakingArtifact = artifacts.require('TutellusLaunchpadStaking')
 const FactionManagerArtifact = artifacts.require('TutellusFactionManager')
+const { getWhitelistTree } = require('../../../utils/whitelistTree');
 
 let myDeployer
 let myToken
@@ -27,7 +28,7 @@ let owner, person
 let myRewardsVaultV2
 let myFactionManager
 
-let vuterinsStaking, vuterinsFarming, nakamotosStaking, nakamotosFarming, factionManager
+let vuterinsStaking, vuterinsFarming, nakamotosStaking, nakamotosFarming, factionManager, myWhitelist, tree, whitelist, personClaim, ownerClaim
 
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
 const ENERGY_MANAGER_ROLE = ethers.utils.id('ENERGY_MANAGER_ROLE')
@@ -51,6 +52,10 @@ const NAKAMOTOS_FARMING_ID = ethers.utils.id('NAKAMOTOS_FARMING')
 
 const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
 const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
+
+const WHITELIST_ADMIN_ROLE = ethers.utils.id('WHITELIST_ADMIN_ROLE');
+const WHITELIST_ID = ethers.utils.id('WHITELIST');
+const URI = 'uri';
 
 const getAddresses = async () => {
 const addresses = await Promise.all([
@@ -76,6 +81,8 @@ const setInstances = async (addresses) => {
 describe('Factions', function () {
     before(async () => {
         [owner, person] = await web3.eth.getAccounts()
+        whitelist = [owner, person];
+        tree = getWhitelistTree(whitelist).toJSON();
     })
     beforeEach(async () => {
         const previous = await latestBlock()
@@ -121,6 +128,35 @@ describe('Factions', function () {
         await myToken.mint(owner, parseEther('100000'))
         await myToken.mint(myRewardsVaultV2.address, parseEther('1000'))
         await myRewardsVaultV2.setRewardPerBlock(parseEther('1'))
+
+        // Whitelist deploy
+        const Whitelist = await ethers.getContractFactory('TutellusWhitelist');
+        const initializeCalldata2 = Whitelist.interface.encodeFunctionData('initialize', []);
+        await myManager.deploy(
+            WHITELIST_ID,
+            Whitelist.bytecode,
+            initializeCalldata2,
+        );
+        const whitelistAddr = await myManager.get(WHITELIST_ID);
+        myWhitelist = Whitelist.attach(whitelistAddr);
+
+        // add accounts to whitelist
+        await myManager.grantRole(WHITELIST_ADMIN_ROLE, owner);
+        await myWhitelist.updateMerkleRoot(tree.merkleRoot, URI);
+        const personClaim = tree.claims[person];
+        const ownerClaim = tree.claims[owner];
+
+        await myWhitelist.add(
+            personClaim.index,
+            person,
+            personClaim.proof,
+        );
+        await myWhitelist.add(
+            ownerClaim.index,
+            owner,
+            ownerClaim.proof,
+        );
+
     })
     describe('Deploy', () => {
         it('Deploying Factions', async () => {
