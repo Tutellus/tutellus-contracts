@@ -6,6 +6,7 @@ import 'contracts/interfaces/ITutellusLaunchpadStaking.sol';
 import 'contracts/interfaces/ITutellusFactionManager.sol';
 import 'contracts/interfaces/ITutellusERC20.sol';
 import 'contracts/interfaces/ITutellusManager.sol';
+import 'contracts/interfaces/ITutellusWhitelist.sol';
 
 contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRole {
 
@@ -21,12 +22,27 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
     mapping(address=>address) public authorized;
     mapping(address=>bool) public isFactionContract;
 
-    modifier isAuthorized (address account) {
+    modifier isWhitelisted (
+        address account
+    ) {
+        address whitelist = ITutellusManager(config).get(keccak256("WHITELIST"));
+        require(
+            ITutellusWhitelist(whitelist).whitelisted(account),
+            'TutellusFactionManager: address not whitelisted'
+        );
+    }
+
+    modifier isAuthorized (
+        address account
+    ) {
         require(msg.sender == account || authorized[account] == msg.sender, 'TutellusFactionManager: account not authorized');
         _;
     }
 
-    modifier checkFaction (bytes32 id, address account) {
+    modifier checkFaction (
+        bytes32 id,
+        address account
+    ) {
         if (factionOf[account] == 0x00) {
             factionOf[account] = id;
             _;
@@ -37,7 +53,9 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         }
     }
 
-    modifier checkAfter (address account) {
+    modifier checkAfter (
+        address account
+    ) {
         _;
         bytes32 id = factionOf[account];
         ITutellusLaunchpadStaking stakingInterface = ITutellusLaunchpadStaking(faction[id].stakingContract);
@@ -49,22 +67,43 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         }
     }
 
-    function authorize(address account) public {
+    function authorize(
+        address account
+    ) public {
         authorized[msg.sender] = account;
     }
 
-    function updateFaction (bytes32 id, address stakingContract, address farmingContract) public onlyRole(_FACTIONS_ADMIN_ROLE) {
+    function updateFaction (
+        bytes32 id,
+        address stakingContract,
+        address farmingContract
+    ) public onlyRole(_FACTIONS_ADMIN_ROLE) {
         faction[id] = Faction(stakingContract, farmingContract);
         isFactionContract[stakingContract] = true;
         isFactionContract[farmingContract] = true;
     }
 
-    function stake (bytes32 id, address account, uint256 amount) public isAuthorized(account) checkFaction(id, account) {
+    function stake (
+        bytes32 id,
+        address account,
+        uint256 amount
+    ) public
+    isAuthorized(account)
+    isWhitelisted(account)
+    checkFaction(id, account)
+    {
         ITutellusLaunchpadStaking(faction[id].stakingContract).deposit(account, amount);
         emit Stake(id, account, amount);
     }
 
-    function stakeLP (bytes32 id, address account, uint256 amount) public isAuthorized(account) checkFaction(id, account) {
+    function stakeLP (
+        bytes32 id,
+        address account,
+        uint256 amount
+    ) public
+    isAuthorized(account)
+    isWhitelisted(account)
+    checkFaction(id, account) {
         ITutellusLaunchpadStaking(faction[id].farmingContract).deposit(account, amount);
         emit StakeLP(id, account, amount);
     }
