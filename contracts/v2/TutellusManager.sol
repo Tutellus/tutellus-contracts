@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 /// @title The contract of TutellusManager
-/// @dev Manages smart contracts deployments, ids and protocol roles
+/// @notice Manages smart contracts deployments, ids and protocol roles
 contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
 
     /** STORAGE */
