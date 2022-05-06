@@ -1,7 +1,6 @@
 const { expectRevert } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 const { constants } = require('ethers');
-const { parseEther } = require('ethers/lib/utils')
 const { ethers } = require('hardhat');
 const { getWhitelistTree } = require('../../utils/whitelistTree');
 
@@ -11,7 +10,7 @@ const URI = 'uri';
 
 let owner, person, person2, whitelist, tree, myWhitelist, myManager
 
-describe.only('Whitelist', function () {
+describe('Whitelist', function () {
     before(async () => {
         [owner, person, person2] = await ethers.getSigners();
         whitelist = [owner.address, person.address];
