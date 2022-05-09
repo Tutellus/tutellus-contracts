@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgrad
 import "contracts/utils/CoinCharger.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "contracts/interfaces/ITutellusManager.sol";
+import 'contracts/interfaces/ITutellusWhitelist.sol';
 
 contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     uint256 public prefunded;
@@ -44,6 +45,16 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
 
     modifier isOpen() {
         require(block.timestamp > openDate, "TutellusIDO: IDO is not open");
+        _;
+    }
+
+    modifier isWhitelisted (
+        address account
+    ) {
+        require(
+            _isWhitelisted(account),
+            'TutellusIDO: address not whitelisted'
+        );
         _;
     }
 
@@ -107,6 +118,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         public
         isOpen
         isNotClosed
+        isWhitelisted(prefunder_)
     {
         require(
             prefundAmount_ >= minPrefund,
@@ -138,7 +150,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         uint256 withdraw_,
         uint256 energy_,
         bytes32[] calldata merkleProof_
-    ) public {
+    ) public isWhitelisted(account_) {
         _verifyMerkle(
             index_,
             account_,
@@ -204,5 +216,10 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
             MerkleProofUpgradeable.verify(merkleProof_, merkleRoot, node_),
             "TutellusIDO: Invalid merkle proof"
         );
+    }
+
+    function _isWhitelisted(address account) internal view returns(bool) {
+        address whitelist = ITutellusManager(config).get(keccak256("WHITELIST"));
+        return ITutellusWhitelist(whitelist).whitelisted(account);
     }
 }

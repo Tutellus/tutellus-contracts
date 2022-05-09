@@ -8,6 +8,7 @@ const json = require('../../../examples/testnet/launchpad/test.json')
 const { getIdoTree } = require('../../../utils/idoTree');
 const TREE = getIdoTree(json)
 const CLAIMS = TREE.toJSON().claims
+const { getWhitelistTree } = require('../../../utils/whitelistTree');
 
 const _BEACON_SLOT = '0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50';
 const DEFAULT_ADMIN_ROLE = '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -27,13 +28,15 @@ const ALTCOINERS_STAKING_ID = ethers.utils.id('ALTCOINERS_STAKING')
 const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
 const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
 const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
+const WHITELIST_ADMIN_ROLE = ethers.utils.id('WHITELIST_ADMIN_ROLE');
+const WHITELIST_ID = ethers.utils.id('WHITELIST');
 const FUNDING_AMOUNT = ethers.utils.parseEther('10000')
 const MIN_PREFUND = ethers.utils.parseEther('100')
 let START_DATE, END_DATE
 
 let accounts
 let owner, funder, prefunder0, prefunder1, prefunder2, prefunder3
-let myManager, myFactory, myIDO, myUSDT, myTUT, myIdoToken
+let myManager, myFactory, myIDO, myUSDT, myTUT, myIdoToken, myWhitelist
 
 describe('IDOFactory & IDO', function () {
     beforeEach(async () => {
@@ -83,6 +86,29 @@ describe('IDOFactory & IDO', function () {
         await myManager.deployProxyWithImplementation(VUTERINS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
         // ALTCOINERS
         await myManager.deployProxyWithImplementation(ALTCOINERS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
+
+        const Whitelist = await ethers.getContractFactory('TutellusWhitelist');
+        await myManager.deploy(
+            WHITELIST_ID,
+            Whitelist.bytecode,
+            initializeCalldata,
+        );
+        const whitelistAddr = await myManager.get(WHITELIST_ID);
+        myWhitelist = Whitelist.attach(whitelistAddr);
+
+        await myManager.grantRole(WHITELIST_ADMIN_ROLE, owner.address);
+        const whitelist = [owner.address, funder.address, prefunder0.address, prefunder1.address, prefunder2.address, prefunder3.address];
+        const tree = getWhitelistTree(whitelist).toJSON();
+        await myWhitelist.updateMerkleRoot(tree.merkleRoot, 'URI');
+
+        for (let i = 0; i < whitelist.length; i++) {
+            const personClaim = tree.claims[whitelist[i]];
+            await myWhitelist.add(
+                personClaim.index,
+                whitelist[i],
+                personClaim.proof,
+            );
+        }
 
         const contracts = await Promise.all([
             myManager.get(FACTION_MANAGER),
@@ -263,6 +289,43 @@ describe('IDOFactory & IDO', function () {
             )
 
             await myIDO.open()
+
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
+            const prefunded = await myIDO.getPrefunded(funder.address)
+
+            const funderBalancePost = await myUSDT.balanceOf(funder.address)
+            const idoBalancePost = await myUSDT.balanceOf(myIDO.address)
+
+            expect(prefunded.toString()).to.equal(prefundAmount.toString())
+            expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount).toString())
+            expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount).toString())
+        });
+
+        it('cant prefund if not whitelisted', async () => {
+            const prefundAmount = ethers.utils.parseEther('5000')
+
+            const funderBalancePre = await myUSDT.balanceOf(funder.address)
+            const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
+
+            await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+
+            await myWhitelist.remove(funder.address)
+            await myIDO.open()
+
+            await expectRevert(
+                (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
+                'TutellusIDO: address not whitelisted'
+            )
+
+            const whitelist = [owner.address, funder.address, prefunder0.address, prefunder1.address, prefunder2.address, prefunder3.address];
+            const tree = getWhitelistTree(whitelist).toJSON();
+            const personClaim = tree.claims[funder.address];
+            await myWhitelist.add(
+                personClaim.index,
+                funder.address,
+                personClaim.proof
+            );
 
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
