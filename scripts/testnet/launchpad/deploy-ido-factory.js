@@ -2,6 +2,7 @@ const bre = require("hardhat");
 const ethers = bre.ethers;
 
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
+const BEACON_OWNER = ""
 
 async function main() {
     bre.run("compile");
@@ -11,7 +12,7 @@ async function main() {
     );
     const initializeCalldata = TutellusIDOFactory.interface.encodeFunctionData(
         "initialize",
-        []
+        [BEACON_OWNER]
     );
 
     const myManager = Manager.attach(

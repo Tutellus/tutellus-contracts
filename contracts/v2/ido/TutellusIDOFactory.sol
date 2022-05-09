@@ -21,7 +21,7 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
         uint256 openDate
     );
 
-    function initialize() public initializer {
+    function initialize(address _beaconOwner) public initializer {
         __AccessControlProxyPausable_init(msg.sender);
 
         UpgradeableBeacon _beacon = new UpgradeableBeacon(
@@ -29,7 +29,7 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
         );
         beacon = address(_beacon);
 
-        _beacon.transferOwnership(msg.sender); //Beacon upgrader
+        _beacon.transferOwnership(_beaconOwner); //Beacon upgrader
     }
 
     function createProxy(bytes calldata initializeCalldata)
