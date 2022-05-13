@@ -5,7 +5,7 @@ const { expectRevert, time, expectEvent } = require('@openzeppelin/test-helpers'
 const { ZERO_ADDRESS } = require('@openzeppelin/test-helpers/src/constants')
 const { expect } = require('hardhat')
 // const ether = require('@openzeppelin/test-helpers/src/ether')
-const { formatEther, parseEther } = require('ethers/lib/utils')
+const { formatEther, parseEther, id } = require('ethers/lib/utils')
 const { BigNumber, constants } = require('ethers')
 const { expectEqEth, expect1WeiApprox, etherToNumber, expectApproxWeiDecimals } = require('../../utils')
 const Deployer = artifacts.require('TutellusDeployer')
@@ -110,6 +110,11 @@ describe('Launchpad Staking', function () {
         await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
         await myManager.deploy(REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
         await myManager.deploy(FACTION_MANAGER, FactionManager.bytecode, initializeFactionManager)
+
+        const WhitelistMock = await ethers.getContractFactory('WhitelistMock');
+        const myWhitelistMock = await WhitelistMock.deploy();
+        await myWhitelistMock.deployTransaction.wait();
+        await myManager.setId(id('WHITELIST'), myWhitelistMock.address);
 
         const energy = await myManager.get(ENERGY_ID)
         const rvv2 = await myManager.get(REWARDS_ID)
