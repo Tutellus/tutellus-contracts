@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.8.9;
 
+import "contracts/libraries/Contracts.sol";
 import "contracts/interfaces/ITutellusManager.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
@@ -12,11 +13,23 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
 
     /** STORAGE */
     
+    /// @inheritdoc ITutellusManager
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
-    mapping(bytes32=>address) public get;
-    mapping(bytes32=>bool) public locked;
-    mapping(address=>bytes32) public idOf;
+    /// @inheritdoc ITutellusManager
+    mapping(bytes32 => address) public get;
+
+    /// @inheritdoc ITutellusManager
+    mapping(bytes32 => bool) public locked;
+
+    /// @inheritdoc ITutellusManager
+    mapping(address => bytes32) public idOf;
+
+    /// @inheritdoc ITutellusManager
+    mapping(address => bool) public isVerified;
+
+    /// @inheritdoc ITutellusManager
+    mapping(address => address) public implementationByProxy;
 
     /** PUBLIC METHODS */
 
@@ -26,21 +39,17 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
         bytes memory bytecode,
         bytes memory initializeCalldata
     ) public onlyRole(DEFAULT_ADMIN_ROLE) returns(address implementation) {
-        bool upgrading;
-        assembly {
-            implementation := create(0, add(bytecode, 32), mload(bytecode))
-        }
+        implementation = Contracts.deploy(bytecode);
 
         address proxyAddress = get[id];
 
         if (proxyAddress != address(0)) {
             upgrade(id, implementation, initializeCalldata);
-            upgrading = true;
+            emit Deployment(id, get[id], implementation, true);
         } else {
             _deployProxy(id, implementation, initializeCalldata);
+            emit Deployment(id, get[id], implementation, false);
         }
-
-        emit Deployment(id, get[id], implementation, upgrading);
     }
 
     /// @inheritdoc ITutellusManager
@@ -79,8 +88,18 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
         require(!locked[id], "TutellusManager: id locked");
         get[id] = addr;
         idOf[addr] = id;
+        isVerified[addr] = true;
 
         emit NewId(id, addr);
+    }
+
+    /// @inheritdoc ITutellusManager
+    function setVerification(
+        address addr,
+        bool verified
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        isVerified[addr] = verified;
+        emit SetVerification(addr, verified, msg.sender);
     }
 
     /// @inheritdoc ITutellusManager
@@ -95,6 +114,7 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
         } else {
             proxy.upgradeTo(implementation);
         }
+        implementationByProxy[address(proxy)] = implementation;
     }
 
     /** PRIVATE METHODS */
@@ -104,12 +124,14 @@ contract TutellusManager is ITutellusManager, AccessControlUpgradeable {
         address implementation,
         bytes memory initializeCalldata
     ) private {
-        ERC1967Proxy proxy = new ERC1967Proxy(
+        address proxy = address(new ERC1967Proxy(
             implementation,
             initializeCalldata
-        );
-        get[id] = address(proxy);
-        idOf[address(proxy)] = id;
+        )); 
+        get[id] = proxy;
+        idOf[proxy] = id;
+        isVerified[proxy] = true;
+        implementationByProxy[proxy] = implementation;
     }
 
 }

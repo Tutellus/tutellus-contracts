@@ -37,6 +37,16 @@ interface ITutellusManager is IAccessControlUpgradeable {
         address indexed addr
     );
 
+    /// @notice Emitted when verification state is updated
+    /// @param addr Address of the verification updated
+    /// @param verified New verification state
+    /// @param sender Address of the transaction sender
+    event SetVerification(
+        address indexed addr,
+        bool indexed verified,
+        address indexed sender
+    );
+
     /** METHODS */
 
     /// @notice Deploys / upgrades a proxy contract by deploying a new implementation
@@ -90,12 +100,34 @@ interface ITutellusManager is IAccessControlUpgradeable {
         address addr
     ) external view returns ( bytes32 id );
 
+    /// @notice Returns the implementation of the proxy
+    /// @param proxy Proxy address
+    /// @return implementation Implementation of the proxy
+    function implementationByProxy(
+        address proxy
+    ) external view returns ( address implementation );
+
+    /// @notice Returns whether an address is verified
+    /// @param addr Address
+    /// @return verified State of verification
+    function isVerified(
+        address addr
+    ) external view returns ( bool verified );
+
     /// @notice Sets a link between a hashed identifier and an address
     /// @param id Hashed identifier
     /// @param addr Address
     function setId(
         bytes32 id,
         address addr
+    ) external;
+
+    /// @notice Sets a new verification state to an address
+    /// @param addr Address
+    /// @param verified New verification state
+    function setVerification(
+        address addr,
+        bool verified
     ) external;
 
     /// @notice Upgrades a proxy contract with an existing implementation 
