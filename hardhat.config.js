@@ -183,7 +183,7 @@ module.exports = {
   gasReporter: {
     currency: 'USD',
     gasPrice: 21,
-    enabled: process.env.REPORT_GAS
+    enabled: true
   },
   etherscan: {
     // url: process.env.ETHERSCAN_URL,
