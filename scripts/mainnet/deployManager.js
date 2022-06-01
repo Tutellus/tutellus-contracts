@@ -1,6 +1,5 @@
 const bre = require('hardhat');
 const ethers = bre.ethers;
-const { utils, constants } = ethers;
 
 async function main () {
   await bre.run('compile');
