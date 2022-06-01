@@ -4,14 +4,13 @@ const { parseEther } = require('ethers/lib/utils');
 const { getBalanceTree, concatJson } = require('../../../utils/balanceTree');
 
 const json1 = {
-    '0x30729B6910757042024304E56BEB015821462691': '1',
+    '0x30729B6910757042024304E56BEB015821462691': parseEther('20000'),
 }
-
 
 const main = async () => {
     await hre.run('compile');
 
-    const myClientsVault = await ethers.getContractAt('TutellusClientsVault', '0xe5248f3d79626b934a5524e0a18fdf7a0d52cef2');
+    const myClientsVault = await ethers.getContractAt('TutellusClientsVault', '0x1f358e074e6f5A40aDD369206c2A0ffeCf847f23');
     console.log('Getting current uri...')
     const uri0 = await myClientsVault.uri();
     console.log('Downloading current JSON...')
