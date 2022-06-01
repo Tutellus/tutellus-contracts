@@ -1,16 +1,15 @@
 const bre = require('hardhat');
 const ethers = bre.ethers;
-const { utils, constants } = ethers;
+const { utils } = ethers;
 const { id } = utils;
 
-const ADMIN_ROLE = constants.HashZero;
-const ROLE = id('CROWDSALE_ADMIN_ROLE');
-const ADDRESS = '0x1eeeDE19FaE1369A8fc3e3F178e42EB8810ba2cf'
+const ROLE = id('CLIENTS_REWARDS_ADMIN_ROLE');
+const ADDRESS = '0xd6e8654DF9C756aFfAe4EF54Fc51Ed874744acB8'
 
 async function main () {
   bre.run('compile');
-  const Manager = await ethers.getContractFactory('ReentalManager');
-  const myManager = Manager.attach('0x00bce06882d66aDfA61da5B173DE7c8d7Bc3E0e6');
+  const Manager = await ethers.getContractFactory('TutellusManager');
+  const myManager = Manager.attach('0x73205567d90A45533879eF39a29920056225eFB2');
   const response = await myManager.grantRole(ROLE, ADDRESS)
   await response.wait()
 }

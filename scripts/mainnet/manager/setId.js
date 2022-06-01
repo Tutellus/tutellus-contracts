@@ -2,13 +2,13 @@ const bre = require('hardhat');
 const ethers = bre.ethers;
 const { utils, constants } = ethers;
 
-const ID = utils.id('REENTAL_VAULT');
-const ADDRESS = '0x1eeeDE19FaE1369A8fc3e3F178e42EB8810ba2cf';
+const ID = utils.id('ERC20');
+const ADDRESS = '0x12a34a6759c871c4c1e8a0a42cfc97e4d7aaf68d';
 
 async function main () {
-  bre.run('compile');
-  const Manager = await ethers.getContractFactory('ReentalManager');
-  const myManager = Manager.attach('0x00bce06882d66aDfA61da5B173DE7c8d7Bc3E0e6');
+  await bre.run('compile');
+  const Manager = await ethers.getContractFactory('TutellusManager');
+  const myManager = Manager.attach('0x73205567d90A45533879eF39a29920056225eFB2');
 
   const proxyCheck = await myManager.get(ID)
   if(proxyCheck == constants.AddressZero) {
