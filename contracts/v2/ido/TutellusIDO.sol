@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.9;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 import "contracts/utils/CoinCharger.sol";
@@ -121,7 +121,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         isWhitelisted(prefunder_)
     {
         require(
-            prefundAmount_ >= minPrefund,
+            prefundAmount_ + _prefunds[prefunder_] >= minPrefund,
             "TutellusIDO: insufficient prefund"
         );
         _prefund(prefundAmount_, prefunder_);

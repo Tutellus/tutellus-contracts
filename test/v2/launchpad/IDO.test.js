@@ -351,6 +351,19 @@ describe('IDOFactory & IDO', function () {
             expect(prefunded.toString()).to.equal(MIN_PREFUND.toString())
         });
 
+        it('can prefund 1 wei if total prefunded is gt min prefund', async () => {
+            await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            
+            await expectRevert(
+                (await myIDO.connect(funder)).prefund(funder.address, 1),
+                'TutellusIDO: insufficient prefund'
+            )
+            myIDO.connect(funder).prefund(funder.address, MIN_PREFUND)
+            await (await myIDO.connect(funder)).prefund(funder.address, 1)
+            const prefunded = await myIDO.getPrefunded(funder.address)
+            expect(prefunded.toString()).to.equal(MIN_PREFUND.add(1).toString())
+        });
+
         it('reverts if prefund under minPrefund amount', async () => {
             const prefundAmount = ethers.utils.parseEther('10')
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
