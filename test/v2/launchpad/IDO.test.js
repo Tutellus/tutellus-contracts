@@ -15,6 +15,7 @@ const DEFAULT_ADMIN_ROLE = '0x00000000000000000000000000000000000000000000000000
 const IDO_FACTORY_ID = ethers.utils.id('IDO_FACTORY')
 const IDO_USDT_ID = ethers.utils.id('IDO_USDT')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
+const UPGRADER_ROLE = ethers.utils.id('UPGRADER_ROLE')
 const ENERGY_ID = ethers.utils.id('ENERGY')
 const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
 const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
@@ -70,7 +71,7 @@ describe('IDOFactory & IDO', function () {
         await myTUT.mint(rewardsAddr, ethers.utils.parseEther('50000'))
         const factoryImp = await TutellusIDOFactory.deploy()
         await factoryImp.deployed()
-        const initializeCalldataFactoryIDO = TutellusIDOFactory.interface.encodeFunctionData('initialize', [owner.address])
+        const initializeCalldataFactoryIDO = TutellusIDOFactory.interface.encodeFunctionData('initialize', [])
         await myManager.deployProxyWithImplementation(IDO_FACTORY_ID, factoryImp.address, initializeCalldataFactoryIDO)
         const factoryAddress = await myManager.get(IDO_FACTORY_ID)
         myFactory = await ethers.getContractAt('TutellusIDOFactory', factoryAddress)
@@ -155,6 +156,7 @@ describe('IDOFactory & IDO', function () {
         myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
 
         await myManager.grantRole(MINTER_ROLE, owner.address)
+        await myManager.grantRole(UPGRADER_ROLE, owner.address)
         await myUSDT.mint(owner.address, ethers.utils.parseEther('1000000'))
         await myUSDT.mint(funder.address, ethers.utils.parseEther('1000000'))
         await myUSDT.mint(myIDO.address, ethers.utils.parseEther('1000000'))
@@ -162,30 +164,6 @@ describe('IDOFactory & IDO', function () {
     });
 
     describe('Factory', function () {
-
-        it('can create an IDO (proxy to beacon)', async () => {
-            const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
-            const idoCalldata = await TutellusIDO.interface.encodeFunctionData(
-                'initialize',
-                [
-                    myManager.address,
-                    FUNDING_AMOUNT,
-                    MIN_PREFUND,
-                    myIdoToken.address,
-                    myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    0
-                ]
-            );
-            const response = await myFactory.createProxy(idoCalldata)
-            const receipt = await response.wait()
-            myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
-            const beaconAddress = await myFactory.beacon()
-            const beaconEncoded = await ethers.provider.getStorageAt(myIDO.address, _BEACON_SLOT)
-            const beaconAddress2 = ethers.utils.defaultAbiCoder.decode(['address'], beaconEncoded)
-            expect(beaconAddress).to.equal(beaconAddress2[0])
-        });
 
         it('only DEFAULT_ADMIN_ROLE can create an IDO', async () => {
             const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
@@ -206,6 +184,93 @@ describe('IDOFactory & IDO', function () {
                 (await myFactory.connect(funder)).createProxy(idoCalldata),
                 'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
             )
+        });
+
+        it('can create multiple IDOs and upgrade individually', async () => {
+            const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
+            const idoCalldata = TutellusIDO.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myIdoToken.address,
+                    myUSDT.address,
+                    START_DATE,
+                    END_DATE,
+                    0
+                ]
+            );
+            const response = await myFactory.createProxy(idoCalldata)
+            const receipt = await response.wait()
+            let myIDO1 = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
+            const response2 = await myFactory.createProxy(idoCalldata)
+            const receipt2 = await response2.wait()
+            const myIDO2 = await ethers.getContractAt('TutellusIDO', receipt2.events[1].args['proxy'])
+            const myProxy1 = await ethers.getContractAt('UUPSUpgradeableByRole', myIDO1.address)
+            const myProxy2 = await ethers.getContractAt('UUPSUpgradeableByRole', myIDO2.address)
+            const IDOV2Mock = await ethers.getContractFactory('IDOV2Mock')
+            const customImplementation = await IDOV2Mock.deploy()
+            await myProxy1.upgradeTo(customImplementation.address)
+            myIDO1 = await ethers.getContractAt('IDOV2Mock', myIDO1.address)
+            expect(await myIDO1.idoVersion()).to.equal("IDO-V2")
+            expect(await myProxy1.implementation()).to.equal(customImplementation.address)
+            expect(await myProxy2.implementation()).to.equal(await myFactory.fixedImplementation())
+        });
+
+        it('can create an IDO with custom implementation', async () => {
+            const IDOV2Mock = await ethers.getContractFactory('IDOV2Mock')
+            const customImplementation = await IDOV2Mock.deploy()
+            const idoCalldata = IDOV2Mock.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myIdoToken.address,
+                    myUSDT.address,
+                    START_DATE,
+                    END_DATE,
+                    0
+                ]
+            );
+            const response = await myFactory.createProxyWithCustomImplementation(customImplementation.address, idoCalldata)
+            const receipt = await response.wait()
+            const customIdo = await ethers.getContractAt('IDOV2Mock', receipt.events[1].args['proxy'])
+            expect(await customIdo.idoVersion()).to.equal("IDO-V2")
+        });
+
+        it('can change fixedImplementation and create proxy using it', async () => {
+            const IDOV2Mock = await ethers.getContractFactory('IDOV2Mock')
+            const customImplementation = await IDOV2Mock.deploy()
+            await myFactory.updateImplementation(customImplementation.address)
+            const idoCalldata = IDOV2Mock.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myIdoToken.address,
+                    myUSDT.address,
+                    START_DATE,
+                    END_DATE,
+                    0
+                ]
+            );
+            const response = await myFactory.createProxy(idoCalldata)
+            const receipt = await response.wait()
+            const customIdo = await ethers.getContractAt('IDOV2Mock', receipt.events[1].args['proxy'])
+            expect(await customIdo.idoVersion()).to.equal("IDO-V2")
+        });
+
+        it('only DEFAULT_ADMIN_ROLE can create an IDO', async () => {
+            const IDOV2Mock = await ethers.getContractFactory('IDOV2Mock')
+            const customImplementation = await IDOV2Mock.deploy()
+            await expectRevert(
+                myFactory.connect(funder).updateImplementation(customImplementation.address),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+            )
+            await myFactory.updateImplementation(customImplementation.address)
         });
     });
 

@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "./TutellusIDO.sol";
 
 contract TutellusIDOFactory is UUPSUpgradeableByRole {
-    address public beacon;
+    address public fixedImplementation;
 
     event NewIDO(
         address indexed proxy,
@@ -21,15 +20,16 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
         uint256 openDate
     );
 
-    function initialize(address _beaconOwner) public initializer {
+    event NewImplementation(address implementation);
+
+    function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
+        fixedImplementation = address(new TutellusIDO());
+    }
 
-        UpgradeableBeacon _beacon = new UpgradeableBeacon(
-            address(new TutellusIDO())
-        );
-        beacon = address(_beacon);
-
-        _beacon.transferOwnership(_beaconOwner); //Beacon upgrader
+    function updateImplementation(address newImplementation) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        fixedImplementation = newImplementation;
+        emit NewImplementation(newImplementation);
     }
 
     function createProxy(bytes calldata initializeCalldata)
@@ -37,17 +37,25 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
         onlyRole(DEFAULT_ADMIN_ROLE)
         returns (address proxy)
     {
-        (proxy) = _createProxy(initializeCalldata);
+        (proxy) = _createProxy(fixedImplementation, initializeCalldata);
     }
 
-    function _createProxy(bytes calldata initializeCalldata)
-        private
-        whenNotPaused
-        returns (address proxyAddress)
+    function createProxyWithCustomImplementation(address implementation, bytes calldata initializeCalldata)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+        returns (address proxy)
     {
-        BeaconProxy proxy = new BeaconProxy(beacon, initializeCalldata);
+        (proxy) = _createProxy(implementation, initializeCalldata);
+    }
 
-        proxyAddress = address(proxy);
+    function _createProxy(
+        address implementation,
+        bytes calldata initializeCalldata
+    ) private whenNotPaused returns (address proxyAddress) {
+        proxyAddress = address(new ERC1967Proxy(
+            implementation,
+            initializeCalldata
+        )); 
 
         (
             address token_,
