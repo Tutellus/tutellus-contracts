@@ -38,3 +38,5 @@ yarn-error.log*
 .vercel
 .yalc
 yalc.lock
+
+holders_testnet.json

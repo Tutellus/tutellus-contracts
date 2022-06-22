@@ -131,7 +131,7 @@ module.exports = {
     // hardhat: {
     //   chainId: 31337,
     //   forking: {
-    //     url: 'https://speedy-nodes-nyc.moralis.io/' + process.env.MORALIS_API_KEY + '/eth/rinkeby/archive'
+    //     url: 'https://speedy-nodes-nyc.moralis.io/' + process.env.MORALIS_API_KEY + '/eth/goerli/archive'
     //   },
     //   accounts: getAccounts()
     // },
@@ -171,6 +171,24 @@ module.exports = {
       },
       {
         version: '0.4.18',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.6.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.5.16',
         settings: {
           optimizer: {
             enabled: true,
