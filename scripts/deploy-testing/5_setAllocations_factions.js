@@ -39,7 +39,7 @@ async function main () {
 
   const Manager = await ethers.getContractFactory('TutellusManager');
   const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2');
-  const myManager = Manager.attach('0x06223cb5CB01191521e07a2e65dD1E0430E0705b');
+  const myManager = Manager.attach('0xF182F7576867D6516C280aacbE99c8230250C153');
   const resp = await myManager.grantRole(ethers.utils.id('REWARDS_MANAGER_ROLE'), accounts[0].address)
   await resp.wait()
   const rvv2Addr = await myManager.get(LAUNCHPAD_REWARDS);

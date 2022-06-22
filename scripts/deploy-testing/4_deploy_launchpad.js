@@ -24,9 +24,9 @@ const LAUNCHPAD_ADMIN_ROLE = ethers.utils.id('LAUNCHPAD_ADMIN_ROLE')
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 
-const TUT_ADDRESS = '0x7F42C954DffaB4dddfdF3dDE8238d9840671B4a8'
-const LP_ADDRESS = '0x1b4b44f875bBD8F5E3424A97237a0eB9dab3Cf8C'
-const MANAGER_ADDRESS = '0x06223cb5CB01191521e07a2e65dD1E0430E0705b'
+const TUT_ADDRESS = '0x0975234abB45394582299bB3a8fC50F1903C1ac2'
+const LP_ADDRESS = '0xAB134443Ebf6ab886D0a0278A486669b81515679'
+const MANAGER_ADDRESS = '0xF182F7576867D6516C280aacbE99c8230250C153'
 
 async function main () {
     const signers = await ethers.getSigners()
@@ -165,23 +165,6 @@ async function main () {
     const resp131 = await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, signers[0].address)
     const resp132 = await myManager.grantRole(WHITELIST_ADMIN_ROLE, signers[0].address)
 
-    console.log('Setting energy multipliers...')
-
-    const stakings = [nakamotosStaking, vuterinsStaking, altcoinersStaking]
-    const farmings = [nakamotosFarming, vuterinsFarming, altcoinersFarming]
-
-    for (let i = 0; i < stakings.length; i++) {
-        const myContract = await ethers.getContractAt('TutellusLaunchpadStaking', stakings[i]);
-        const tx = await myContract.setEnergyMultiplier(ethers.utils.parseEther('2'));
-        await tx.wait();
-    }
-
-    for (let i = 0; i < farmings.length; i++) {
-        const myContract = await ethers.getContractAt('TutellusLaunchpadStaking', farmings[i]);
-        const tx = await myContract.setEnergyMultiplier(ethers.utils.parseEther('929.938772404'));
-        await tx.wait();
-    }
-
     console.log('Granting faction manager role...')
     const resp14 = await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
 
@@ -200,6 +183,23 @@ async function main () {
         resp14.wait(),
         resp15.wait(),
     ])
+
+    console.log('Setting energy multipliers...')
+
+    const stakings = [nakamotosStaking, vuterinsStaking, altcoinersStaking]
+    const farmings = [nakamotosFarming, vuterinsFarming, altcoinersFarming]
+
+    for (let i = 0; i < stakings.length; i++) {
+        const myContract = await ethers.getContractAt('TutellusLaunchpadStaking', stakings[i]);
+        const tx = await myContract.setEnergyMultiplier(ethers.utils.parseEther('2'));
+        await tx.wait();
+    }
+
+    for (let i = 0; i < farmings.length; i++) {
+        const myContract = await ethers.getContractAt('TutellusLaunchpadStaking', farmings[i]);
+        const tx = await myContract.setEnergyMultiplier(ethers.utils.parseEther('929.938772404'));
+        await tx.wait();
+    }
 
     console.log('Roles granted.')
     console.log('Updating factions...')

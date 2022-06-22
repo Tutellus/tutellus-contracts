@@ -6,7 +6,7 @@ const { concatArrays, getWhitelistTree } = require('../../utils/whitelistTree');
 const main = async () => {
     await hre.run('compile');
 
-    const myWhitelist = await ethers.getContractAt('TutellusWhitelist', '0xF6953a3E6dEc8C6Bec93d1f1B4dc1fD04FEC3384');
+    const myWhitelist = await ethers.getContractAt('TutellusWhitelist', '0x5F1a679b87222122de92A68C3c7e5A4A92455Deb');
     console.log('Getting current uri...')
     const uri0 = await myWhitelist.uri();
 
