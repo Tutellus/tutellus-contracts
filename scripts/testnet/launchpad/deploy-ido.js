@@ -1,14 +1,14 @@
 const bre = require("hardhat");
 const ethers = bre.ethers;
 
-const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY_V2");
+const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 const IDO_USDT = ethers.utils.id("IDO_USDT");
-const MANAGER_ADDR = "0x9b77Cb09d5E61D44fEf00e59Cfcc8Af67DAe9A45";
+const MANAGER_ADDR = "0xF182F7576867D6516C280aacbE99c8230250C153";
 const FUNDING_AMOUNT = ethers.utils.parseEther("100000");
 const MIN_PREFUND = ethers.utils.parseEther("1000");
 const TIME_OFFSET = 864000
 const START_DATE = parseInt(Date.now()/1000) + TIME_OFFSET
-const END_DATE = START_DATE + 1000000 + TIME_OFFSET
+const END_DATE = START_DATE + 86400000 + TIME_OFFSET
 
 async function main() {
     bre.run("compile");
