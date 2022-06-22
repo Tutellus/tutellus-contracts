@@ -23,6 +23,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     mapping(address => uint256) private _claimed;
     mapping(address => bool) private _withdrawn;
     mapping(address => uint256) private _prefunds;
+    mapping(address => bool) private _termsAndConditions;
 
     event Prefund(address indexed funder, uint256 amount);
     event Withdraw(address indexed funder, uint256 amount);
@@ -37,6 +38,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         uint256 energy
     );
     event Closed(bool closed);
+    event AcceptTermsAndConditions(address idoUser);
 
     modifier isNotClosed() {
         require(!closed, "TutellusIDO: IDO is closed");
@@ -55,6 +57,11 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
             _isWhitelisted(account),
             'TutellusIDO: address not whitelisted'
         );
+        _;
+    }
+
+    modifier acceptedTermsAndConditions(address account) {
+        require(_termsAndConditions[account], 'TutellusIDO: address not accepted terms and conditions');
         _;
     }
 
@@ -80,6 +87,11 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
 
     function getPrefunded(address prefunder_) public view returns (uint256) {
         return _prefunds[prefunder_];
+    }
+
+    function acceptTermsAndConditions() public isWhitelisted(msg.sender) {
+        _termsAndConditions[msg.sender] = true;
+        emit AcceptTermsAndConditions(msg.sender);
     }
 
     function released(uint256 allocation) public view returns (uint256) {
@@ -118,7 +130,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         public
         isOpen
         isNotClosed
-        isWhitelisted(prefunder_)
+        acceptedTermsAndConditions(prefunder_)
     {
         require(
             prefundAmount_ + _prefunds[prefunder_] >= minPrefund,
@@ -150,7 +162,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         uint256 withdraw_,
         uint256 energy_,
         bytes32[] calldata merkleProof_
-    ) public isWhitelisted(account_) {
+    ) public acceptedTermsAndConditions(account_) {
         _verifyMerkle(
             index_,
             account_,

@@ -283,6 +283,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
 
@@ -320,6 +321,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(newIDO.address)
             
             await myUSDT.connect(funder).approve(newIDO.address, ethers.constants.MaxUint256)
+            await newIDO.connect(funder).acceptTermsAndConditions()
 
             await expectRevert(
                 newIDO.connect(funder).prefund(funder.address, prefundAmount),
@@ -348,6 +350,7 @@ describe('IDOFactory & IDO', function () {
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
             await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
 
             await expectRevert(
                 (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
@@ -367,7 +370,7 @@ describe('IDOFactory & IDO', function () {
             expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount).toString())
         });
 
-        it('cant prefund if not whitelisted', async () => {
+        it('cant prefund if not acceptedTermsAndConditions', async () => {
             const prefundAmount = ethers.utils.parseEther('5000')
 
             const funderBalancePre = await myUSDT.balanceOf(funder.address)
@@ -381,7 +384,7 @@ describe('IDOFactory & IDO', function () {
 
             await expectRevert(
                 (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
-                'TutellusIDO: address not whitelisted'
+                'TutellusIDO: address not accepted terms and conditions'
             )
 
             const whitelist = [owner.address, funder.address, prefunder0.address, prefunder1.address, prefunder2.address, prefunder3.address];
@@ -393,6 +396,7 @@ describe('IDOFactory & IDO', function () {
                 personClaim.proof
             );
 
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
 
@@ -407,6 +411,7 @@ describe('IDOFactory & IDO', function () {
         it('can prefund exact min prefund amount', async () => {
             const prefundAmount = ethers.utils.parseEther('10')
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await expectRevert(
                 (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
                 'TutellusIDO: insufficient prefund'
@@ -418,6 +423,7 @@ describe('IDOFactory & IDO', function () {
 
         it('can prefund 1 wei if total prefunded is gt min prefund', async () => {
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             
             await expectRevert(
                 (await myIDO.connect(funder)).prefund(funder.address, 1),
@@ -432,6 +438,7 @@ describe('IDOFactory & IDO', function () {
         it('reverts if prefund under minPrefund amount', async () => {
             const prefundAmount = ethers.utils.parseEther('10')
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await expectRevert(
                 (await myIDO.connect(funder)).prefund(funder.address, prefundAmount),
                 'TutellusIDO: insufficient prefund'
@@ -452,6 +459,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
             await (await myIDO.connect(funder)).withdraw(withdrawAmount)
@@ -474,6 +482,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
 
@@ -504,6 +513,7 @@ describe('IDOFactory & IDO', function () {
             const withdrawAmountRight = ethers.utils.parseEther('4900')
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             await expectRevert(
                 (await myIDO.connect(funder)).withdraw(withdrawAmountWrong),
@@ -518,6 +528,7 @@ describe('IDOFactory & IDO', function () {
             const withdrawAmountRight = ethers.utils.parseEther('4000')
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             await expectRevert(
                 (await myIDO.connect(funder)).withdraw(withdrawAmountWrong),
@@ -534,6 +545,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
             await (await myIDO.connect(funder)).withdrawAll()
@@ -556,6 +568,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
 
@@ -588,6 +601,7 @@ describe('IDOFactory & IDO', function () {
             let divisionBN = ethers.BigNumber.from('4')
             await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
             for (let i = 2; i < 6; i++) {
+                await (await myIDO.connect(accounts[i])).acceptTermsAndConditions()
                 await ethers.provider.send("evm_setNextBlockTimestamp", [START_DATE + ((i-2) * slot)])
                 await myIDO.claim(
                     CLAIMS[accounts[i].address].index,
@@ -622,6 +636,7 @@ describe('IDOFactory & IDO', function () {
 
         it('cant claim with wrong proof', async () => {
             await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await (await myIDO.connect(accounts[2])).acceptTermsAndConditions()
             await expectRevert(
                 myIDO.connect(funder).claim(
                     CLAIMS[accounts[2].address].index,
