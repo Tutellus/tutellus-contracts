@@ -2,8 +2,8 @@ const { ethers } = require('ethers');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const fs = require('fs')
 const path = require('path')
-const IDO = '0x5431b9516bC59810132932Da4f3790e9541Ef132'
-const ENERGY_ADDR = '0x388F6778660D07578B426607DF6937baEBf9405B'
+const IDO = '0xAB25CBdD7396Cf0d22Df9180fB83D98ebFDb4CaF'
+const ENERGY_ADDR = '0x582C10dAa0ccdF4D536ca39074Cc62E736441AF8'
 const POAP_ID = '0x920fe3daba3d7e2f76b6bf2cd29ede1505083df5202d94862a7bb5c8bb3b4806'
 const jsonPath = '../../../examples/testnet/launchpad/' + IDO.toLowerCase() + '.json'
 
