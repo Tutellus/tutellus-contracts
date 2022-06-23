@@ -89,6 +89,10 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         return _prefunds[prefunder_];
     }
 
+    function getAcceptedTermsAndConditions(address account) public view returns (bool) {
+        return _termsAndConditions[account];
+    }
+
     function acceptTermsAndConditions() public isWhitelisted(msg.sender) {
         _termsAndConditions[msg.sender] = true;
         emit AcceptTermsAndConditions(msg.sender);
