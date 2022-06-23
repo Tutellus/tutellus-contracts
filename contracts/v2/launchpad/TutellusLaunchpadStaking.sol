@@ -56,6 +56,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   event UpdateData(address account, uint256 amount, uint256 rewardDebt, uint256 notClaimed, uint endInterval);
   event SetFees(uint256 minFee, uint256 maxFee, uint feeInterval);
   event Migrate(address from, address to, address account, uint256 amount, bytes response);
+  event SetEnergyMultiplier(uint256 multiplier);
 
   modifier onlyFactionManager {
     require(msg.sender == ITutellusManager(config).get(keccak256('FACTION_MANAGER')), 'TutellusLaunchpadStaking: only faction manager');
@@ -77,6 +78,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
   function setEnergyMultiplier (uint256 newMultiplier) public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
     energyMultiplier = newMultiplier;
+    emit SetEnergyMultiplier(energyMultiplier);
   }
 
   modifier update() {

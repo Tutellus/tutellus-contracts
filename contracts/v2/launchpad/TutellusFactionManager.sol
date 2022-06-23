@@ -148,24 +148,33 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
 
         uint256 stakingBalance = stakingInterface.getUserBalance(account);
         uint256 farmingBalance = farmingInterface.getUserBalance(account);
+        uint256 newStakingAmount;
+        uint256 newFarmingAmount;
 
         if (stakingBalance > 0) {
-            uint256 newAmount = stakingInterface.withdraw(account, stakingBalance);
-            ITutellusLaunchpadStaking(faction[to].stakingContract).deposit(account, newAmount);
+            newStakingAmount = stakingInterface.withdraw(account, stakingBalance);
             emit Unstake(id, account, stakingBalance);
-            emit Stake(to, account, newAmount);
         }
 
         if (farmingBalance > 0) {
-            uint256 newAmount = farmingInterface.withdraw(account, farmingBalance);
-            ITutellusLaunchpadStaking(faction[to].farmingContract).deposit(account, newAmount);
+            newFarmingAmount = farmingInterface.withdraw(account, farmingBalance);
             emit UnstakeLP(id, account, farmingBalance);
-            emit StakeLP(to, account, newAmount);
+        }
+
+        emit FactionOut(id, account);
+        emit FactionIn(to, account);
+
+        if (newStakingAmount > 0) {
+            ITutellusLaunchpadStaking(faction[to].stakingContract).deposit(account, newStakingAmount);
+            emit Stake(to, account, newStakingAmount);
+        }
+
+        if (newFarmingAmount > 0) {
+            ITutellusLaunchpadStaking(faction[to].farmingContract).deposit(account, newFarmingAmount);
+            emit StakeLP(to, account, newFarmingAmount);
         }
 
         factionOf[account] = to;
-        emit FactionOut(id, account);
-        emit FactionIn(to, account);
         emit Migrate(id, to, account);
     }
 
