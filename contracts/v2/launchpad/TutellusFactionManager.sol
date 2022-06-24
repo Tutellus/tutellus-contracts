@@ -93,8 +93,8 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
     isWhitelisted(account)
     checkFaction(id, account)
     {
-        ITutellusLaunchpadStaking(faction[id].stakingContract).deposit(account, amount);
-        emit Stake(id, account, amount);
+        uint256 energy = ITutellusLaunchpadStaking(faction[id].stakingContract).deposit(account, amount);
+        emit Stake(id, account, amount, energy);
     }
 
     function stakeLP (
@@ -105,8 +105,8 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
     isAuthorized(account)
     isWhitelisted(account)
     checkFaction(id, account) {
-        ITutellusLaunchpadStaking(faction[id].farmingContract).deposit(account, amount);
-        emit StakeLP(id, account, amount);
+        uint256 energy = ITutellusLaunchpadStaking(faction[id].farmingContract).deposit(account, amount);
+        emit StakeLP(id, account, amount, energy);
     }
 
     function unstake (
@@ -118,8 +118,8 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
     {
         bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant unstake');
-        ITutellusLaunchpadStaking(faction[id].stakingContract).withdraw(account, amount);
-        emit Unstake(id, account, amount);
+        (,uint256 energy) = ITutellusLaunchpadStaking(faction[id].stakingContract).withdraw(account, amount);
+        emit Unstake(id, account, amount, energy);
     }
 
     function unstakeLP (
@@ -131,8 +131,8 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
     {
         bytes32 id = factionOf[account];
         require(id != 0x00, 'TutellusFactionManager: cant unstakeLP');
-        ITutellusLaunchpadStaking(faction[id].farmingContract).withdraw(account, amount);
-        emit UnstakeLP(id, account, amount);
+        (,uint256 energy) = ITutellusLaunchpadStaking(faction[id].farmingContract).withdraw(account, amount);
+        emit UnstakeLP(id, account, amount, energy);
     }
 
     function migrateFaction (
@@ -150,28 +150,29 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         uint256 farmingBalance = farmingInterface.getUserBalance(account);
         uint256 newStakingAmount;
         uint256 newFarmingAmount;
+        uint256 energy;
 
         if (stakingBalance > 0) {
-            newStakingAmount = stakingInterface.withdraw(account, stakingBalance);
-            emit Unstake(id, account, stakingBalance);
+            (newStakingAmount, energy) = stakingInterface.withdraw(account, stakingBalance);
+            emit Unstake(id, account, stakingBalance, energy);
         }
 
         if (farmingBalance > 0) {
-            newFarmingAmount = farmingInterface.withdraw(account, farmingBalance);
-            emit UnstakeLP(id, account, farmingBalance);
+            (newFarmingAmount, energy) = farmingInterface.withdraw(account, farmingBalance);
+            emit UnstakeLP(id, account, farmingBalance, energy);
         }
 
         emit FactionOut(id, account);
         emit FactionIn(to, account);
 
         if (newStakingAmount > 0) {
-            ITutellusLaunchpadStaking(faction[to].stakingContract).deposit(account, newStakingAmount);
-            emit Stake(to, account, newStakingAmount);
+            energy = ITutellusLaunchpadStaking(faction[to].stakingContract).deposit(account, newStakingAmount);
+            emit Stake(to, account, newStakingAmount, energy);
         }
 
         if (newFarmingAmount > 0) {
-            ITutellusLaunchpadStaking(faction[to].farmingContract).deposit(account, newFarmingAmount);
-            emit StakeLP(to, account, newFarmingAmount);
+            energy = ITutellusLaunchpadStaking(faction[to].farmingContract).deposit(account, newFarmingAmount);
+            emit StakeLP(to, account, newFarmingAmount, energy);
         }
 
         factionOf[account] = to;

@@ -111,7 +111,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   // Deposits tokens for staking
-  function deposit(address account, uint256 amount) public update onlyFactionManager {
+  function deposit(address account, uint256 amount) public update onlyFactionManager returns(uint256) {
     require(amount > 0, 'TutellusLaunchpadStaking: amount must be over zero');
 
     ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
@@ -144,10 +144,11 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
     emit Deposit(account, amount, energyMinted);
+    return energyMinted;
   }
 
   // Withdraws tokens from staking
-  function withdraw(address account, uint256 amount) public update onlyFactionManager returns (uint256) {
+  function withdraw(address account, uint256 amount) public update onlyFactionManager returns (uint256, uint256) {
     require(amount > 0, 'TutellusLaunchpadStaking: amount must be over zero');
     Data storage user = data[account];
 
@@ -191,7 +192,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
     emit Withdraw(account, amount, burned, energyBurned);
-    return amount;
+    return (amount, energyShare);
   }
 
   // Claims rewards

@@ -13,7 +13,7 @@ interface ITutellusLaunchpadStaking {
   function claim (  ) external;
   function config (  ) external view returns ( address );
   function data ( address ) external view returns ( uint256 amount, uint256 rewardDebt, uint256 notClaimed, uint256 endInterval, uint256 minFee, uint256 maxFee, uint256 feeInterval, uint256 energyDebt );
-  function deposit ( address account, uint256 amount ) external;
+  function deposit ( address account, uint256 amount ) external returns ( uint256 );
   function energyMultiplier (  ) external view returns ( uint256 );
   function feeInterval (  ) external view returns ( uint256 );
   function getBlocksLeft ( address account ) external view returns ( uint256 );
@@ -36,5 +36,5 @@ interface ITutellusLaunchpadStaking {
   function updateManager ( address manager ) external;
   function upgradeTo ( address newImplementation ) external;
   function upgradeToAndCall ( address newImplementation, bytes calldata data ) external;
-  function withdraw ( address account, uint256 amount ) external returns ( uint256 );
+  function withdraw ( address account, uint256 amount ) external returns ( uint256, uint256 );
 }

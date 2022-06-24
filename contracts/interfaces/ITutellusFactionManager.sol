@@ -6,11 +6,11 @@ interface ITutellusFactionManager {
   event FactionIn(bytes32 id, address account);
   event FactionOut(bytes32 id, address account);
 
-  event Stake(bytes32 id, address account, uint256 amount);
-  event Unstake(bytes32 id, address account, uint256 amount);
+  event Stake(bytes32 id, address account, uint256 amount, uint256 energy);
+  event Unstake(bytes32 id, address account, uint256 amount, uint256 energy);
 
-  event StakeLP(bytes32 id, address account, uint256 amount);
-  event UnstakeLP(bytes32 id, address account, uint256 amount);
+  event StakeLP(bytes32 id, address account, uint256 amount, uint256 energy);
+  event UnstakeLP(bytes32 id, address account, uint256 amount, uint256 energy);
 
   event Migrate(bytes32 id, bytes32 to, address account);
 
