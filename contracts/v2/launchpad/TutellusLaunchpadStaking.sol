@@ -7,6 +7,7 @@ import 'contracts/interfaces/ITutellusRewardsVaultV2.sol';
 import 'contracts/interfaces/ITutellusManager.sol';
 import 'contracts/interfaces/ITutellusFactionManager.sol';
 import 'contracts/utils/UUPSUpgradeableByRole.sol';
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
 contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
 
@@ -135,7 +136,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
       _reward(account);
     }
 
-    uint256 energyMinted = amount * energyMultiplier / 1 ether;
+    uint256 energyMinted = amount * _getEnergyMultiplier() / 1 ether;
     user.energyDebt += energyInterface.scale(energyMinted);
 
     ITutellusFactionManager(msg.sender).depositFrom(account, amount, token);
@@ -259,6 +260,21 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   function getUserBalance(address account) public view returns(uint256) {
     Data memory user = data[account];
     return user.amount;
+  }
+
+  function getEnergyMultiplier() public view returns(uint256) {
+    return _getEnergyMultiplier();
+  }
+
+  function _getEnergyMultiplier() internal view returns (uint256) {
+    address tut = ITutellusManager(config).get(keccak256('ERC20'));
+    if (token == tut) return 1 ether;
+    (uint112 reserve0, uint112 reserve1,) = IUniswapV2Pair(token).getReserves();
+    address token0 = IUniswapV2Pair(token).token0();
+    uint256 tutReserves = token0 == tut ? reserve0 : reserve1;
+    uint256 tutValue = tutReserves * 2;
+    uint256 totalSupply = IUniswapV2Pair(token).totalSupply();
+    return tutValue * 1 ether / totalSupply;
   }
 
   /**
