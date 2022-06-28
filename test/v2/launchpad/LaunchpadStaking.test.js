@@ -35,9 +35,11 @@ const REWARDS_MANAGER_ROLE = ethers.utils.id('REWARDS_MANAGER_ROLE')
 const LAUNCHPAD_ADMIN_ROLE = ethers.utils.id('LAUNCHPAD_ADMIN_ROLE')
 const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
 const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
+const ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
 const REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 const ENERGY_ID = ethers.utils.id('ENERGY');
+const ENERGY_MULTIPLIER_MANAGER = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER')
 const ONE_ETHER = parseEther('1')
 const TWO_ETHER = parseEther('2')
 const SIX_ETHER = parseEther('6')
@@ -102,6 +104,7 @@ describe('Launchpad Staking', function () {
 
         const Energy = await ethers.getContractFactory('TutellusEnergy')
         const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
+        const TutellusEnergyMultiplierManager = await ethers.getContractFactory('TutellusEnergyMultiplierManager')
         let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
 
         const FactionManager = await ethers.getContractFactory('TutellusFactionManager');
@@ -110,6 +113,7 @@ describe('Launchpad Staking', function () {
         await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
         await myManager.deploy(REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
         await myManager.deploy(FACTION_MANAGER, FactionManager.bytecode, initializeFactionManager)
+        await myManager.deploy(ENERGY_MULTIPLIER_MANAGER, TutellusEnergyMultiplierManager.bytecode, initializeCalldata)
 
         const WhitelistMock = await ethers.getContractFactory('WhitelistMock');
         const myWhitelistMock = await WhitelistMock.deploy();
@@ -118,17 +122,20 @@ describe('Launchpad Staking', function () {
 
         const energy = await myManager.get(ENERGY_ID)
         const rvv2 = await myManager.get(REWARDS_ID)
+        const energyManagerAddr = await myManager.get(ENERGY_MULTIPLIER_MANAGER)
         const factionManager = await myManager.get(FACTION_MANAGER)
         expect(energy).not.eq(ZERO_ADDRESS)
         myEnergy = Energy.attach(energy)
         myRewardsVaultV2 = RewardsVaultV2.attach(rvv2)
         myFactionManager = FactionManager.attach(factionManager)
+        myEnergyManager = TutellusEnergyMultiplierManager.attach(energyManagerAddr)
 
         await myManager.grantRole(MINTER_ROLE, owner)
         await myManager.grantRole(REWARDS_MANAGER_ROLE, owner)
         await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
         await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
         await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
+        await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, owner)
         
         await myToken.mint(owner, parseEther('100000'))
     })
@@ -157,6 +164,9 @@ describe('Launchpad Staking', function () {
 
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
             myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
 
             // Creating a faction
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
@@ -187,6 +197,9 @@ describe('Launchpad Staking', function () {
 
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
             myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
 
             // Creating a faction
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
@@ -230,6 +243,9 @@ describe('Launchpad Staking', function () {
 
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
             myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
 
             // Creating a faction
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
@@ -354,6 +370,9 @@ describe('Launchpad Staking', function () {
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
             myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
 
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+
             // Creating a faction
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
             await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
@@ -410,6 +429,9 @@ describe('Launchpad Staking', function () {
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
             myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
 
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+
             // Creating a faction
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)
             await myFactionManager.updateFaction(NAKAMOTOS_FACTION, launchpadStaking, launchpadFarming)
@@ -455,13 +477,13 @@ describe('Launchpad Staking', function () {
                 'TutellusLaunchpadStaking: maxFee cannot exceed 100 ether'
             )
         })
-        it('Set a new energy multiplier', async () => {
-            await myLaunchpadStaking.setEnergyMultiplier(TWO_ETHER)
-            await myToken.approve(myFactionManager.address, ONE_ETHER)
-            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
-            const energyBalance = await myEnergy.balanceOf(owner)
-            expectEqEth(energyBalance, TWO_ETHER)
-        })
+        // it('Set a new energy multiplier', async () => {
+        //     await myLaunchpadStaking.setEnergyMultiplier(TWO_ETHER)
+        //     await myToken.approve(myFactionManager.address, ONE_ETHER)
+        //     await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+        //     const energyBalance = await myEnergy.balanceOf(owner)
+        //     expectEqEth(energyBalance, TWO_ETHER)
+        // })
     })
     describe('Autoreward', () => {
         beforeEach(async () => {
@@ -487,6 +509,9 @@ describe('Launchpad Staking', function () {
 
             myLaunchpadStaking = LaunchpadStaking.attach(launchpadStaking)
             myLaunchpadFarming = LaunchpadStaking.attach(launchpadFarming)
+
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
+            await myEnergyManager.setMultiplierType(launchpadStaking, 1)
 
             // Creating a faction
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, myFactionManager.address)

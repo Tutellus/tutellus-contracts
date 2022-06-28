@@ -153,7 +153,7 @@ describe('IDOFactory & IDO', function () {
         );
         const response = await myFactory.createProxy(idoCalldata)
         const receipt = await response.wait()
-        myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
+        myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
 
         await myManager.grantRole(MINTER_ROLE, owner.address)
         await myManager.grantRole(UPGRADER_ROLE, owner.address)
@@ -203,10 +203,10 @@ describe('IDOFactory & IDO', function () {
             );
             const response = await myFactory.createProxy(idoCalldata)
             const receipt = await response.wait()
-            let myIDO1 = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
+            let myIDO1 = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
             const response2 = await myFactory.createProxy(idoCalldata)
             const receipt2 = await response2.wait()
-            const myIDO2 = await ethers.getContractAt('TutellusIDO', receipt2.events[1].args['proxy'])
+            const myIDO2 = await ethers.getContractAt('TutellusIDO', receipt2.events[2].args['proxy'])
             const myProxy1 = await ethers.getContractAt('UUPSUpgradeableByRole', myIDO1.address)
             const myProxy2 = await ethers.getContractAt('UUPSUpgradeableByRole', myIDO2.address)
             const IDOV2Mock = await ethers.getContractFactory('IDOV2Mock')
@@ -315,7 +315,7 @@ describe('IDOFactory & IDO', function () {
             );
             const response = await myFactory.createProxy(idoCalldata)
             const receipt = await response.wait()
-            const newIDO = await ethers.getContractAt('TutellusIDO', receipt.events[1].args['proxy'])
+            const newIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
 
             const funderBalancePre = await myUSDT.balanceOf(funder.address)
             const idoBalancePre = await myUSDT.balanceOf(newIDO.address)

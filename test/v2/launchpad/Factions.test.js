@@ -36,9 +36,11 @@ const REWARDS_MANAGER_ROLE = ethers.utils.id('REWARDS_MANAGER_ROLE')
 const LAUNCHPAD_ADMIN_ROLE = ethers.utils.id('LAUNCHPAD_ADMIN_ROLE')
 const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
 const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
+const ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE')
 const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
 const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
 const REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
+const ENERGY_MULTIPLIER_MANAGER = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER')
 const ENERGY_ID = ethers.utils.id('ENERGY');
 const ONE_ETHER = parseEther('1')
 const TWO_ETHER = parseEther('2')
@@ -112,16 +114,20 @@ describe('Factions', function () {
 
         const Energy = await ethers.getContractFactory('TutellusEnergy')
         const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
+        const TutellusEnergyMultiplierManager = await ethers.getContractFactory('TutellusEnergyMultiplierManager')
         let initializeCalldata = Energy.interface.encodeFunctionData('initialize', []);
         
         await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
         await myManager.deploy(REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
+        await myManager.deploy(ENERGY_MULTIPLIER_MANAGER, TutellusEnergyMultiplierManager.bytecode, initializeCalldata)
 
         const energy = await myManager.get(ENERGY_ID)
         const rvv2 = await myManager.get(REWARDS_ID)
+        const energyManagerAddr = await myManager.get(ENERGY_MULTIPLIER_MANAGER)
         expect(energy).not.eq(constants.ZeroAddress)
         myEnergy = Energy.attach(energy)
         myRewardsVaultV2 = RewardsVaultV2.attach(rvv2)
+        myEnergyManager = TutellusEnergyMultiplierManager.attach(energyManagerAddr)
 
         await myManager.grantRole(MINTER_ROLE, owner)
         await myManager.grantRole(REWARDS_MANAGER_ROLE, owner)
@@ -182,11 +188,17 @@ describe('Factions', function () {
             await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsFarming)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosFarming)
+            await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, owner)
 
             await myRewardsVaultV2.add(vuterinsStaking, [parseEther('100')])
             await myRewardsVaultV2.add(vuterinsFarming, [parseEther('50'), parseEther('50')])
             await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
             await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
+
+            await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
+            await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
+            await myEnergyManager.setMultiplierType(vuterinsFarming, 1)
+            await myEnergyManager.setMultiplierType(nakamotosFarming, 1)
 
             myFactionManager = FactionManager.attach(factionManager)
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
@@ -222,11 +234,17 @@ describe('Factions', function () {
             await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsFarming)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosFarming)
+            await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, owner)
 
             await myRewardsVaultV2.add(vuterinsStaking, [parseEther('100')])
             await myRewardsVaultV2.add(vuterinsFarming, [parseEther('50'), parseEther('50')])
             await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
             await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
+
+            await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
+            await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
+            await myEnergyManager.setMultiplierType(vuterinsFarming, 1)
+            await myEnergyManager.setMultiplierType(nakamotosFarming, 1)
 
             myFactionManager = FactionManager.attach(factionManager)
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
@@ -292,11 +310,17 @@ describe('Factions', function () {
             await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsFarming)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosFarming)
+            await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, owner)
 
             await myRewardsVaultV2.add(vuterinsStaking, [parseEther('100')])
             await myRewardsVaultV2.add(vuterinsFarming, [parseEther('50'), parseEther('50')])
             await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
             await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
+
+            await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
+            await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
+            await myEnergyManager.setMultiplierType(vuterinsFarming, 1)
+            await myEnergyManager.setMultiplierType(nakamotosFarming, 1)
 
             myFactionManager = FactionManager.attach(factionManager)
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
@@ -379,11 +403,17 @@ describe('Factions', function () {
             await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsFarming)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
             await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosFarming)
+            await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, owner)
 
             await myRewardsVaultV2.add(vuterinsStaking, [parseEther('100')])
             await myRewardsVaultV2.add(vuterinsFarming, [parseEther('50'), parseEther('50')])
             await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
             await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
+
+            await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
+            await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
+            await myEnergyManager.setMultiplierType(vuterinsFarming, 1)
+            await myEnergyManager.setMultiplierType(nakamotosFarming, 1)
 
             myFactionManager = FactionManager.attach(factionManager)
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)

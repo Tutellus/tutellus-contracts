@@ -6,6 +6,7 @@ import 'contracts/interfaces/ITutellusEnergy.sol';
 import 'contracts/interfaces/ITutellusRewardsVaultV2.sol';
 import 'contracts/interfaces/ITutellusManager.sol';
 import 'contracts/interfaces/ITutellusFactionManager.sol';
+import 'contracts/interfaces/ITutellusEnergyMultiplierManager.sol';
 import 'contracts/utils/UUPSUpgradeableByRole.sol';
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
@@ -267,14 +268,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
   }
 
   function _getEnergyMultiplier() internal view returns (uint256) {
-    address tut = ITutellusManager(config).get(keccak256('ERC20'));
-    if (token == tut) return 1 ether;
-    (uint112 reserve0, uint112 reserve1,) = IUniswapV2Pair(token).getReserves();
-    address token0 = IUniswapV2Pair(token).token0();
-    uint256 tutReserves = token0 == tut ? reserve0 : reserve1;
-    uint256 tutValue = tutReserves * 2;
-    uint256 totalSupply = IUniswapV2Pair(token).totalSupply();
-    return tutValue * 1 ether / totalSupply;
+    address _energyManager = ITutellusManager(config).get(keccak256('ENERGY_MULTIPLIER_MANAGER'));
+    return ITutellusEnergyMultiplierManager(_energyManager).getEnergyMultiplier(address(this));
   }
 
   /**
