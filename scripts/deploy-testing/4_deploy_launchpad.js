@@ -15,6 +15,8 @@ const ENERGY_AUX_ID = ethers.utils.id('ENERGY_AUX')
 const ENERGY_ID = ethers.utils.id('ENERGY')
 const ERC20_ID = ethers.utils.id('ERC20')
 const WHITELIST_ID = ethers.utils.id('WHITELIST')
+const ENERGY_MULTIPLIER_MANAGER_ID = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER')
+const ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE')
 const WHITELIST_ADMIN_ROLE = ethers.utils.id('WHITELIST_ADMIN_ROLE')
 const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
 const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
@@ -24,9 +26,9 @@ const LAUNCHPAD_ADMIN_ROLE = ethers.utils.id('LAUNCHPAD_ADMIN_ROLE')
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 
-const TUT_ADDRESS = '0x0975234abB45394582299bB3a8fC50F1903C1ac2'
-const LP_ADDRESS = '0xAB134443Ebf6ab886D0a0278A486669b81515679'
-const MANAGER_ADDRESS = '0xF182F7576867D6516C280aacbE99c8230250C153'
+const TUT_ADDRESS = '0x930f169A87545a8c6a3e7934d42d1582c03e1b35'
+const LP_ADDRESS = '0xfd5447D667eB6960fA326cfa68b7936f52940cA7'
+const MANAGER_ADDRESS = '0x0e75e4D2041287813a693971634400EAe765910C'
 
 async function main () {
     const signers = await ethers.getSigners()
@@ -38,6 +40,7 @@ async function main () {
     const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
     const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
     const TutellusWhitelist = await ethers.getContractFactory("TutellusWhitelist");
+    const TutellusEnergyMultiplierManager = await ethers.getContractFactory("TutellusEnergyMultiplierManager");
     const Token = await ethers.getContractFactory("Token");
 
     const myManager = await ethers.getContractAt('TutellusManager', MANAGER_ADDRESS)
@@ -54,8 +57,11 @@ async function main () {
     await resp30.wait()
     const resp300 = await myManager.deploy(WHITELIST_ID, TutellusWhitelist.bytecode, initializeCalldata)
     await resp300.wait()
+    const resp3000 = await myManager.deploy(ENERGY_MULTIPLIER_MANAGER_ID, TutellusEnergyMultiplierManager.bytecode, initializeCalldata)
+    await resp3000.wait()
     const rewardsAddr = await myManager.get(LAUNCHPAD_REWARDS_ID)
     const whitelistAddr = await myManager.get(WHITELIST_ID)
+    const energyMasterAddr = await myManager.get(ENERGY_MULTIPLIER_MANAGER_ID)
     const myTUT = await ethers.getContractAt('Token', TUT_ADDRESS)
     await myTUT.mint(rewardsAddr, ethers.utils.parseEther('50000'))
 
@@ -68,6 +74,13 @@ async function main () {
         "Whitelist: ",
         whitelistAddr
     );
+
+    console.log(
+        "EnergyMultiplierManager: ",
+        energyMasterAddr
+    );
+
+    const myEnergyManager = TutellusEnergyMultiplierManager.attach(energyMasterAddr)
 
     const myUsdt = await Token.deploy("Tutellus IDO USDT", "TUT-USDT")
     await myUsdt.deployed()
@@ -164,6 +177,21 @@ async function main () {
     const resp130 = await myManager.grantRole(ENERGY_MINTER_ROLE, altcoinersFarming)
     const resp131 = await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, signers[0].address)
     const resp132 = await myManager.grantRole(WHITELIST_ADMIN_ROLE, signers[0].address)
+    const resp1320 = await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, signers[0].address)
+    await resp1320.wait()
+
+    const txx1 = await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
+    txx1.wait()
+    const txx2 = await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
+    txx2.wait()
+    const txx3 = await myEnergyManager.setMultiplierType(altcoinersStaking, 1)
+    txx3.wait()
+    const txx4 = await myEnergyManager.setMultiplierType(nakamotosFarming, 2)
+    txx4.wait()
+    const txx5 = await myEnergyManager.setMultiplierType(vuterinsFarming, 2)
+    txx5.wait()
+    const txx6 = await myEnergyManager.setMultiplierType(altcoinersFarming, 2)
+    txx6.wait()
 
     console.log('Granting faction manager role...')
     const resp14 = await myManager.grantRole(FACTION_MANAGER_ROLE, factionManager)
@@ -183,23 +211,6 @@ async function main () {
         resp14.wait(),
         resp15.wait(),
     ])
-
-    console.log('Setting energy multipliers...')
-
-    const stakings = [nakamotosStaking, vuterinsStaking, altcoinersStaking]
-    const farmings = [nakamotosFarming, vuterinsFarming, altcoinersFarming]
-
-    for (let i = 0; i < stakings.length; i++) {
-        const myContract = await ethers.getContractAt('TutellusLaunchpadStaking', stakings[i]);
-        const tx = await myContract.setEnergyMultiplier(ethers.utils.parseEther('2'));
-        await tx.wait();
-    }
-
-    for (let i = 0; i < farmings.length; i++) {
-        const myContract = await ethers.getContractAt('TutellusLaunchpadStaking', farmings[i]);
-        const tx = await myContract.setEnergyMultiplier(ethers.utils.parseEther('929.938772404'));
-        await tx.wait();
-    }
 
     console.log('Roles granted.')
     console.log('Updating factions...')
