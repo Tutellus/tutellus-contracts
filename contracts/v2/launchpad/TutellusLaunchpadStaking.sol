@@ -138,7 +138,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     }
 
     uint256 energyMinted = amount * _getEnergyMultiplier() / 1 ether;
-    user.energyDebt += energyInterface.scale(energyMinted);
+    uint256 energyScaled = energyInterface.scale(energyMinted);
+    user.energyDebt += energyScaled;
 
     ITutellusFactionManager(msg.sender).depositFrom(account, amount, token);
     energyInterface.mintVariable(account, energyMinted);
@@ -146,7 +147,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
     emit Update(balance, accRewardsPerShare, lastUpdate, stakers);
     emit UpdateData(account, user.amount, user.rewardDebt, user.notClaimed, user.endInterval);
     emit Deposit(account, amount, energyMinted);
-    return energyMinted;
+    return energyScaled;
   }
 
   // Withdraws tokens from staking
