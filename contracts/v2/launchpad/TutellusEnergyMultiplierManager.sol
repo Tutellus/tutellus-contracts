@@ -11,8 +11,10 @@ contract TutellusEnergyMultiplierManager is UUPSUpgradeableByRole {
     bytes32 public constant ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE = keccak256('ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE');
 
     mapping(address => uint8) private _multiplierType;
+    mapping(uint8 => uint256) private _factorByType;
 
     event SetMultiplierType(address energyContract, uint8 multiplierType);
+    event SetFactor(uint256 factor, uint8 multiplierType);
 
     constructor() {
         _disableInitializers();
@@ -20,6 +22,8 @@ contract TutellusEnergyMultiplierManager is UUPSUpgradeableByRole {
 
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
+        _factorByType[1] = 1;
+        _factorByType[2] = 1;
     }
 
     function getEnergyMultiplier(address _contract) public view returns(uint256) {
@@ -31,11 +35,16 @@ contract TutellusEnergyMultiplierManager is UUPSUpgradeableByRole {
         emit SetMultiplierType(_contract, _type);
     }
 
+    function setFactoryByType(uint256 factor, uint8 _type) public onlyRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE) {
+        _factorByType[_type] = factor;
+        emit SetFactor(factor, _type);
+    }
+
     function _getEnergyMultiplier(address _contract) internal view returns(uint256 multiplier) {
         if (_multiplierType[_contract] == 1) {
-            multiplier = _getMultiplierStaking();
+            multiplier = _getMultiplierStaking() * _factorByType[1];
         } else if (_multiplierType[_contract] == 2) {
-            multiplier = _getEnergyMultiplierFarming(_contract);
+            multiplier = _getEnergyMultiplierFarming(_contract) * _factorByType[2];
         }
     }
 
