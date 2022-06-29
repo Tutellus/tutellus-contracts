@@ -98,6 +98,10 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         emit AcceptTermsAndConditions(msg.sender);
     }
 
+    function claimed(address account) public view returns(uint256) {
+        return _claimed[account];
+    }
+
     function released(uint256 allocation) public view returns (uint256) {
         return
             block.timestamp > endDate ? allocation : block.timestamp > startDate
