@@ -3,13 +3,13 @@ const ethers = bre.ethers;
 
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 const IDO_USDT = ethers.utils.id("IDO_USDT");
-const MANAGER_ADDR = "0xF182F7576867D6516C280aacbE99c8230250C153";
-const FUNDING_AMOUNT = ethers.utils.parseEther("100000");
+const MANAGER_ADDR = "0x0e75e4D2041287813a693971634400EAe765910C";
+const FUNDING_AMOUNT = ethers.utils.parseEther("30000");
 const MIN_PREFUND = ethers.utils.parseEther("1000");
 const TIME_OFFSET = 864000
 const START_DATE = parseInt(Date.now()/1000) + TIME_OFFSET
 const END_DATE = START_DATE + 86400000 + TIME_OFFSET
-const IDO_TOKEN_AMOUNT = ethers.utils.parseEther("300000");
+const IDO_TOKEN_AMOUNT = ethers.utils.parseEther("60000");
 
 async function main() {
     bre.run("compile");
@@ -35,10 +35,10 @@ async function main() {
 
     console.log(
         "IDO: ",
-        receipt.events[1].args.proxy
+        receipt.events[2].args.proxy
     );
 
-    const mintTx = await myIdoToken.mint(receipt.events[1].args.proxy, IDO_TOKEN_AMOUNT)
+    const mintTx = await myIdoToken.mint(receipt.events[2].args.proxy, IDO_TOKEN_AMOUNT)
     await mintTx.wait()
     console.log("IDO token minted...")
 }
