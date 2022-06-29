@@ -9,6 +9,7 @@ const MIN_PREFUND = ethers.utils.parseEther("1000");
 const TIME_OFFSET = 864000
 const START_DATE = parseInt(Date.now()/1000) + TIME_OFFSET
 const END_DATE = START_DATE + 86400000 + TIME_OFFSET
+const IDO_TOKEN_AMOUNT = ethers.utils.parseEther("300000");
 
 async function main() {
     bre.run("compile");
@@ -36,6 +37,10 @@ async function main() {
         "IDO: ",
         receipt.events[1].args.proxy
     );
+
+    const mintTx = await myIdoToken.mint(receipt.events[1].args.proxy, IDO_TOKEN_AMOUNT)
+    await mintTx.wait()
+    console.log("IDO token minted...")
 }
 
 main()
