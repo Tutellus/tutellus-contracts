@@ -331,6 +331,9 @@ function computeDistribution(prefundersArray) {
             values['allocation'] = prefundersArray[i].allocated.toString()
             values['withdraw'] = prefundersArray[i].left.toString()
             values['energy'] = prefundersArray[i].energy.toString()
+            values['faction'] = prefundersArray[i].faction
+            values['isTop'] = prefundersArray[i].row == 0 ? true : false
+            values['isSupertutellian'] = prefundersArray[i].row == 2 ? false : true
             json[prefundersArray[i].account] = values
         }
     } else {
