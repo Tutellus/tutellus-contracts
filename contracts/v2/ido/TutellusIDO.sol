@@ -37,6 +37,13 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         uint256 withdraw,
         uint256 energy
     );
+    event WithdrawLeft(
+        uint256 index,
+        address account,
+        uint256 allocation,
+        uint256 withdraw,
+        uint256 energy
+    );
     event Closed(bool closed);
     event AcceptTermsAndConditions(address idoUser);
 
@@ -167,6 +174,35 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         );
     }
 
+    function withdrawLeft(
+        uint256 index_,
+        address account_,
+        uint256 allocation_,
+        uint256 withdraw_,
+        uint256 energy_,
+        bytes32[] calldata merkleProof_
+    ) public acceptedTermsAndConditions(account_) {
+        _verifyMerkle(
+            index_,
+            account_,
+            allocation_,
+            withdraw_,
+            energy_,
+            merkleProof_
+        );
+        if ((!_withdrawn[account_]) && (withdraw_ > 0)) {
+            _withdrawn[account_] = true;
+            _transfer(prefundToken, account_, withdraw_);
+        }
+        emit WithdrawLeft(
+            index_,
+            account_,
+            allocation_,
+            withdraw_,
+            energy_
+        );
+    }
+
     function claim(
         uint256 index_,
         address account_,
@@ -187,10 +223,6 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         if (claimableAmount_ > 0) {
             _claimed[account_] += claimableAmount_;
             _transfer(idoToken, account_, claimableAmount_);
-        }
-        if ((!_withdrawn[account_]) && (withdraw_ > 0)) {
-            _withdrawn[account_] = true;
-            _transfer(prefundToken, account_, withdraw_);
         }
         emit Claim(
             index_,

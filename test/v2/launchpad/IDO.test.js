@@ -613,8 +613,18 @@ describe('IDOFactory & IDO', function () {
                 )
                 let idoBalance = await myIdoToken.balanceOf(accounts[i].address)
                 expect(idoBalance.toString()).to.equal(ethers.BigNumber.from(json[accounts[i].address].allocation).mul(ethers.BigNumber.from((i-2).toString())).div(divisionBN).toString())
-                let usdtBalance = await myUSDT.balanceOf(accounts[i].address)
-                expect(usdtBalance.toString()).to.equal(json[accounts[i].address].withdraw)
+                let usdtBalancePre = await myUSDT.balanceOf(accounts[i].address)
+                expect(usdtBalancePre.toString()).to.equal('0')
+                await myIDO.withdrawLeft(
+                    CLAIMS[accounts[i].address].index,
+                    accounts[i].address,
+                    CLAIMS[accounts[i].address].allocation,
+                    CLAIMS[accounts[i].address].withdraw,
+                    CLAIMS[accounts[i].address].energy,
+                    CLAIMS[accounts[i].address].proof
+                )
+                let usdtBalancePost = await myUSDT.balanceOf(accounts[i].address)
+                expect(usdtBalancePost.toString()).to.equal(json[accounts[i].address].withdraw)
             }
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [END_DATE + 1000000])
