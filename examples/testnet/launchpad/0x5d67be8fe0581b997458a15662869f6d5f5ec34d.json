@@ -1,0 +1,18 @@
+{
+    "0xff529c047ecfe2f78caf41e84773c4f865ef84f1": {
+        "allocation": "28365000000000000000000",
+        "withdraw": "1635000000000000000000",
+        "energy": "0",
+        "faction": "0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae",
+        "isTop": false,
+        "isSupertutellian": false
+    },
+    "0x22933773a6020feb3bc10d4c8c8d47b033fa20cc": {
+        "allocation": "1635000000000000000000",
+        "withdraw": "9365000000000000000000",
+        "energy": "0",
+        "faction": "0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae",
+        "isTop": false,
+        "isSupertutellian": false
+    }
+}

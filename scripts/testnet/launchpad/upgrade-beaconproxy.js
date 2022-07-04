@@ -6,7 +6,7 @@
 const hre = require("hardhat");
 const ethers = hre.ethers;
 
-const MANAGER_ADDR = "0x4780f2f52a5FDF8Fb6f7D4328490A193bD0C16BF";
+const MANAGER_ADDR = "0x0e75e4D2041287813a693971634400EAe765910C";
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 
 async function main() {
@@ -17,24 +17,24 @@ async function main() {
     // manually to make sure everything is compiled
     await hre.run("compile");
 
-    // We get the contract to deploy
+    // // We get the contract to deploy
     const manager = await ethers.getContractAt("TutellusManager", MANAGER_ADDR);
-    const factoryAddr = await manager.get(LAUNCHPAD_IDO_FACTORY);
-    const factory = await ethers.getContractAt(
-        "TutellusIDOFactory",
-        factoryAddr
-    );
-    const beaconAddr = await factory.beacon();
-    const beacon = await ethers.getContractAt("UpgradeableBeacon", beaconAddr);
-    console.log(await beacon.owner())
-    // const TutellusIDO = await ethers.getContractFactory("TutellusIDO");
-    // const newImplementation = await TutellusIDO.deploy();
-    // await newImplementation.deployed();
+    const tx = await manager.grantRole(ethers.utils.id('UPGRADER_ROLE'), "0xCD7669AAFffB7F683995E6eD9b53d1E5FE72c142")
+    await tx.wait()
+    // const factoryAddr = await manager.get(LAUNCHPAD_IDO_FACTORY);
+    // const factory = await ethers.getContractAt(
+    //     "TutellusIDOFactory",
+    //     factoryAddr
+    // );
+    // const beaconAddr = await factory.beacon();
+    const beacon = await ethers.getContractAt("UUPSUpgradeable", "0xB4f3b622C0A9Fa8B2efC2C943C455186D31044d1");
+    const TutellusIDO = await ethers.getContractFactory("TutellusIDO");
+    const newImplementation = await TutellusIDO.deploy();
+    await newImplementation.deployed();
 
-    // const response = await beacon.upgradeTo(newImplementation.address);
-    // await response.wait();
-    // const implementation = await beacon.implementation();
-    // console.log("New implementation: ", implementation);
+    const response = await beacon.upgradeTo(newImplementation.address);
+    await response.wait();
+    console.log("New implementation: ", newImplementation.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

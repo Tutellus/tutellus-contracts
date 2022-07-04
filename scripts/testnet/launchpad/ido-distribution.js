@@ -2,7 +2,7 @@ const { ethers } = require('ethers');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const fs = require('fs')
 const path = require('path')
-const IDO = '0xAB25CBdD7396Cf0d22Df9180fB83D98ebFDb4CaF'
+const IDO = '0x5d67be8fe0581b997458a15662869f6d5f5ec34d'
 const ENERGY_ADDR = '0x582C10dAa0ccdF4D536ca39074Cc62E736441AF8'
 const POAP_ID = '0x920fe3daba3d7e2f76b6bf2cd29ede1505083df5202d94862a7bb5c8bb3b4806'
 const jsonPath = '../../../examples/testnet/launchpad/' + IDO.toLowerCase() + '.json'
@@ -12,7 +12,7 @@ const ZERO_BN = ethers.utils.parseEther('0')
 const ONE_BN = ethers.utils.parseEther('1')
 const HUNDRED_BN = ethers.utils.parseEther('100')
 const SUPERTUTELLIAN_LIMIT_BN = ethers.utils.parseEther('1500')
-const N_TOPS = 3
+const N_TOPS = 1
 let N_TOPS_LEFT = N_TOPS
 
 const FACTION_TO_RANKING = {

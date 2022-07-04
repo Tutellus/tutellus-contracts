@@ -7,7 +7,7 @@ const fs = require("fs");
 const { readFile } = require("fs/promises");
 const path = require("path");
 const { getIdoTree } = require("../../../utils/idoTree");
-const IDO = "0xAB25CBdD7396Cf0d22Df9180fB83D98ebFDb4CaF";
+const IDO = "0x5d67be8fe0581b997458a15662869f6d5f5ec34d";
 const jsonPath =
     "../../../examples/testnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
