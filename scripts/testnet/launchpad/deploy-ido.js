@@ -1,14 +1,14 @@
 const bre = require("hardhat");
 const ethers = bre.ethers;
 
-const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY_V2");
+const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 const IDO_USDT = ethers.utils.id("IDO_USDT");
-const MANAGER_ADDR = "0x9b77Cb09d5E61D44fEf00e59Cfcc8Af67DAe9A45";
+const MANAGER_ADDR = "0x0e75e4D2041287813a693971634400EAe765910C";
 const FUNDING_AMOUNT = ethers.utils.parseEther("30000");
 const MIN_PREFUND = ethers.utils.parseEther("1000");
 const TIME_OFFSET = 0
 const START_DATE = parseInt(Date.now()/1000) + TIME_OFFSET
-const END_DATE = START_DATE + 86400000 + TIME_OFFSET
+const END_DATE = START_DATE + 432000 + TIME_OFFSET
 const IDO_TOKEN_AMOUNT = ethers.utils.parseEther("60000");
 
 async function main() {
@@ -20,7 +20,7 @@ async function main() {
     const TutellusIDO = await ethers.getContractFactory("TutellusIDO");
     const Token = await ethers.getContractFactory("Token");
 
-    const myIdoToken = await Token.deploy("Tutellus IDO 4", "IDO4")
+    const myIdoToken = await Token.deploy("Tutellus IDO 3", "IDO3")
     await myIdoToken.deployed()
     const myManager = Manager.attach(MANAGER_ADDR);
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
