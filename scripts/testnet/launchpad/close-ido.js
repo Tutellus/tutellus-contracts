@@ -7,11 +7,11 @@ const fs = require("fs");
 const { readFile } = require("fs/promises");
 const path = require("path");
 const { getIdoTree } = require("../../../utils/idoTree");
-const IDO = "0x5d67be8fe0581b997458a15662869f6d5f5ec34d";
+const IDO = "0x046Ac4a1fCAA576c2850Cd7D3b1268A11e97fF8C";
 const jsonPath =
     "../../../examples/testnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
-    "https://api.thegraph.com/subgraphs/name/gperezalba/launchpad";
+    "https://api.thegraph.com/subgraphs/name/gperezalba/launchpad-goerli";
 
 const data = {
     host: "ipfs.infura.io",
