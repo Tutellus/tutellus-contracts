@@ -4,20 +4,13 @@ const { parseEther } = require('ethers/lib/utils');
 const { concatArrays, getWhitelistTree } = require('../../../utils/whitelistTree');
 
 const ADDRESSES = [
-    "0x30729B6910757042024304E56BEB015821462691",
-    "0xff529c047ecfe2f78caf41e84773c4f865ef84f1",
-    "0x71a6cedac992f6ee61b439a5aa053d8c638ec409",
-    "0x22933773a6020feb3bc10d4c8c8d47b033fa20cc",
-    "0xCD7669AAFffB7F683995E6eD9b53d1E5FE72c142",
-    "0xCC18024a12FcF2099693cB6C22eb127765Ae6dbf",
-    "0x0DD1AC51cBaDD3e4DFa98DdD07E383d4706b7732",
-    "0xfF529C047ecFe2F78cAF41E84773C4f865eF84F1"
+    "0x22933773A6020fEB3bC10D4C8C8d47B033FA20cc"
 ];
 
 const main = async () => {
     await hre.run('compile');
 
-    const myWhitelist = await ethers.getContractAt('TutellusWhitelist', '0x130EfDEb1B1ad62d1DEcD812B80fFD252CE2f95D');
+    const myWhitelist = await ethers.getContractAt('TutellusWhitelist', '0x7B6e624f144D6fA4792a6FCEc02F33E9E5e3BE27');
     console.log('Getting current uri...')
     const uri0 = await myWhitelist.uri();
 

@@ -4,13 +4,13 @@ const { utils, constants } = ethers;
 const { id } = utils;
 
 const ADMIN_ROLE = constants.HashZero;
-const ROLE = id('MINTER_ROLE');
-const ADDRESS = '0x1589C183C84c8D61aBD871F184ddfBfaF0c2983E'
+const ROLE = '0x28f5a99355973cc89255b8c4ac88405f27c78ded7608b040ee77a8bdf44d15e2'
+const ADDRESS = '0x30729b6910757042024304e56beb015821462691'
 
 async function main () {
   await bre.run('compile');
   const Manager = await ethers.getContractFactory('TutellusManager');
-  const myManager = Manager.attach('0x9b77Cb09d5E61D44fEf00e59Cfcc8Af67DAe9A45');
+  const myManager = Manager.attach('0x0e75e4D2041287813a693971634400EAe765910C');
   const response = await myManager.grantRole(ROLE, ADDRESS)
   await response.wait()
 }
