@@ -33,7 +33,6 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     }
 
     function initialize(
-        address account,
         address stakingAddress,
         address feedBtcUsd,
         address tutAddress,
@@ -75,7 +74,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
             depositAmount
         );
 
-        IERC20(_tutAddress).transferFrom(account, proxy, depositAmount);
+        require(IERC20(_tutAddress).transferFrom(account, proxy, depositAmount), "");
     }
 
     function _createProxy(
@@ -87,6 +86,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     ) private whenNotPaused returns (address proxyAddress) {
         bytes memory initializeCalldata = abi.encodeWithSelector(
             TutellusStakeToLearn.initialize.selector, 
+            msg.sender,
             account,
             depositAmount,
             _stakingAddress,
@@ -121,7 +121,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
         uint deadline, 
         bytes memory signature, 
         address signer
-    ) internal returns(bool) {
+    ) internal view returns(bool) {
         bytes32 structHash = keccak256(
             abi.encode(
                 _TUTELLUS_STAKETOLEARN_TYPEHASH,
