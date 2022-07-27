@@ -1,7 +1,10 @@
-const { ethers } = require('ethers');
+const bre = require("hardhat");
+const ethers = bre.ethers;
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const fs = require('fs')
-const path = require('path')
+
+const path = require('path');
+const LP_TOKEN = '0xfd5447D667eB6960fA326cfa68b7936f52940cA7'
 const IDO = '0x046Ac4a1fCAA576c2850Cd7D3b1268A11e97fF8C'
 const ENERGY_ADDR = '0xd0977Cce3094772297ACB21c41cd44752D7768Ed'
 const POAP_ID = '0x920fe3daba3d7e2f76b6bf2cd29ede1505083df5202d94862a7bb5c8bb3b4806'
@@ -10,10 +13,13 @@ const jsonPath = '../../../examples/testnet/launchpad/' + IDO.toLowerCase() + '.
 const GRAPH_URL = 'https://api.thegraph.com/subgraphs/name/gperezalba/launchpad-goerli'
 const ZERO_BN = ethers.utils.parseEther('0')
 const ONE_BN = ethers.utils.parseEther('1')
+const TWO_WEI_BN = ethers.BigNumber.from('2')
 const HUNDRED_BN = ethers.utils.parseEther('100')
-const SUPERTUTELLIAN_LIMIT_BN = ethers.utils.parseEther('1500')
+const STANDARD_LIMIT_BN = ethers.utils.parseEther('100')
+const SUPERBOOSTER_LIMIT_BN = ethers.utils.parseEther('600')
 const N_TOPS = 1
 let N_TOPS_LEFT = N_TOPS
+let RESERVES_TUT, RESERVES_BTC, LP_TOTAL_SUPPLY
 
 const FACTION_TO_RANKING = {
     '0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae': -1,
@@ -94,6 +100,7 @@ const mathObj = {
 }
 
 async function main() {
+    await getReserves()
     const ido = await getIDO()
     const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount)
     const prefundedBN = ethers.BigNumber.from(ido.prefunded)
@@ -108,7 +115,10 @@ async function main() {
 
         // Get all IDO prefunders by IDO
         let prefunders = await getPrefunders()
+        let stakers = (await getStakers(prefunders)).stakers
+        let stakedTut = getStakedTut(stakers)
 
+        // Aggregate static, unscaled-variable and poaps energy
         const energyObj = computePrefundersEnergy(prefunders)
 
         // Calculate factions ranking
@@ -118,7 +128,7 @@ async function main() {
         prefunders = sortPrefundersByEnergy(prefunders, energyObj)
 
         // Classify prefunders in slots (and calc total prefund by slot)
-        const prefundersArray = classifyPrefunders(prefunders, energyObj)
+        const prefundersArray = classifyPrefunders(prefunders, energyObj, stakedTut)
 
         // Calculate aggregated amounts of slots
         calculateSlotTotals(fundingAmountBN)
@@ -175,7 +185,7 @@ main()
         process.exit(1)
     })
 
-function classifyPrefunders(prefunders, energyObj) {
+function classifyPrefunders(prefunders, energyObj, stakedTut) {
     let prefunder, column
     const prefundersArray = []
     for (let i = 0; i < prefunders.length; i++) {
@@ -191,7 +201,7 @@ function classifyPrefunders(prefunders, energyObj) {
         obj.column = column
         obj.energy = energyObj[prefunder.account]
 
-        if (isSupertutellian(prefunder)) {
+        if (isSuperBooster(stakedTut[prefunder.account.toLowerCase()])) {
             if (isTop()) {
                 PREFUNDS[0][column] = PREFUNDS[0][column].add(prefunder.prefunded)
                 obj.row = 0
@@ -200,10 +210,13 @@ function classifyPrefunders(prefunders, energyObj) {
                 obj.row = 1
                 SUPERTUTELLIAN_LOTTERY[column].push(obj)
             }
-        } else {
+        } else if (isStandard(stakedTut[prefunder.account.toLowerCase()])) {
             obj.row = 2
             PREFUNDS[2][column] = PREFUNDS[2][column].add(prefunder.prefunded)
             TUTELLIAN_LOTTERY[column].push(obj)
+        } else {
+            obj.row = 3 //TBD: any problem with total prefund available etc?
+            //TBD: what if theres allocation left and prefunded left but from no-standard users?
         }
 
         prefundersArray.push(obj)
@@ -328,12 +341,12 @@ function computeDistribution(prefundersArray) {
             }
 
             const values = {}
+            values['ranking'] = i
             values['allocation'] = prefundersArray[i].allocated.toString()
-            values['withdraw'] = prefundersArray[i].left.toString()
+            values['refund'] = prefundersArray[i].left.toString()
             values['energy'] = prefundersArray[i].energy.toString()
             values['faction'] = prefundersArray[i].faction
-            values['isTop'] = prefundersArray[i].row == 0 ? true : false
-            values['isSupertutellian'] = prefundersArray[i].row == 2 ? false : true
+            values['type'] = prefundersArray[i].row
             json[prefundersArray[i].account] = values
         }
     } else {
@@ -352,9 +365,9 @@ function allocateFinalRemainder(prefundersArray, remainder, json) {
         const prefunderAvailable = prefundersArray[prefunderIndex].prefunded.sub(prefundersArray[prefunderIndex].allocated)
         if (prefunderAvailable.gte(remainder)) {
             increasePrefunderAllocation(prefundersArray[prefunderIndex], remainder)
-            const values = {}
+            const values = json[prefundersArray[prefunderIndex].account] == undefined ? {} : json[prefundersArray[prefunderIndex].account]
             values['allocation'] = prefundersArray[prefunderIndex].allocated.toString()
-            values['withdraw'] = prefundersArray[prefunderIndex].left.toString()
+            values['refund'] = prefundersArray[prefunderIndex].left.toString()
             values['energy'] = prefundersArray[prefunderIndex].energy.toString()
             json[prefundersArray[prefunderIndex].account] = values
             finished = true;
@@ -426,7 +439,6 @@ function getNormalization() {
 
 function rayMul(a, b) {
     if (a == 0 || b == 0) return 0
-    console.log(((a.mul(b)).add(mathObj.halfRAY)).div(mathObj.ray).toString())
     return ((a.mul(b)).add(mathObj.halfRAY)).div(mathObj.ray)
 }
 
@@ -472,8 +484,12 @@ async function querySubgraph(query) {
     }
 }
 
-function isSupertutellian(prefunder) {
-    return SUPERTUTELLIAN_LIMIT_BN.lte(prefunder.energyHolder.balanceVariable) //TBD: review condition
+function isSuperBooster(tutAmount) {
+    return SUPERBOOSTER_LIMIT_BN.lte(tutAmount) //TBD: review condition
+}
+
+function isStandard(tutAmount) {
+    return STANDARD_LIMIT_BN.lte(tutAmount) //TBD: review condition
 }
 
 function isTop() {
@@ -487,7 +503,7 @@ function randomIntFromInterval(min, max) { // min and max included
 }
 
 async function setWinnerFaction(prefunders, energyObj) {
-    const factions = (await getFactions()).factions
+    const factions = (await getFactions()).factions //TBD: use FactionsByIDO?
     const indexObj = {}
 
     for (let i = 0; i < factions.length; i++) {
@@ -506,4 +522,40 @@ async function setWinnerFaction(prefunders, energyObj) {
         FACTION_TO_RANKING[factions[i].id] = i
         console.log(FACTION_TO_NAME[factions[i].id])
     }
+}
+
+
+async function getStakers(prefunders) {
+    //TBD: prepare to >1000
+    let array = ''
+    for(let i = 0; i < prefunders.length; i++) {
+        array = array.concat('"').concat(prefunders[i].account.toLowerCase())
+    }
+    let query = '{ stakers (where: {account_in:[' + array + '"], amount_gt:0}) { account type contract amount } }'
+    return await querySubgraph(query)
+}
+
+function getStakedTut(stakers) {
+    const obj = {}
+    for(let i = 0; i < stakers.length; i++) {
+        let account = stakers[i].account.toLowerCase()
+        let amountBN = new ethers.BigNumber.from(stakers[i].amount)
+        if (obj[account] == undefined) obj[account] = ZERO_BN
+        let tutAmount = stakers[i].type == 1 ? amountBN : transformLpToTut(amountBN)
+        obj[account] = obj[account].add(tutAmount)
+    }
+    return obj
+}
+
+function transformLpToTut(lpAmount) {
+    const lpShare = lpAmount.mul(ONE_BN).div(LP_TOTAL_SUPPLY)
+    return RESERVES_TUT.mul(TWO_WEI_BN).mul(lpShare).div(ONE_BN)
+}
+
+async function getReserves() {
+    const contract = await ethers.getContractAt('IUniswapV2Pair', LP_TOKEN)
+    const reserves = await contract.getReserves()
+    RESERVES_TUT = new ethers.BigNumber.from(reserves.reserve0)
+    RESERVES_BTC = new ethers.BigNumber.from(reserves.reserve1)
+    LP_TOTAL_SUPPLY = await contract.totalSupply()
 }

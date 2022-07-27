@@ -1,10 +1,10 @@
 {
     "0x71a6cedac992f6ee61b439a5aa053d8c638ec409": {
+        "ranking": 0,
         "allocation": "30000000000000000000000",
-        "withdraw": "971000000000000000000000",
-        "energy": "196596444434633932491",
+        "refund": "971000000000000000000000",
+        "energy": "669970101415136012584",
         "faction": "0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae",
-        "isTop": false,
-        "isSupertutellian": false
+        "type": 0
     }
 }
