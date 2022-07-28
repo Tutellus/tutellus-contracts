@@ -21,6 +21,7 @@ const TWO_WEI_BN = ethers.BigNumber.from('2')
 const HUNDRED_BN = ethers.utils.parseEther('100')
 const STANDARD_LIMIT_BN = ethers.utils.parseEther('100')
 const SUPERBOOSTER_LIMIT_BN = ethers.utils.parseEther('600')
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther('0.25')
 const N_TOPS = 1
 let N_TOPS_LEFT = N_TOPS
 let RESERVES_TUT, LP_TOTAL_SUPPLY
@@ -353,19 +354,19 @@ function stringifyBNInJson() {
 
 function increasePrefunderLeft(key, amountBN) {
     increasePrefunderAllocation(key, amountBN)
-    PREFUNDERS[key].left = PREFUNDERS[key].left.add(amountBN) //TBD: use price to calculate allocation in ido-token
+    PREFUNDERS[key].left = PREFUNDERS[key].left.add(transformUsdtToIdoToken(amountBN)) //TBD: use price to calculate allocation in ido-token
     TOTAL_ALLOCATION_LEFT = TOTAL_ALLOCATION_LEFT.sub(amountBN)
 }
 
 function increasePrefunderLottery(key, amountBN) {
     increasePrefunderAllocation(key, amountBN)
-    PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.add(amountBN) //TBD: use price to calculate allocation in ido-token
+    PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.add(transformUsdtToIdoToken(amountBN)) //TBD: use price to calculate allocation in ido-token
     return PREFUNDERS[key].refund.isZero()
 }
 
 function increasePrefunderAllocation(key, amountBN) {
     PREFUNDERS[key].refund = PREFUNDERS[key].refund.sub(amountBN)
-    PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.add(amountBN) //TBD: use price to calculate allocation in ido-token
+    PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.add(transformUsdtToIdoToken(amountBN)) //TBD: use price to calculate allocation in ido-token
     TOTAL_ALLOCATION = TOTAL_ALLOCATION.add(amountBN)
 }
 
@@ -388,6 +389,10 @@ function getEmptyValuesObject() {
 }
 
 /******** MATH UTILS */
+
+function transformUsdtToIdoToken(amountUsdtBN) {
+    return amountUsdtBN.mul(ONE_BN).div(IDO_TOKEN_USDT_PRICE)
+}
 
 function transformLpToTut(lpAmount) {
     const lpShare = lpAmount.mul(ONE_BN).div(LP_TOTAL_SUPPLY)
