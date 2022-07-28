@@ -186,7 +186,7 @@ function buildObject(prefundersArray, stakersArray) {
             const tutAmount = obj.type == 1 ? amountBN : transformLpToTut(amountBN)
             PREFUNDERS[key].staked = PREFUNDERS[key].staked.add(tutAmount)
         })
-        
+
         const column = FACTIONS[PREFUNDERS[key].faction].ranking
         PREFUNDERS[key].column = column
     })
@@ -212,7 +212,7 @@ function sortPrefundersByEnergy() {
         const column = FACTIONS[PREFUNDERS[key].faction].ranking
         PREFUNDERS[key].row = row
         PREFUNDERS[key].ranking = i
-        PREFUNDS[row][column] = PREFUNDS[row][column].add(PREFUNDERS[key].prefund)
+        if (row < 3) PREFUNDS[row][column] = PREFUNDS[row][column].add(PREFUNDERS[key].prefund)
 
         if (row == 1) SUPERTUTELLIAN_LOTTERY[column].push(key)
         if (row == 2) TUTELLIAN_LOTTERY[column].push(key)
