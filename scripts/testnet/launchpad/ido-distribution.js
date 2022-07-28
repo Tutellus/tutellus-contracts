@@ -63,7 +63,7 @@ const SUPERTUTELLIAN_LOTTERY = [[],[],[]]
 const TUTELLIAN_LOTTERY = [[],[],[]]
 
 const mathObj = {
-    blockTimestamp: ethers.BigNumber.from(parseInt(Date.now() / 1000).toString()), //TBD: review if valid
+    blockTimestamp: ethers.BigNumber.from(parseInt(Date.now() / 1000).toString()),
     lastUpdateTimestamp: 0,
     rate: 0,
     secondsPerYear: ethers.BigNumber.from('31536000'),
@@ -95,7 +95,7 @@ async function main() {
         await setWinnerFaction()
 
         const prefunders = await getPrefunders()
-        const stakers = (await getStakers(prefunders)).stakers
+        const stakers = await getStakers(prefunders)
         buildObject(prefunders, stakers)
 
         console.log(FACTIONS)
@@ -145,7 +145,7 @@ main()
 /******** CORE */
 
 async function setWinnerFaction() {
-    const factions = (await getSubgraphDataByIdo()).factionByIDOs //TBD: use FactionsByIDO?
+    const factions = (await getSubgraphDataByIdo()).factionByIDOs
 
     for(let i = 0; i < factions.length; i++) {
         const key = factions[i].faction.id
@@ -354,19 +354,19 @@ function stringifyBNInJson() {
 
 function increasePrefunderLeft(key, amountBN) {
     increasePrefunderAllocation(key, amountBN)
-    PREFUNDERS[key].left = PREFUNDERS[key].left.add(transformUsdtToIdoToken(amountBN)) //TBD: use price to calculate allocation in ido-token
+    PREFUNDERS[key].left = PREFUNDERS[key].left.add(transformUsdtToIdoToken(amountBN))
     TOTAL_ALLOCATION_LEFT = TOTAL_ALLOCATION_LEFT.sub(amountBN)
 }
 
 function increasePrefunderLottery(key, amountBN) {
     increasePrefunderAllocation(key, amountBN)
-    PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.add(transformUsdtToIdoToken(amountBN)) //TBD: use price to calculate allocation in ido-token
+    PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.add(transformUsdtToIdoToken(amountBN))
     return PREFUNDERS[key].refund.isZero()
 }
 
 function increasePrefunderAllocation(key, amountBN) {
     PREFUNDERS[key].refund = PREFUNDERS[key].refund.sub(amountBN)
-    PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.add(transformUsdtToIdoToken(amountBN)) //TBD: use price to calculate allocation in ido-token
+    PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.add(transformUsdtToIdoToken(amountBN))
     TOTAL_ALLOCATION = TOTAL_ALLOCATION.add(amountBN)
 }
 
@@ -428,11 +428,11 @@ function calculateLinearInterest(lastUpdateTimestamp) {
 }
 
 function isSuperBooster(tutAmount) {
-    return SUPERBOOSTER_LIMIT_BN.lte(tutAmount) //TBD: review condition
+    return SUPERBOOSTER_LIMIT_BN.lte(tutAmount)
 }
 
 function isStandard(tutAmount) {
-    return STANDARD_LIMIT_BN.lte(tutAmount) //TBD: review condition
+    return STANDARD_LIMIT_BN.lte(tutAmount)
 }
 
 function isTop() {
@@ -448,19 +448,38 @@ function randomIntFromInterval(min, max) { // min and max included
 /******** SUBGRAPH */
 
 async function getStakers(prefunders) {
-    //TBD: prepare to >1000
     let array = '"'
     for(let i = 0; i < prefunders.length - 1; i++) {
         array = array.concat(prefunders[i].account.toLowerCase()).concat('", "')
     }
     array = array.concat(prefunders[prefunders.length - 1].account.toLowerCase()).concat('"')
-    let query = '{ stakers (where: {account_in:[' + array + '], amount_gt:0}) { account type contract amount } }'
-    return await querySubgraph(query)
+    let skip = 0
+    let query = '{ stakers (where: {account_in:[' + array + '], amount_gt:0}, first:1000, skip:' + skip + ') { account type contract amount } }'
+    let response = (await querySubgraph(query)).stakers
+    let loopresponse = response
+
+    while(loopresponse.length >= 1000) {
+        skip = response.length
+        query = '{ stakers (where: {account_in:[' + array + '], amount_gt:0}, first:1000, skip:' + skip + ') { account type contract amount } }'
+        loopresponse = (await querySubgraph(query)).stakers
+        response = response.concat(loopresponse)
+    }
+    return response
 }
 
 async function getPrefunders() {
-    let query = '{ prefunders (where: {ido:"' + IDO.toLowerCase() + '", active:true}, orderBy:prefunded, orderDirection:desc) { account faction prefunded energyHolder { balanceVariable balanceStatic poaps(where:{poap:"'+ POAP_ID.toLowerCase() +'"}) { balance } } } }'
-    return (await querySubgraph(query)).prefunders
+    let skip = 0
+    let query = '{ prefunders (where: {ido:"' + IDO.toLowerCase() + '", active:true} first:1000, skip:' + skip + ', orderBy:prefunded, orderDirection:desc) { account faction prefunded energyHolder { balanceVariable balanceStatic poaps(where:{poap:"'+ POAP_ID.toLowerCase() +'"}) { balance } } } }'
+    let response = (await querySubgraph(query)).prefunders
+    let loopresponse = response
+
+    while(loopresponse.length >= 1000) {
+        skip = response.length
+        query = '{ prefunders (where: {ido:"' + IDO.toLowerCase() + '", active:true} first:1000, skip:' + skip + ', orderBy:prefunded, orderDirection:desc) { account faction prefunded energyHolder { balanceVariable balanceStatic poaps(where:{poap:"'+ POAP_ID.toLowerCase() +'"}) { balance } } } }'
+        loopresponse = (await querySubgraph(query)).prefunders
+        response = response.concat(loopresponse)
+    }
+    return response
 }
 
 async function getSubgraphDataByIdo() {
