@@ -4,134 +4,76 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const fs = require('fs')
 const path = require('path');
 
-const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
-const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
-const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
-
-const LP_TOKEN = '0xfd5447D667eB6960fA326cfa68b7936f52940cA7'
-const IDO = '0x3a00d1b1F4Fa768801Dd416E43930808C72c80e9'
-const ENERGY_ADDR = '0xd0977Cce3094772297ACB21c41cd44752D7768Ed'
-const POAP_ID = '0x920fe3daba3d7e2f76b6bf2cd29ede1505083df5202d94862a7bb5c8bb3b4806'
-const jsonPath = '../../../examples/testnet/launchpad/' + IDO.toLowerCase() + '.json'
-
 const GRAPH_URL = 'https://api.thegraph.com/subgraphs/name/gperezalba/launchpad-goerli'
 const ZERO_BN = ethers.utils.parseEther('0')
 const ONE_BN = ethers.utils.parseEther('1')
 const TWO_WEI_BN = ethers.BigNumber.from('2')
 const HUNDRED_BN = ethers.utils.parseEther('100')
 const STANDARD_LIMIT_BN = ethers.utils.parseEther('100')
-const SUPERBOOSTER_LIMIT_BN = ethers.utils.parseEther('600')
-const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther('0.25')
-const N_TOPS = 1
-let N_TOPS_LEFT = N_TOPS
+const BOOSTER_LIMIT_BN = ethers.utils.parseEther('600')
+const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
+const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
+const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
+const LP_TOKEN = '0xfd5447D667eB6960fA326cfa68b7936f52940cA7'
+const ENERGY_ADDR = '0xd0977Cce3094772297ACB21c41cd44752D7768Ed'
+const jsonPath = '../../../examples/testnet/launchpad/'
 let RESERVES_TUT, LP_TOTAL_SUPPLY
 
-const ALLOCATION_PERCENTAGES = [
-    [ethers.utils.parseEther('20'), ethers.utils.parseEther('14'), ethers.utils.parseEther('11')],
-    [ethers.utils.parseEther('13'), ethers.utils.parseEther('8'), ethers.utils.parseEther('7')],
-    [ethers.utils.parseEther('12'), ethers.utils.parseEther('8'), ethers.utils.parseEther('7')]
-]
-const PREFUNDS = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN]
-]
-
-const ALLOCATION = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN]
-]
-
-const LOTTERY = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN]
-]
-
-const RATIOS = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN]
-]
-
-let TOTAL_ALLOCATION_LEFT = ZERO_BN
-let TOTAL_ALLOCATION = ZERO_BN
-let TOTAL_PREFUNDS_LEFT = ZERO_BN
-
-const SUPERTUTELLIAN_LOTTERY = [[],[],[]]
-const TUTELLIAN_LOTTERY = [[],[],[]]
-
-const mathObj = {
-    blockTimestamp: ethers.BigNumber.from(parseInt(Date.now() / 1000).toString()),
-    lastUpdateTimestamp: 0,
-    rate: 0,
-    secondsPerYear: ethers.BigNumber.from('31536000'),
-    ray: ethers.BigNumber.from('1000000000000000000000000000'),
-    normalization: 0,
-    halfRAY: ethers.BigNumber.from('500000000000000000000000000'),
-}
-
-const PREFUNDERS = new Object()
-const FACTIONS = new Object()
-FACTIONS[NAKAMOTOS_FACTION] = {energy: ZERO_BN, ranking: -1}
-FACTIONS[VUTERINS_FACTION] = {energy: ZERO_BN, ranking: -1}
-FACTIONS[ALTCOINERS_FACTION] = {energy: ZERO_BN, ranking: -1}
+// VARIABLE INPUTS
+const POAP_ID = '0x920fe3daba3d7e2f76b6bf2cd29ede1505083df5202d94862a7bb5c8bb3b4806'
+const IDO = '0x3a00d1b1F4Fa768801Dd416E43930808C72c80e9'
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther('0.25')
+const N_SUPERBOOSTERS = 1
+let N_SUPERBOOSTERS_LEFT = N_SUPERBOOSTERS
+let ONLY_RESULTS = false
 
 async function main() {
     await getReserves()
     const ido = await getIDO()
     const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount)
     const prefundedBN = ethers.BigNumber.from(ido.prefunded)
-    console.log('Needed: ', ethers.utils.formatEther(fundingAmountBN))
-    console.log('Available: ', ethers.utils.formatEther(prefundedBN))
 
     if (fundingAmountBN.gt(prefundedBN)) {
-        console.log('Funding is over prefunded amount')
-    } else {
+        ONLY_RESULTS = true
+    }
 
-        await setMathObj()
+    // Initialize object used to unscale energy
+    await setMathObj()
 
-        await setWinnerFaction()
+    // Set ranking of factions based on energy (considering only energy of prefunders)
+    await setWinnerFaction()
 
-        const prefunders = await getPrefunders()
-        const stakers = await getStakers(prefunders)
-        buildObject(prefunders, stakers)
+    // Get array of IDO's prefunders
+    const prefunders = await getPrefunders()
 
-        console.log(FACTIONS)
+    // Get array with deposits (staking and farming) of prefunders
+    const stakers = await getStakers(prefunders)
 
-        sortPrefundersByEnergy()
+    // Initialize JSON object with know props
+    buildObject(prefunders, stakers)
 
+    // Sort by energy and set ranking and type in JSON object
+    sortPrefundersByEnergy()
+
+    if (!ONLY_RESULTS) { //only if we want to calculate allocations to close IDO
+        
+        // Build 3x3 matrix(s) with general amounts
         buildMatrixs(fundingAmountBN)
 
+        // Distribute fixed allocation of superboosters and boosters
         distributeAllocationFixed()
 
+        // Distribute lottery allocation of boosters and standards
         distributeAllocationLottery()
 
+        // Distribute left allocation (if any) based in ranking order
         distributeAllocationLeft()
-
-        stringifyBNInJson()
-
-        console.log(PREFUNDERS)
-
-        console.log(ethers.utils.formatEther(ALLOCATION[0][0]), '  ', ethers.utils.formatEther(ALLOCATION[0][1]), '  ', ethers.utils.formatEther(ALLOCATION[0][2]), '  ')
-        console.log(ethers.utils.formatEther(ALLOCATION[1][0]), '  ', ethers.utils.formatEther(ALLOCATION[1][1]), '  ', ethers.utils.formatEther(ALLOCATION[1][2]), '  ')
-        console.log(ethers.utils.formatEther(ALLOCATION[2][0]), '  ', ethers.utils.formatEther(ALLOCATION[2][1]), '  ', ethers.utils.formatEther(ALLOCATION[2][2]), '  ')
-        console.log('-----')
-        console.log(ethers.utils.formatEther(PREFUNDS[0][0]), '  ', ethers.utils.formatEther(PREFUNDS[0][1]), '  ', ethers.utils.formatEther(PREFUNDS[0][2]), '  ')
-        console.log(ethers.utils.formatEther(PREFUNDS[1][0]), '  ', ethers.utils.formatEther(PREFUNDS[1][1]), '  ', ethers.utils.formatEther(PREFUNDS[1][2]), '  ')
-        console.log(ethers.utils.formatEther(PREFUNDS[2][0]), '  ', ethers.utils.formatEther(PREFUNDS[2][1]), '  ', ethers.utils.formatEther(PREFUNDS[2][2]), '  ')
-        console.log('-----')
-        console.log(ethers.utils.formatEther(LOTTERY[0][0]), '  ', ethers.utils.formatEther(LOTTERY[0][1]), '  ', ethers.utils.formatEther(LOTTERY[0][2]), '  ')
-        console.log(ethers.utils.formatEther(LOTTERY[1][0]), '  ', ethers.utils.formatEther(LOTTERY[1][1]), '  ', ethers.utils.formatEther(LOTTERY[1][2]), '  ')
-        console.log(ethers.utils.formatEther(LOTTERY[2][0]), '  ', ethers.utils.formatEther(LOTTERY[2][1]), '  ', ethers.utils.formatEther(LOTTERY[2][2]), '  ')
-        console.log('-----')
-        console.log(ethers.utils.formatEther(RATIOS[0][0]), '  ', ethers.utils.formatEther(RATIOS[0][1]), '  ', ethers.utils.formatEther(RATIOS[0][2]), '  ')
-        console.log(ethers.utils.formatEther(RATIOS[1][0]), '  ', ethers.utils.formatEther(RATIOS[1][1]), '  ', ethers.utils.formatEther(RATIOS[1][2]), '  ')
-        console.log(ethers.utils.formatEther(RATIOS[2][0]), '  ', ethers.utils.formatEther(RATIOS[2][1]), '  ', ethers.utils.formatEther(RATIOS[2][2]), '  ')
-
-        fs.writeFileSync(path.join(__dirname, jsonPath), JSON.stringify(PREFUNDERS, null, 4))
     }
+
+    // Convert BigNumbers to strings and remove unused props
+    stringifyBNInJson()
+
+    fs.writeFileSync(path.join(__dirname, (jsonPath + IDO.toLowerCase() + '.json')), JSON.stringify(PREFUNDERS, null, 4))
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
@@ -144,15 +86,18 @@ main()
 
 /******** CORE */
 
+// we assume energy of prefunders type=user is valid
 async function setWinnerFaction() {
     const factions = (await getSubgraphDataByIdo()).factionByIDOs
 
+    // factions array is already in desc order
     for(let i = 0; i < factions.length; i++) {
         const key = factions[i].faction.id
         FACTIONS[key].ranking = i
         FACTIONS[key].energy = unscaleEnergyVariable(ethers.BigNumber.from(factions[i].energy))
     }
 
+    // in case a faction is empty
     let ranking = 2
     for (let faction in FACTIONS) {
         if (FACTIONS[faction].ranking == -1) {
@@ -194,7 +139,6 @@ function buildObject(prefundersArray, stakersArray) {
 }
 
 function sortPrefundersByEnergy() {
-    //sort by energy
     const sortable = []
 
     for (let key in PREFUNDERS) {
@@ -207,14 +151,13 @@ function sortPrefundersByEnergy() {
         const key = sortable[i].account
 
         const staked = PREFUNDERS[key].staked
-        PREFUNDERS[key].type = !isStandard(staked) ? 3 : !isSuperBooster(staked) ? 2 : isTop() ? 0 : 1
+        PREFUNDERS[key].type = !isStandard(staked) ? 3 : !isBooster(staked) ? 2 : isSuperBooster() ? 0 : 1
 
         const row = PREFUNDERS[key].type
         const column = FACTIONS[PREFUNDERS[key].faction].ranking
         PREFUNDERS[key].row = row
         PREFUNDERS[key].ranking = i
         if (row < 3) PREFUNDS[row][column] = PREFUNDS[row][column].add(PREFUNDERS[key].prefund)
-
         if (row == 1) SUPERTUTELLIAN_LOTTERY[column].push(key)
         if (row == 2) TUTELLIAN_LOTTERY[column].push(key)
     }
@@ -223,15 +166,18 @@ function sortPrefundersByEnergy() {
 function buildMatrixs(fundingAmountBN) {
     for (let i = 0; i < ALLOCATION.length; i++) {
         for (let j = 0; j < ALLOCATION[i].length; j++) {
-            // Calculate available amounts (in USDT) by slot
+            // Calculate available allocation amounts (in USDT) by slot
             ALLOCATION[i][j] = fundingAmountBN.mul(ALLOCATION_PERCENTAGES[i][j]).div(HUNDRED_BN)
             const initialAllocation = ALLOCATION[i][j]
 
             // Derivate amount available to lottery by slot
+
+            // Superboosters: 0% lottery, 100% fixed. If slot is overprefunded ratio < 1
             if (i == 0 && !PREFUNDS[i][j].isZero()) {
                 RATIOS[i][j] = ALLOCATION[i][j].gte(PREFUNDS[i][j]) ? ONE_BN : ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j])
             }
 
+            // Boosters: 50% fixed, 50% lottery. If slot is overprefunded ratio < 1, considering 50% of prefunds
             if (i == 1) {
                 LOTTERY[i][j] = ALLOCATION[i][j].div(TWO_WEI_BN)
                 ALLOCATION[i][j] = ALLOCATION[i][j].sub(LOTTERY[i][j])
@@ -240,6 +186,7 @@ function buildMatrixs(fundingAmountBN) {
                 }
             }
 
+            // Standards: 100% lottery, 0% fixed. Ratio no needed
             if (i == 2) {
                 LOTTERY[i][j] = ALLOCATION[i][j]
                 ALLOCATION[i][j] = ZERO_BN
@@ -309,9 +256,6 @@ function distributeAllocationLottery() {
 function distributeAllocationLeft() {
     if (TOTAL_PREFUNDS_LEFT.gte(TOTAL_ALLOCATION_LEFT)) {
         // Enough to distribute
-        console.log('Prefunds left enough to cover allocation left')
-        console.log('Allocation left', ethers.utils.formatEther(TOTAL_ALLOCATION_LEFT))
-        console.log('Prefunds available', ethers.utils.formatEther(TOTAL_PREFUNDS_LEFT))
 
         const sortable = []
         for (let key in PREFUNDERS) {
@@ -330,8 +274,7 @@ function distributeAllocationLeft() {
         }
     } else {
         // Not enough to distribute
-        console.log('Prefunds left NOT enough to cover allocation left')
-        console.log(ethers.utils.formatEther(TOTAL_ALLOCATION_LEFT.sub(TOTAL_PREFUNDS_LEFT)), ' USDT left')
+        throw new Error("Not enough prefund available to distribute allocation left")
     }
 }
 
@@ -427,17 +370,17 @@ function calculateLinearInterest(lastUpdateTimestamp) {
     return (mathObj.rate.mul(timeDifference).div(mathObj.secondsPerYear)).add(mathObj.ray)
 }
 
-function isSuperBooster(tutAmount) {
-    return SUPERBOOSTER_LIMIT_BN.lte(tutAmount)
+function isBooster(tutAmount) {
+    return BOOSTER_LIMIT_BN.lte(tutAmount)
 }
 
 function isStandard(tutAmount) {
     return STANDARD_LIMIT_BN.lte(tutAmount)
 }
 
-function isTop() {
-    if (!(N_TOPS_LEFT > 0)) return false
-    N_TOPS_LEFT--
+function isSuperBooster() {
+    if (!(N_SUPERBOOSTERS_LEFT > 0)) return false
+    N_SUPERBOOSTERS_LEFT--
     return true
 }
 
@@ -526,3 +469,58 @@ async function querySubgraph(query) {
         console.error(error);
     }
 }
+
+/******** CONSTS */
+
+const mathObj = {
+    blockTimestamp: ethers.BigNumber.from(parseInt(Date.now() / 1000).toString()),
+    lastUpdateTimestamp: 0,
+    rate: 0,
+    secondsPerYear: ethers.BigNumber.from('31536000'),
+    ray: ethers.BigNumber.from('1000000000000000000000000000'),
+    normalization: 0,
+    halfRAY: ethers.BigNumber.from('500000000000000000000000000'),
+}
+
+const PREFUNDERS = new Object()
+const FACTIONS = new Object()
+FACTIONS[NAKAMOTOS_FACTION] = {energy: ZERO_BN, ranking: -1}
+FACTIONS[VUTERINS_FACTION] = {energy: ZERO_BN, ranking: -1}
+FACTIONS[ALTCOINERS_FACTION] = {energy: ZERO_BN, ranking: -1}
+
+const ALLOCATION_PERCENTAGES = [
+    [ethers.utils.parseEther('20'), ethers.utils.parseEther('14'), ethers.utils.parseEther('11')],
+    [ethers.utils.parseEther('13'), ethers.utils.parseEther('8'), ethers.utils.parseEther('7')],
+    [ethers.utils.parseEther('12'), ethers.utils.parseEther('8'), ethers.utils.parseEther('7')]
+]
+
+const PREFUNDS = [
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN]
+]
+
+const ALLOCATION = [
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN]
+]
+
+const LOTTERY = [
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN]
+]
+
+const RATIOS = [
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN],
+    [ZERO_BN, ZERO_BN, ZERO_BN]
+]
+
+let TOTAL_ALLOCATION_LEFT = ZERO_BN
+let TOTAL_ALLOCATION = ZERO_BN
+let TOTAL_PREFUNDS_LEFT = ZERO_BN
+
+const SUPERTUTELLIAN_LOTTERY = [[],[],[]]
+const TUTELLIAN_LOTTERY = [[],[],[]]
