@@ -1,0 +1,41 @@
+{
+    "0xcd7669aafffb7f683995e6ed9b53d1e5fe72c142": {
+        "account": "0xcd7669aafffb7f683995e6ed9b53d1e5fe72c142",
+        "ranking": 1,
+        "type": 0,
+        "faction": "0x771dccb6a31b3e1604e08ac8b9186bf28341bbadf563d1030aefdd5dca42a071",
+        "energy": "6734887167809540978130",
+        "allocation": "27000000000000000000000",
+        "prefund": "30000000000000000000000",
+        "lottery": "0",
+        "refund": "3000000000000000000000",
+        "left": "22800000000000000000000",
+        "staked": "6749353674680611227124"
+    },
+    "0xdb970fd8ed083d0dc6000fa1e4973f27d8eda2a9": {
+        "account": "0xdb970fd8ed083d0dc6000fa1e4973f27d8eda2a9",
+        "ranking": 0,
+        "type": 1,
+        "faction": "0xe33b57b9ff16e65a8c081e942bac1ac7295aed81796ec2c3e9aabc459783f2ae",
+        "energy": "50107751440028453064053",
+        "allocation": "2000000000000000000000",
+        "prefund": "2000000000000000000000",
+        "lottery": "1000000000000000000000",
+        "refund": "0",
+        "left": "0",
+        "staked": "50214591539037164235157"
+    },
+    "0x71a6cedac992f6ee61b439a5aa053d8c638ec409": {
+        "account": "0x71a6cedac992f6ee61b439a5aa053d8c638ec409",
+        "ranking": 2,
+        "type": 1,
+        "faction": "0x7e1ee7b85790db7769a1da3114adec489e4583fc3a62d944b2f861d832e62bc5",
+        "energy": "669988393325881963265",
+        "allocation": "1000000000000000000000",
+        "prefund": "1000000000000000000000",
+        "lottery": "500000000000000000000",
+        "refund": "0",
+        "left": "0",
+        "staked": "671814499754942256756"
+    }
+}
