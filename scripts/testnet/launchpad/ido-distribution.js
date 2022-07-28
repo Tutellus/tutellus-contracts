@@ -186,19 +186,9 @@ function buildObject(prefundersArray, stakersArray) {
             const tutAmount = obj.type == 1 ? amountBN : transformLpToTut(amountBN)
             PREFUNDERS[key].staked = PREFUNDERS[key].staked.add(tutAmount)
         })
-
-        const staked = PREFUNDERS[key].staked
-        PREFUNDERS[key].type = !isStandard(staked) ? 3 : !isSuperBooster(staked) ? 2 : isTop() ? 0 : 1
-
-        const row = PREFUNDERS[key].type
+        
         const column = FACTIONS[PREFUNDERS[key].faction].ranking
-        PREFUNDERS[key].row = row
         PREFUNDERS[key].column = column
-
-        PREFUNDS[row][column] = PREFUNDS[row][column].add(PREFUNDERS[key].prefund)
-
-        if (row == 1) SUPERTUTELLIAN_LOTTERY[column].push(key)
-        if (row == 2) TUTELLIAN_LOTTERY[column].push(key)
     })
 }
 
@@ -214,7 +204,18 @@ function sortPrefundersByEnergy() {
 
     for (let i = 0; i < sortable.length; i++) {
         const key = sortable[i].account
+
+        const staked = PREFUNDERS[key].staked
+        PREFUNDERS[key].type = !isStandard(staked) ? 3 : !isSuperBooster(staked) ? 2 : isTop() ? 0 : 1
+
+        const row = PREFUNDERS[key].type
+        const column = FACTIONS[PREFUNDERS[key].faction].ranking
+        PREFUNDERS[key].row = row
         PREFUNDERS[key].ranking = i
+        PREFUNDS[row][column] = PREFUNDS[row][column].add(PREFUNDERS[key].prefund)
+
+        if (row == 1) SUPERTUTELLIAN_LOTTERY[column].push(key)
+        if (row == 2) TUTELLIAN_LOTTERY[column].push(key)
     }
 }
 
