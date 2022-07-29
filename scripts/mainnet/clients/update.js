@@ -1,12 +1,12 @@
 const hre = require('hardhat');
+const { ethers } = hre;
+const { Wallet, provider } = ethers;
 const { downloadJSON, uploadJSON } = require('../../../utils/ipfs');
 const { parseEther, isAddress } = require('ethers/lib/utils');
 const { getBalanceTree, concatJson } = require('../../../utils/balanceTree');
-const { assert } = require('assert');
+const { createTx, sendTx } = require('../../../utils/gnosis');
 
 const json1 = {
-    "0x5Ba393A21Baf111cA14F5Cf73643333a13f3272F": parseEther("2262").toString(),
-    "0x351356843A8cFDB726C757014b47E1291315217f": parseEther("800").toString(),
 }
 
 const checkWallets = (json) => {
@@ -20,8 +20,12 @@ const checkWallets = (json) => {
     })
 }
 
+const SAFE = "0x5ACB3043da168b59b775eA28F3942597F45e9543"
+
 const main = async () => {
     await hre.run('compile');
+
+    const wallet = new Wallet(process.env.PRIVATE_KEY);
 
     checkWallets(json1);
 
@@ -37,13 +41,20 @@ const main = async () => {
     const uri = await uploadJSON(json, tree.merkleRoot);
     console.log('Updating contract... merkleRoot:', tree.merkleRoot, ', uri:', uri);
 
-    const data = myClientsVault.interface.encodeFunctionData('updateMerkleRoot', [
-        tree.merkleRoot,
-        uri,
-    ]);
+    const data = {
+        to: myClientsVault.address,
+        data: myClientsVault.interface.encodeFunctionData('updateMerkleRoot', [
+            tree.merkleRoot,
+            uri,
+        ]),
+        value: 0,
+        operation: 0,
+    };
 
-    console.log('URI:', uri);
-    console.log('Data:', data);
+    const chainId = ethers.provider._network.chainId;
+    const txData = await createTx(provider, chainId, SAFE, data, wallet);
+    await sendTx(chainId, SAFE, txData);
+    console.log('SafeTxHash:', txData.contractTransactionHash)
 
     // const tx = await myClientsVault.updateMerkleRoot(tree.merkleRoot, uri);
     // await tx.wait();
