@@ -436,7 +436,7 @@ function transformUsdtToIdoToken(amountUsdtBN) {
 
 function transformLpToTut(lpAmount) {
     const lpShare = lpAmount.mul(ONE_BN).div(LP_TOTAL_SUPPLY);
-    return RESERVES_TUT.mul(TWO_WEI_BN).mul(lpShare).div(ONE_BN);
+    return RESERVES_TUT.mul(lpShare).div(ONE_BN);
 }
 
 async function getReserves() {
