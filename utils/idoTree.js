@@ -12,10 +12,10 @@ const checkValidJSON = (object = {}) => {
   Object.keys(object).forEach(key => {
     assert(utils.isAddress(key), ERROR_INVALID_JSON)
     const allocation = object[key]['allocation']
-    const withdraw = object[key]['withdraw']
+    const refund = object[key]['refund']
     const energy = object[key]['energy']
     assert(validAmount(allocation), ERROR_INVALID_JSON)
-    assert(validAmount(withdraw), ERROR_INVALID_JSON)
+    assert(validAmount(refund), ERROR_INVALID_JSON)
     assert(validAmount(energy), ERROR_INVALID_JSON)
   })
 }
@@ -26,7 +26,7 @@ const toArray = (object = {}) => {
     acu.push({
       account: key,
       allocation: BigNumber.from(object[key]['allocation']),
-      withdraw: BigNumber.from(object[key]['withdraw']),
+      refund: BigNumber.from(object[key]['refund']),
       energy: BigNumber.from(object[key]['energy'])
     })
     return acu
@@ -34,16 +34,16 @@ const toArray = (object = {}) => {
 }
 
 const toHexNode = (array = []) =>
-  array.map(({ account, allocation, withdraw, energy }, index) =>
-    keccak256({ index, account, allocation, withdraw, energy })
+  array.map(({ account, allocation, refund, energy }, index) =>
+    keccak256({ index, account, allocation, refund, energy })
   )
 
 // keccak256(abi.encode(index, account, amount))
-const keccak256 = ({ index, account, allocation, withdraw, energy }) => {
-  // console.log('> keccak256', index, account, allocation, withdraw)
+const keccak256 = ({ index, account, allocation, refund, energy }) => {
+  // console.log('> keccak256', index, account, allocation, refund)
   return Buffer.from(
     utils.solidityKeccak256(
-      ['uint256', 'address', 'uint256', 'uint256', 'uint256'], [index, account, allocation, withdraw, energy]).substr(2),
+      ['uint256', 'address', 'uint256', 'uint256', 'uint256'], [index, account, allocation, refund, energy]).substr(2),
     'hex'
   )
 }
@@ -58,8 +58,8 @@ exports.getIdoTree = (distributionJSON) => {
   const nodesArray = toHexNode(distributionArray)
   const tree = MerkelTree(nodesArray)
 
-  const getProof = ({ index, account, allocation, withdraw, energy }) =>
-    tree.getHexProof(keccak256({ index, account, allocation, withdraw, energy }))
+  const getProof = ({ index, account, allocation, refund, energy }) =>
+    tree.getHexProof(keccak256({ index, account, allocation, refund, energy }))
 
   const allocationTotal =
     distributionArray.reduce(
@@ -67,9 +67,9 @@ exports.getIdoTree = (distributionJSON) => {
       BigNumber.from(0)
     )
 
-  const withdrawTotal =
+  const refundTotal =
     distributionArray.reduce(
-      (acu, { withdraw }) => acu.add(withdraw),
+      (acu, { refund }) => acu.add(refund),
       BigNumber.from(0)
     )
 
@@ -80,14 +80,14 @@ exports.getIdoTree = (distributionJSON) => {
     )
 
   const claims =
-    distributionArray.reduce((acu, { account, allocation, withdraw, energy }, index) => {
-      // console.log('claims', account, allocation, withdraw, energy, index)
+    distributionArray.reduce((acu, { account, allocation, refund, energy }, index) => {
+      // console.log('claims', account, allocation, refund, energy, index)
       acu[account] = {
         index,
         allocation: allocation.toHexString(),
-        withdraw: withdraw.toHexString(),
+        refund: refund.toHexString(),
         energy: energy.toHexString(),
-        proof: getProof({ index, account, allocation, withdraw, energy })
+        proof: getProof({ index, account, allocation, refund, energy })
       }
       return acu
     }, {})
@@ -98,7 +98,7 @@ exports.getIdoTree = (distributionJSON) => {
     toJSON: () => ({
       merkleRoot: tree.getHexRoot(),
       allocationTotal: allocationTotal.toHexString(),
-      withdrawTotal: withdrawTotal.toHexString(),
+      refundTotal: refundTotal.toHexString(),
       energyTotal: energyTotal.toHexString(),
       claims
     })

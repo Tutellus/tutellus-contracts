@@ -7,7 +7,9 @@ const fs = require("fs");
 const { readFile } = require("fs/promises");
 const path = require("path");
 const { getIdoTree } = require("../../../utils/idoTree");
-const IDO = "0x046Ac4a1fCAA576c2850Cd7D3b1268A11e97fF8C";
+const ONE_BN = ethers.utils.parseEther("1");
+const IDO = "0x3a00d1b1F4Fa768801Dd416E43930808C72c80e9";
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.25");
 const jsonPath =
     "../../../examples/testnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
@@ -22,13 +24,13 @@ const data = {
 async function main() {
     const ido = await getIDO();
     const prefunders = await getPrefunders();
-    const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount);
-    const prefundedBN = ethers.BigNumber.from(ido.prefunded);
+    const fundingAmountUsdtBN = ethers.BigNumber.from(ido.fundingAmount);
+    const prefundedUsdtBN = ethers.BigNumber.from(ido.prefunded);
     const file = await readFile(path.join(__dirname, jsonPath), "utf8");
     const json = JSON.parse(file);
     const validJson = verifyJson(
-        fundingAmountBN,
-        prefundedBN,
+        fundingAmountUsdtBN,
+        prefundedUsdtBN,
         prefunders,
         json
     );
@@ -60,21 +62,24 @@ main()
         process.exit(1);
     });
 
-function verifyJson(needed, prefunded, prefunders, json) {
-    let sumAllocation = ethers.utils.parseEther("0");
-    let sumWithdraw = ethers.utils.parseEther("0");
+function verifyJson(neededUsdtBN, prefundedUsdtBN, prefunders, json) {
+    let sumAllocationIdoBN = ethers.utils.parseEther("0");
+    let sumRefundUsdtBN = ethers.utils.parseEther("0");
+    let sumAllocationUsdtBN;
 
     for (let i = 0; i < prefunders.length; i++) {
-        sumAllocation = sumAllocation.add(
+        sumAllocationIdoBN = sumAllocationIdoBN.add(
             json[prefunders[i].account]["allocation"]
         );
-        sumWithdraw = sumWithdraw.add(json[prefunders[i].account]["withdraw"]);
+        sumRefundUsdtBN = sumRefundUsdtBN.add(json[prefunders[i].account]["refund"]);
+
+        sumAllocationUsdtBN = transformIdoTokenToUsdt(sumAllocationIdoBN)
     }
 
-    const left = needed.gt(sumAllocation) ? needed.sub(sumAllocation) : sumAllocation.sub(needed)
+    const left = neededUsdtBN.gt(sumAllocationUsdtBN) ? neededUsdtBN.sub(sumAllocationUsdtBN) : sumAllocationUsdtBN.sub(neededUsdtBN)
 
     return (
-        left.lte(ethers.constants.WeiPerEther) && sumAllocation.add(sumWithdraw).eq(prefunded)
+        left.lte(ethers.constants.WeiPerEther) && sumAllocationUsdtBN.add(sumRefundUsdtBN).eq(prefundedUsdtBN)
     );
 }
 
@@ -117,4 +122,14 @@ async function querySubgraph(query) {
     } catch (error) {
         console.error(error);
     }
+}
+
+/******** MATH UTILS */
+
+function transformUsdtToIdoToken(amountUsdtBN) {
+    return amountUsdtBN.mul(ONE_BN).div(IDO_TOKEN_USDT_PRICE);
+}
+
+function transformIdoTokenToUsdt(amountIdoBN) {
+    return amountIdoBN.mul(IDO_TOKEN_USDT_PRICE).div(ONE_BN);
 }
