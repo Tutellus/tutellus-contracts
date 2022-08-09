@@ -20,7 +20,7 @@ async function main() {
     const TutellusIDO = await ethers.getContractFactory("TutellusIDO");
     const Token = await ethers.getContractFactory("Token");
 
-    const myIdoToken = await Token.deploy("Tutellus IDO 5", "IDO5")
+    const myIdoToken = await Token.deploy("Tutellus IDO 7", "IDO7")
     await myIdoToken.deployed()
     const myManager = Manager.attach(MANAGER_ADDR);
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
