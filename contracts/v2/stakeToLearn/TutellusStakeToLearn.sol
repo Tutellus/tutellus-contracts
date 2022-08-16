@@ -51,11 +51,17 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         _stakingAddress = stakingAddress;
         _feedBtcUsd = feedBtcUsd;
         _btcAddress = btcAddress;
+        _tutAddress = tutAddress;
         _poolAddress = poolAddress;
         _price = price;
         _anualInterestPercentage = anualInterestPercentage;
 
-        IERC20(tutAddress).approve(stakingAddress, depositAmount);
+        address token0 = IUniswapV2Pair(poolAddress).token0();
+        address token1 = IUniswapV2Pair(poolAddress).token1();
+        require(tutAddress == token0 || tutAddress == token1, "");
+        require(btcAddress == token0 || btcAddress == token1, "");
+
+        IERC20(tutAddress).approve(stakingAddress, type(uint256).max);
         _deposit(depositAmount);
     }
 
@@ -63,10 +69,10 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         return _owner;
     }
 
-    function checkClose() public view returns(bool, bool) {
+    function checkClose() public view returns(bool) {
         uint rewards = _getPendingRewards();
         uint staked = _getStaked();
-        return (_checkClose(rewards), _checkClose(rewards + staked));
+        return _checkClose(rewards + staked);
     }
 
     function claimAndDeposit() public onlyOwner {
@@ -81,16 +87,16 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
     }
 
     function closeForceAdmin() public onlyRole(TUTELLUS_STAKETOLEARN_ADMIN_ROLE) {
-        _closeForce();
+        _closeForce(true);
     }
 
     function closeForce() public onlyOwner {
-        _closeForce();
+        _closeForce(false);
     }
 
-    function _closeForce() internal {
+    function _closeForce(bool skipCheck) internal {
         uint amountAvailable = _getPendingRewards() + _getStaked();
-        require(_checkClose(amountAvailable), "");
+        require(_checkClose(amountAvailable) || skipCheck, "");
         _claim();
         _close();
     }
@@ -114,10 +120,12 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         _withdraw();
         IERC20 tut = IERC20(_tutAddress);
         uint closeAmount = _getAmountToClose();
+        uint balance = tut.balanceOf(address(this));
+        uint treasuryAmount = closeAmount < balance ? closeAmount : balance;
         address treasury = ITutellusManager(config).get(keccak256("STAKETOLEARN_VAULT"));
-        require(tut.transfer(treasury, closeAmount), "");
-        uint amountLeft = tut.balanceOf(address(this));
-        require(tut.transfer(_owner, amountLeft), "");
+        require(tut.transfer(treasury, treasuryAmount), "");
+        uint amountLeft = closeAmount < balance ? balance - closeAmount : 0;
+        if (amountLeft > 0) require(tut.transfer(_owner, amountLeft), "");
     }
 
     function _claim() internal returns(uint) {
@@ -162,7 +170,7 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
     function _transformBtcToUsd(uint amountBtc) internal view returns(uint) {
         IERC20Metadata btcToken = IERC20Metadata(_btcAddress);
         AggregatorV3Interface aggregatorInterface = AggregatorV3Interface(_feedBtcUsd);
-        uint256 decimals = aggregatorInterface.decimals(); //8, TBD: get in initialize or hardcode
+        uint256 decimals = aggregatorInterface.decimals(); //8
         (, int256 answer, , , ) = aggregatorInterface.latestRoundData();
         uint256 amountUsd = (amountBtc * uint256(answer)) / (10**decimals);
         return (amountUsd * 1 ether) / (10**btcToken.decimals()); //return in wei, 18 decimals
