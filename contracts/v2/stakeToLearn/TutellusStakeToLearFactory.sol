@@ -8,9 +8,10 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "contracts/interfaces/ITutellusStaking.sol";
+import "contracts/utils/BeaconFactory.sol";
 import {TutellusStakeToLearn} from "./TutellusStakeToLearn.sol";
 
-contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable {
+contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable, BeaconFactory {
     bytes32 internal constant _TUTELLUS_STAKETOLEARN_TYPEHASH =
         keccak256(
             "StakeToLearn(address account,uint256 price,uint256 anualInterestPercentage,uint256 amount,uint256 deadline)"
@@ -23,10 +24,8 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     address private _tutAddress;
     address private _btcAddress;
     address private _poolAddress;
-    address public fixedImplementation;
 
-    event NewStakeToLear(address indexed proxy, address indexed account, uint price, uint anualInterestPercentage, uint depositAmount);
-    event NewImplementation(address implementation);
+    event NewStakeToLearn(address indexed proxy, address indexed account, uint price, uint anualInterestPercentage, uint depositAmount);
 
     constructor() {
         _disableInitializers();
@@ -41,7 +40,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     ) public initializer {
         __AccessControlProxyPausable_init(msg.sender); //TBD: not msg.sender
         __EIP712_init("TutellusStakeToLearnFactory", "1");
-        fixedImplementation = address(new TutellusStakeToLearn());
+        _upgradeByImplementation(address(new TutellusStakeToLearn()));
 
         _stakingAddress = stakingAddress;
         _feedBtcUsd = feedBtcUsd;
@@ -50,9 +49,12 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
         _poolAddress = poolAddress;
     }
 
-    function updateImplementation(address newImplementation) public onlyRole(TUTELLUS_STAKETOLEARN_ADMIN_ROLE) {
-        fixedImplementation = newImplementation;
-        emit NewImplementation(newImplementation);
+    function upgrade(bytes memory bytecode) public onlyRole(TUTELLUS_STAKETOLEARN_ADMIN_ROLE) returns (address implementation) {
+        return _upgradeByBytecode(bytecode);
+    }
+
+    function upgradeWithImplementation(address implementation) public onlyRole(TUTELLUS_STAKETOLEARN_ADMIN_ROLE) {
+        _upgradeByImplementation(implementation);
     }
 
     function createProxy(
@@ -67,7 +69,6 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
         hasRole(TUTELLUS_STAKETOLEARN_SIGNER, signer);
         _verifySignature(account, price, anualInterestPercentage, depositAmount, deadline, signature, signer);
         proxy = _createProxy(
-            fixedImplementation,
             account,
             price,
             anualInterestPercentage,
@@ -78,7 +79,6 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     }
 
     function _createProxy(
-        address implementation,
         address account,
         uint price,
         uint anualInterestPercentage,
@@ -99,12 +99,9 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
             depositAmount
         );
 
-        proxyAddress = address(new ERC1967Proxy(
-            implementation,
-            initializeCalldata
-        ));
+        proxyAddress = _createProxy(initializeCalldata);
 
-        emit NewStakeToLear(
+        emit NewStakeToLearn(
             proxyAddress,
             account,
             price,
