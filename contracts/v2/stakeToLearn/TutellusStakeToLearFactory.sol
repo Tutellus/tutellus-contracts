@@ -19,11 +19,11 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     bytes32 private immutable TUTELLUS_STAKETOLEARN_ADMIN_ROLE = keccak256("TUTELLUS_STAKETOLEARN_ADMIN_ROLE");
     bytes32 private immutable TUTELLUS_STAKETOLEARN_SIGNER = keccak256("TUTELLUS_STAKETOLEARN_SIGNER");
 
-    address private _stakingAddress;
-    address private _feedBtcUsd;
-    address private _tutAddress;
-    address private _btcAddress;
-    address private _poolAddress;
+    address public stakingAddress;
+    address public feedBtcUsd;
+    address public tutAddress;
+    address public btcAddress;
+    address public poolAddress;
 
     event NewStakeToLearn(address indexed proxy, address indexed account, uint price, uint anualInterestPercentage, uint depositAmount);
 
@@ -32,21 +32,21 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     }
 
     function initialize(
-        address stakingAddress,
-        address feedBtcUsd,
-        address tutAddress,
-        address btcAddress,
-        address poolAddress
+        address stakingAddress_,
+        address feedBtcUsd_,
+        address tutAddress_,
+        address btcAddress_,
+        address poolAddress_
     ) public initializer {
         __AccessControlProxyPausable_init(msg.sender); //TBD: not msg.sender
         __EIP712_init("TutellusStakeToLearnFactory", "1");
         _upgradeByImplementation(address(new TutellusStakeToLearn()));
 
-        _stakingAddress = stakingAddress;
-        _feedBtcUsd = feedBtcUsd;
-        _tutAddress = tutAddress;
-        _btcAddress = btcAddress;
-        _poolAddress = poolAddress;
+        stakingAddress = stakingAddress_;
+        feedBtcUsd = feedBtcUsd_;
+        tutAddress = tutAddress_;
+        btcAddress = btcAddress_;
+        poolAddress = poolAddress_;
     }
 
     function upgrade(bytes memory bytecode) public onlyRole(TUTELLUS_STAKETOLEARN_ADMIN_ROLE) returns (address implementation) {
@@ -75,7 +75,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
             depositAmount
         );
 
-        require(IERC20(_tutAddress).transferFrom(account, proxy, depositAmount), "");
+        require(IERC20(tutAddress).transferFrom(account, proxy, depositAmount), "");
     }
 
     function _createProxy(
@@ -89,11 +89,11 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
             msg.sender,
             account,
             depositAmount,
-            _stakingAddress,
-            _feedBtcUsd,
-            _tutAddress,
-            _btcAddress,
-            _poolAddress,
+            stakingAddress,
+            feedBtcUsd,
+            tutAddress,
+            btcAddress,
+            poolAddress,
             price,
             anualInterestPercentage,
             depositAmount

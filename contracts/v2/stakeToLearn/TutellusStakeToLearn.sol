@@ -10,16 +10,13 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "contracts/interfaces/ITutellusManager.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "contracts/interfaces/ITutellusStaking.sol";
+import "contracts/interfaces/ITutellusStakeToLearnFactory.sol";
 
 contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
     bytes32 private immutable TUTELLUS_STAKETOLEARN_ADMIN_ROLE = keccak256("TUTELLUS_STAKETOLEARN_ADMIN_ROLE");
 
     address private _owner;
-    address private _stakingAddress;
-    address private _feedBtcUsd;
-    address private _tutAddress;
-    address private _btcAddress;
-    address private _poolAddress;
+    ITutellusStakeToLearnFactory private _factory;
     uint private _price;
     uint private _anualInterestPercentage;
     uint private _startDate;
@@ -36,11 +33,6 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
     function initialize(
         address accessControlManager,
         address account,
-        address stakingAddress,
-        address feedBtcUsd,
-        address tutAddress,
-        address btcAddress,
-        address poolAddress,
         uint price,
         uint anualInterestPercentage,
         uint depositAmount
@@ -48,19 +40,20 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         __AccessControlProxyPausable_init(accessControlManager);
 
         _owner = account;
-        _stakingAddress = stakingAddress;
-        _feedBtcUsd = feedBtcUsd;
-        _btcAddress = btcAddress;
-        _tutAddress = tutAddress;
-        _poolAddress = poolAddress;
+        _factory = ITutellusStakeToLearnFactory(msg.sender);
         _price = price;
         _anualInterestPercentage = anualInterestPercentage;
+
+        address tutAddress = _factory.tutAddress();
+        address btcAddress = _factory.btcAddress();
+        address poolAddress = _factory.poolAddress();
+        address stakingAddress = _factory.stakingAddress();
 
         address token0 = IUniswapV2Pair(poolAddress).token0();
         address token1 = IUniswapV2Pair(poolAddress).token1();
         require(tutAddress == token0 || tutAddress == token1, "");
         require(btcAddress == token0 || btcAddress == token1, "");
-
+ 
         IERC20(tutAddress).approve(stakingAddress, type(uint256).max);
         _deposit(depositAmount);
     }
@@ -118,7 +111,8 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
 
     function _close() internal {
         _withdraw();
-        IERC20 tut = IERC20(_tutAddress);
+        address tutAddress = _factory.tutAddress();
+        IERC20 tut = IERC20(tutAddress);
         uint closeAmount = _getAmountToClose();
         uint balance = tut.balanceOf(address(this));
         uint treasuryAmount = closeAmount < balance ? closeAmount : balance;
@@ -130,26 +124,31 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
 
     function _claim() internal returns(uint) {
         uint claimAmount = _getPendingRewards();
-        ITutellusStaking(_stakingAddress).claim();
+        address stakingAddress = _factory.stakingAddress();
+        ITutellusStaking(stakingAddress).claim();
         return claimAmount;
     }
 
     function _deposit(uint depositAmount) internal {
-        ITutellusStaking(_stakingAddress).depositFrom(address(this), depositAmount);
+        address stakingAddress = _factory.stakingAddress();
+        ITutellusStaking(stakingAddress).depositFrom(address(this), depositAmount);
     }
 
     function _withdraw() internal returns(uint) {
+        address stakingAddress = _factory.stakingAddress();
         uint withdrawAmount = _getStaked();
-        ITutellusStaking(_stakingAddress).withdraw(withdrawAmount);
+        ITutellusStaking(stakingAddress).withdraw(withdrawAmount);
         return withdrawAmount;
     }
 
     function _getStaked() internal view returns (uint) {
-        return ITutellusStaking(_stakingAddress).getUserBalance(address(this));
+        address stakingAddress = _factory.stakingAddress();
+        return ITutellusStaking(stakingAddress).getUserBalance(address(this));
     }
 
     function _getPendingRewards() internal view returns (uint) {
-        return ITutellusStaking(_stakingAddress).pendingRewards(address(this));
+        address stakingAddress = _factory.stakingAddress();
+        return ITutellusStaking(stakingAddress).pendingRewards(address(this));
     }
 
     function _transformTutToUsd(uint amountTut) internal view returns(uint) {
@@ -163,13 +162,16 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
     }
 
     function _getPoolReserves() internal view returns(uint reserveTut, uint reserveBtc) {
-        IUniswapV2Pair _pool = IUniswapV2Pair(_poolAddress);
+        address poolAddress = _factory.poolAddress();
+        IUniswapV2Pair _pool = IUniswapV2Pair(poolAddress);
         (reserveTut, reserveBtc,) = _pool.getReserves();
     }
 
     function _transformBtcToUsd(uint amountBtc) internal view returns(uint) {
-        IERC20Metadata btcToken = IERC20Metadata(_btcAddress);
-        AggregatorV3Interface aggregatorInterface = AggregatorV3Interface(_feedBtcUsd);
+        address feedBtcUsd = _factory.feedBtcUsd();
+        address btcAddress = _factory.btcAddress();
+        IERC20Metadata btcToken = IERC20Metadata(btcAddress);
+        AggregatorV3Interface aggregatorInterface = AggregatorV3Interface(feedBtcUsd);
         uint256 decimals = aggregatorInterface.decimals(); //8
         (, int256 answer, , , ) = aggregatorInterface.latestRoundData();
         uint256 amountUsd = (amountBtc * uint256(answer)) / (10**decimals);
