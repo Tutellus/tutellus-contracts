@@ -4,6 +4,9 @@ const { parseEther } = require('ethers/lib/utils');
 const { concatArrays, getWhitelistTree } = require('../../utils/whitelistTree');
 
 const ADDRESSES = [
+    "0xB5B077CB356F8a7050ac1939B356e4f9e9E3517C",
+    "0x9017981eAb2B2cC348ad382b0a3e4a0AeFA7EF54",
+    "0x6011C90AD69DA2193CFE55Fc8521aa4Eb40A5FF4",
     "0x30729B6910757042024304E56BEB015821462691",
     "0xff529c047ecfe2f78caf41e84773c4f865ef84f1",
     "0x71a6cedac992f6ee61b439a5aa053d8c638ec409",
