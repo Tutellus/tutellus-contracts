@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerU
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "contracts/interfaces/ITutellusStaking.sol";
 import "contracts/utils/BeaconFactory.sol";
@@ -46,10 +47,15 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
 
         stakingAddress = stakingAddress_;
         feedBtcUsd = feedBtcUsd_;
-        feedUsdEur = feedBtcUsd_;
+        feedUsdEur = feedUsdEur_;
         tutAddress = tutAddress_;
         btcAddress = btcAddress_;
         poolAddress = poolAddress_;
+
+        address token0 = IUniswapV2Pair(poolAddress).token0();
+        address token1 = IUniswapV2Pair(poolAddress).token1();
+        require(tutAddress == token0 || tutAddress == token1, "");
+        require(btcAddress == token0 || btcAddress == token1, "");
     }
 
     function upgrade(bytes memory bytecode) public onlyRole(TUTELLUS_STAKETOLEARN_ADMIN_ROLE) returns (address implementation) {

@@ -45,15 +45,8 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         _anualInterestPercentage = anualInterestPercentage;
 
         address tutAddress = _factory.tutAddress();
-        address btcAddress = _factory.btcAddress();
-        address poolAddress = _factory.poolAddress();
         address stakingAddress = _factory.stakingAddress();
-
-        address token0 = IUniswapV2Pair(poolAddress).token0();
-        address token1 = IUniswapV2Pair(poolAddress).token1();
-        require(tutAddress == token0 || tutAddress == token1, "");
-        require(btcAddress == token0 || btcAddress == token1, "");
- 
+        
         IERC20(tutAddress).approve(stakingAddress, type(uint256).max);
         _deposit(depositAmountTut);
     }
