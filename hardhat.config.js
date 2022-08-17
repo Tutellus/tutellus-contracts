@@ -131,7 +131,7 @@ module.exports = {
     // hardhat: {
     //   chainId: 31337,
     //   forking: {
-    //     url: 'https://speedy-nodes-nyc.moralis.io/' + process.env.MORALIS_API_KEY + '/eth/goerli/archive'
+    //     url: 'https://goerli.infura.io/v3/' + process.env.INFURA_API_KEY
     //   },
     //   accounts: getAccounts()
     // },
