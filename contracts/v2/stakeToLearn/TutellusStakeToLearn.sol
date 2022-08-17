@@ -17,7 +17,7 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
 
     address private _owner;
     ITutellusStakeToLearnFactory private _factory;
-    uint private _price;
+    uint private _priceEur;
     uint private _anualInterestPercentage;
     uint private _startDate;
 
@@ -33,15 +33,15 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
     function initialize(
         address accessControlManager,
         address account,
-        uint price,
+        uint priceEur,
         uint anualInterestPercentage,
-        uint depositAmount
+        uint depositAmountTut
     ) public initializer {
         __AccessControlProxyPausable_init(accessControlManager);
 
         _owner = account;
         _factory = ITutellusStakeToLearnFactory(msg.sender);
-        _price = price;
+        _priceEur = priceEur;
         _anualInterestPercentage = anualInterestPercentage;
 
         address tutAddress = _factory.tutAddress();
@@ -55,7 +55,7 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         require(btcAddress == token0 || btcAddress == token1, "");
  
         IERC20(tutAddress).approve(stakingAddress, type(uint256).max);
-        _deposit(depositAmount);
+        _deposit(depositAmountTut);
     }
 
     function owner() public view returns(address) {
@@ -88,38 +88,38 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
     }
 
     function _closeForce(bool skipCheck) internal {
-        uint amountAvailable = _getPendingRewards() + _getStaked();
-        require(_checkClose(amountAvailable) || skipCheck, "");
+        uint amountAvailableTut = _getPendingRewards() + _getStaked();
+        require(_checkClose(amountAvailableTut) || skipCheck, "");
         _claim();
         _close();
     }
 
-    function _checkClose(uint amountAvailable) internal view returns(bool) {
-        uint closeAmount = _getAmountToClose();
-        return amountAvailable >= closeAmount;
+    function _checkClose(uint amountAvailableTut) internal view returns(bool) {
+        uint closeAmountTut = _getAmountToClose();
+        return amountAvailableTut >= closeAmountTut;
     }
 
     function _getAmountToClose() internal view returns(uint) {
-        return _getInterest() + _price;
+        return _transformEurToTut(_getInterest() + _priceEur);
     }
 
     function _getInterest() internal view returns(uint) {
         uint loanTime = block.timestamp - _startDate;
         uint interestPercentage = loanTime * _anualInterestPercentage / 365 days;
-        return _price * interestPercentage / 10000; //TBD: decide if use 1e18 decimals or only 2
+        return _priceEur * interestPercentage / 10000; //TBD: decide if use 1e18 decimals or only 2
     }
 
     function _close() internal {
         _withdraw();
         address tutAddress = _factory.tutAddress();
         IERC20 tut = IERC20(tutAddress);
-        uint closeAmount = _getAmountToClose();
-        uint balance = tut.balanceOf(address(this));
-        uint treasuryAmount = closeAmount < balance ? closeAmount : balance;
+        uint closeAmountTut = _getAmountToClose();
+        uint balanceTut = tut.balanceOf(address(this));
+        uint treasuryAmountTut = closeAmountTut < balanceTut ? closeAmountTut : balanceTut;
         address treasury = ITutellusManager(config).get(keccak256("STAKETOLEARN_VAULT"));
-        require(tut.transfer(treasury, treasuryAmount), "");
-        uint amountLeft = closeAmount < balance ? balance - closeAmount : 0;
-        if (amountLeft > 0) require(tut.transfer(_owner, amountLeft), "");
+        require(tut.transfer(treasury, treasuryAmountTut), "");
+        uint amountLeftTut = closeAmountTut < balanceTut ? balanceTut - closeAmountTut : 0;
+        if (amountLeftTut > 0) require(tut.transfer(_owner, amountLeftTut), "");
     }
 
     function _claim() internal returns(uint) {
@@ -151,14 +151,15 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         return ITutellusStaking(stakingAddress).pendingRewards(address(this));
     }
 
-    function _transformTutToUsd(uint amountTut) internal view returns(uint) {
-        return amountTut * _getTutToUsdPrice() / 1 ether;
+    function _transformEurToTut(uint amountTut) internal view returns(uint) {
+        return amountTut * 1 ether / _getTutToEurPrice();
     }
 
-    function _getTutToUsdPrice() internal view returns(uint) {
+    function _getTutToEurPrice() internal view returns(uint) {
         (uint reserveTut, uint reserveBtc) = _getPoolReserves();
         uint reserveUsd = _transformBtcToUsd(reserveBtc);
-        return reserveUsd * 1 ether / reserveTut;
+        uint priceUsd =  reserveUsd * 1 ether / reserveTut;
+        return _transformUsdToEur(priceUsd);
     }
 
     function _getPoolReserves() internal view returns(uint reserveTut, uint reserveBtc) {
@@ -176,5 +177,13 @@ contract TutellusStakeToLearn is UUPSUpgradeableByRole, EIP712Upgradeable {
         (, int256 answer, , , ) = aggregatorInterface.latestRoundData();
         uint256 amountUsd = (amountBtc * uint256(answer)) / (10**decimals);
         return (amountUsd * 1 ether) / (10**btcToken.decimals()); //return in wei, 18 decimals
+    }
+
+    function _transformUsdToEur(uint amountUsd) internal view returns(uint) {
+        address feedUsdEur = _factory.feedUsdEur();
+        AggregatorV3Interface aggregatorInterface = AggregatorV3Interface(feedUsdEur);
+        uint256 decimals = aggregatorInterface.decimals(); //8
+        (, int256 answer, , , ) = aggregatorInterface.latestRoundData();
+        return (amountUsd * (10**decimals)) / uint256(answer); //return in wei, 18 decimals
     }
 }

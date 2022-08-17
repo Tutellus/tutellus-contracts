@@ -21,6 +21,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
 
     address public stakingAddress;
     address public feedBtcUsd;
+    address public feedUsdEur;
     address public tutAddress;
     address public btcAddress;
     address public poolAddress;
@@ -34,6 +35,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
     function initialize(
         address stakingAddress_,
         address feedBtcUsd_,
+        address feedUsdEur_,
         address tutAddress_,
         address btcAddress_,
         address poolAddress_
@@ -44,6 +46,7 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
 
         stakingAddress = stakingAddress_;
         feedBtcUsd = feedBtcUsd_;
+        feedUsdEur = feedBtcUsd_;
         tutAddress = tutAddress_;
         btcAddress = btcAddress_;
         poolAddress = poolAddress_;
@@ -89,11 +92,6 @@ contract TutellusStakeToLearnFactory is UUPSUpgradeableByRole, EIP712Upgradeable
             msg.sender,
             account,
             depositAmount,
-            stakingAddress,
-            feedBtcUsd,
-            tutAddress,
-            btcAddress,
-            poolAddress,
             price,
             anualInterestPercentage,
             depositAmount
