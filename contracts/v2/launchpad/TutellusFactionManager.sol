@@ -7,6 +7,7 @@ import 'contracts/interfaces/ITutellusFactionManager.sol';
 import 'contracts/interfaces/ITutellusERC20.sol';
 import 'contracts/interfaces/ITutellusManager.sol';
 import 'contracts/interfaces/ITutellusWhitelist.sol';
+import 'contracts/interfaces/ITutellusEnergy.sol';
 
 contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRole {
 
@@ -133,6 +134,26 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         require(id != 0x00, 'TutellusFactionManager: cant unstakeLP');
         (,uint256 energy) = ITutellusLaunchpadStaking(faction[id].farmingContract).withdraw(account, amount);
         emit UnstakeLP(id, account, amount, energy);
+    }
+
+    function getMigrateLoss (address account) public view returns(uint) {
+        bytes32 id = factionOf[account];
+        if (id == 0x00) return 0;
+        ITutellusLaunchpadStaking stakingInterface = ITutellusLaunchpadStaking(faction[id].stakingContract);
+        ITutellusLaunchpadStaking farmingInterface = ITutellusLaunchpadStaking(faction[id].farmingContract);
+        uint256 stakingBalance = stakingInterface.getUserBalance(account);
+        uint256 stakingFee = stakingInterface.getFee(account);
+        uint256 stakingEnergyMultiplier = stakingInterface.getEnergyMultiplier();
+        uint256 farmingBalance = farmingInterface.getUserBalance(account);
+        uint256 farmingFee = farmingInterface.getFee(account);
+        uint256 farmingEnergyMultiplier = farmingInterface.getEnergyMultiplier();
+
+        stakingBalance -= stakingBalance * stakingFee / 1e20;
+        farmingBalance -= farmingBalance * farmingFee / 1e20;
+
+        uint newBalance = (((stakingBalance * stakingEnergyMultiplier) + (farmingBalance * farmingEnergyMultiplier)) / 1 ether);
+        ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
+        return energyInterface.balanceOf(account) - newBalance;
     }
 
     function migrateFaction (

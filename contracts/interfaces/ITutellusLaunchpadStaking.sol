@@ -14,7 +14,7 @@ interface ITutellusLaunchpadStaking {
   function config (  ) external view returns ( address );
   function data ( address ) external view returns ( uint256 amount, uint256 rewardDebt, uint256 notClaimed, uint256 endInterval, uint256 minFee, uint256 maxFee, uint256 feeInterval, uint256 energyDebt );
   function deposit ( address account, uint256 amount ) external returns ( uint256 );
-  function energyMultiplier (  ) external view returns ( uint256 );
+  function getEnergyMultiplier (  ) external view returns ( uint256 );
   function feeInterval (  ) external view returns ( uint256 );
   function getBlocksLeft ( address account ) external view returns ( uint256 );
   function getFee ( address account ) external view returns ( uint256 );
