@@ -141,6 +141,8 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         if (id == 0x00) return 0;
         ITutellusLaunchpadStaking stakingInterface = ITutellusLaunchpadStaking(faction[id].stakingContract);
         ITutellusLaunchpadStaking farmingInterface = ITutellusLaunchpadStaking(faction[id].farmingContract);
+        uint newBalance;
+        {
         uint256 stakingBalance = stakingInterface.getUserBalance(account);
         uint256 stakingFee = stakingInterface.getFee(account);
         uint256 stakingEnergyMultiplier = stakingInterface.getEnergyMultiplier();
@@ -151,8 +153,11 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         stakingBalance -= stakingBalance * stakingFee / 1e20;
         farmingBalance -= farmingBalance * farmingFee / 1e20;
 
-        uint newBalance = (((stakingBalance * stakingEnergyMultiplier) + (farmingBalance * farmingEnergyMultiplier)) / 1 ether);
+        newBalance = (((stakingBalance * stakingEnergyMultiplier) + (farmingBalance * farmingEnergyMultiplier)) / 1 ether);
+        }
         ITutellusEnergy energyInterface = ITutellusEnergy(ITutellusManager(config).get(keccak256('ENERGY')));
+        uint balance = energyInterface.balanceOf(account);
+        if (newBalance > balance) return 0;
         return energyInterface.balanceOf(account) - newBalance;
     }
 
