@@ -7,8 +7,8 @@ const MANAGER_ADDR = "0x0e75e4D2041287813a693971634400EAe765910C";
 const FUNDING_AMOUNT = ethers.utils.parseEther("30000");
 const MIN_PREFUND = ethers.utils.parseEther("1000");
 const TIME_OFFSET = 0
-const START_DATE = parseInt(Date.now()/1000) + TIME_OFFSET
-const END_DATE = START_DATE + 432000 + TIME_OFFSET
+const START_DATE = 1661126400
+const END_DATE = 1661299200
 const IDO_TOKEN_AMOUNT = ethers.utils.parseEther("60000");
 
 async function main() {
@@ -20,7 +20,7 @@ async function main() {
     const TutellusIDO = await ethers.getContractFactory("TutellusIDO");
     const Token = await ethers.getContractFactory("Token");
 
-    const myIdoToken = await Token.deploy("Tutellus IDO 7", "IDO7")
+    const myIdoToken = await Token.deploy("Tutellus IDO 8", "IDO8")
     await myIdoToken.deployed()
     const myManager = Manager.attach(MANAGER_ADDR);
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
