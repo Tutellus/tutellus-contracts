@@ -15,7 +15,7 @@ const FACTION_TO_NAME = {
 const GRAPH_URL =
     "https://api.thegraph.com/subgraphs/name/gperezalba/launchpad-goerli";
 const ENERGY_ADDR = "0xd0977Cce3094772297ACB21c41cd44752D7768Ed";
-const IDO_ADDR = ethers.constants.AddressZero; //'0x046Ac4a1fCAA576c2850Cd7D3b1268A11e97fF8C'
+const IDO_ADDR = '0x140541a4EB3f17c2C756419c5d2A5149b5434bE6'
 
 async function main() {
     const energyContract = await ethers.getContractAt(

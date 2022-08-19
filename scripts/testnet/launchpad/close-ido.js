@@ -1,6 +1,7 @@
 const bre = require("hardhat");
 const ethers = bre.ethers;
 const { create: ipfsHttpClient } = require("ipfs-http-client");
+const { downloadJSON, uploadJSON } = require('../../../utils/ipfs');
 const fetch = (...args) =>
     import("node-fetch").then(({ default: fetch }) => fetch(...args));
 const fs = require("fs");
@@ -8,7 +9,7 @@ const { readFile } = require("fs/promises");
 const path = require("path");
 const { getIdoTree } = require("../../../utils/idoTree");
 const ONE_BN = ethers.utils.parseEther("1");
-const IDO = "0x3a00d1b1F4Fa768801Dd416E43930808C72c80e9";
+const IDO = "0x140541a4EB3f17c2C756419c5d2A5149b5434bE6";
 const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.25");
 const jsonPath =
     "../../../examples/testnet/launchpad/" + IDO.toLowerCase() + ".json";
@@ -37,13 +38,13 @@ async function main() {
 
     if (validJson) {
         try {
-            const ipfs = ipfsHttpClient(data);
-            const added = await ipfs.add(file);
-            console.log("Uri: https://ipfs.io/ipfs/" + added.cid.toString());
             const tree = getIdoTree(json);
             console.log("MerkleRoot: ", tree.toJSON().merkleRoot);
+            const uri = await uploadJSON(json, tree.toJSON().merkleRoot)
+            console.log("Uri: " + uri);
+            const cid = uri.split("https://ipfs.io/ipfs/")[1]
             const ido = await ethers.getContractAt('TutellusIDO', IDO)
-            const response = await ido.updateMerkleRoot(tree.toJSON().merkleRoot, added.cid.toString())
+            const response = await ido.updateMerkleRoot(tree.toJSON().merkleRoot, cid)
             await response.wait()
             console.log('Success...')
         } catch (error) {
