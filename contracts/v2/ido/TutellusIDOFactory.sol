@@ -21,6 +21,7 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
     );
 
     event NewImplementation(address implementation);
+    event UpdateMerkleRoot(address ido, bytes32 merkleRoot, string uri);
 
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
@@ -30,6 +31,11 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
     function updateImplementation(address newImplementation) public onlyRole(DEFAULT_ADMIN_ROLE) {
         fixedImplementation = newImplementation;
         emit NewImplementation(newImplementation);
+    }
+
+    function updateMerkleRoot(address ido, bytes32 merkleRoot, string memory uri) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        TutellusIDO(ido).updateMerkleRoot(merkleRoot, uri);
+        emit UpdateMerkleRoot(ido, merkleRoot, uri);
     }
 
     function createProxy(bytes calldata initializeCalldata)
