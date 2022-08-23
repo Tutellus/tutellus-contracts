@@ -607,7 +607,7 @@ describe('IDOFactory & IDO', function () {
                     CLAIMS[accounts[i].address].index,
                     accounts[i].address,
                     CLAIMS[accounts[i].address].allocation,
-                    CLAIMS[accounts[i].address].withdraw,
+                    CLAIMS[accounts[i].address].refund,
                     CLAIMS[accounts[i].address].energy,
                     CLAIMS[accounts[i].address].proof
                 )
@@ -619,12 +619,12 @@ describe('IDOFactory & IDO', function () {
                     CLAIMS[accounts[i].address].index,
                     accounts[i].address,
                     CLAIMS[accounts[i].address].allocation,
-                    CLAIMS[accounts[i].address].withdraw,
+                    CLAIMS[accounts[i].address].refund,
                     CLAIMS[accounts[i].address].energy,
                     CLAIMS[accounts[i].address].proof
                 )
                 let usdtBalancePost = await myUSDT.balanceOf(accounts[i].address)
-                expect(usdtBalancePost.toString()).to.equal(json[accounts[i].address].withdraw)
+                expect(usdtBalancePost.toString()).to.equal(json[accounts[i].address].refund)
             }
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [END_DATE + 1000000])
@@ -633,14 +633,14 @@ describe('IDOFactory & IDO', function () {
                     CLAIMS[accounts[i].address].index,
                     accounts[i].address,
                     CLAIMS[accounts[i].address].allocation,
-                    CLAIMS[accounts[i].address].withdraw,
+                    CLAIMS[accounts[i].address].refund,
                     CLAIMS[accounts[i].address].energy,
                     CLAIMS[accounts[i].address].proof
                 )
                 let idoBalance = await myIdoToken.balanceOf(accounts[i].address)
                 expect(idoBalance.toString()).to.equal(ethers.BigNumber.from(json[accounts[i].address].allocation).toString())
                 let usdtBalance = await myUSDT.balanceOf(accounts[i].address)
-                expect(usdtBalance.toString()).to.equal(json[accounts[i].address].withdraw)
+                expect(usdtBalance.toString()).to.equal(json[accounts[i].address].refund)
             }
         });
 
@@ -652,7 +652,7 @@ describe('IDOFactory & IDO', function () {
                     CLAIMS[accounts[2].address].index,
                     accounts[2].address,
                     CLAIMS[accounts[2].address].allocation,
-                    CLAIMS[accounts[2].address].withdraw,
+                    CLAIMS[accounts[2].address].refund,
                     CLAIMS[accounts[2].address].energy,
                     CLAIMS[accounts[3].address].proof
                 ),

@@ -24,6 +24,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     mapping(address => bool) private _withdrawn;
     mapping(address => uint256) private _prefunds;
     mapping(address => bool) private _termsAndConditions;
+    mapping(address => mapping(address => bool)) private _operatorApprovals;
 
     event Prefund(address indexed funder, uint256 amount);
     event Withdraw(address indexed funder, uint256 amount);
@@ -46,6 +47,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     );
     event Closed(bool closed);
     event AcceptTermsAndConditions(address idoUser);
+    event OperatorApproval(address owner, address operator, bool approved);
 
     modifier isNotClosed() {
         require(!closed, "TutellusIDO: IDO is closed");
@@ -64,6 +66,11 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
             _isWhitelisted(account),
             'TutellusIDO: address not whitelisted'
         );
+        _;
+    }
+
+    modifier isPrefunderOrOperator(address prefunder) {
+        require(_msgSender() == prefunder || _operatorApprovals[prefunder][_msgSender()], "TutellusIDO: not prefunder or operator");
         _;
     }
 
@@ -98,6 +105,20 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
 
     function getAcceptedTermsAndConditions(address account) public view returns (bool) {
         return _termsAndConditions[account];
+    }
+
+    function isOperator(address owner, address operator) public view returns (bool) {
+        return _operatorApprovals[owner][operator];
+    }
+
+    function setOperator(
+        address operator,
+        bool approved
+    ) public virtual {
+        address owner = _msgSender();
+        require(owner != operator, "ERC721: approve to caller");
+        _operatorApprovals[owner][operator] = approved;
+        emit OperatorApproval(owner, operator, approved);
     }
 
     function acceptTermsAndConditions() public isWhitelisted(msg.sender) {
@@ -151,6 +172,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         isOpen
         isNotClosed
         acceptedTermsAndConditions(prefunder_)
+        isPrefunderOrOperator(prefunder_)
     {
         require(
             prefundAmount_ + _prefunds[prefunder_] >= minPrefund,
