@@ -3,41 +3,32 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
+import 'contracts/interfaces/ITutellusIDOFactory.sol';
 import "./TutellusIDO.sol";
 
-contract TutellusIDOFactory is UUPSUpgradeableByRole {
+contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
+    /// @inheritdoc ITutellusIDOFactory
     address public fixedImplementation;
 
-    event NewIDO(
-        address indexed proxy,
-        address token,
-        uint256 fundingAmount,
-        uint256 minPrefund,
-        address idoToken,
-        address prefundToken,
-        uint256 startDate,
-        uint256 endDate,
-        uint256 openDate
-    );
-
-    event NewImplementation(address implementation);
-    event UpdateMerkleRoot(address ido, bytes32 merkleRoot, string uri);
-
+    /// @inheritdoc ITutellusIDOFactory
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
         fixedImplementation = address(new TutellusIDO());
     }
 
+    /// @inheritdoc ITutellusIDOFactory
     function updateImplementation(address newImplementation) public onlyRole(DEFAULT_ADMIN_ROLE) {
         fixedImplementation = newImplementation;
         emit NewImplementation(newImplementation);
     }
 
+    /// @inheritdoc ITutellusIDOFactory
     function updateMerkleRoot(address ido, bytes32 merkleRoot, string memory uri) external onlyRole(DEFAULT_ADMIN_ROLE) {
         TutellusIDO(ido).updateMerkleRoot(merkleRoot, uri);
         emit UpdateMerkleRoot(ido, merkleRoot, uri);
     }
 
+    /// @inheritdoc ITutellusIDOFactory
     function createProxy(bytes calldata initializeCalldata)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -46,6 +37,7 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
         (proxy) = _createProxy(fixedImplementation, initializeCalldata);
     }
 
+    /// @inheritdoc ITutellusIDOFactory
     function createProxyWithCustomImplementation(address implementation, bytes calldata initializeCalldata)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -64,7 +56,7 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
         )); 
 
         (
-            address token_,
+            address roleManager_,
             uint256 fundingAmount_,
             uint256 minPrefund_,
             address idoToken_,
@@ -79,7 +71,7 @@ contract TutellusIDOFactory is UUPSUpgradeableByRole {
 
         emit NewIDO(
             proxyAddress,
-            token_,
+            roleManager_,
             fundingAmount_,
             minPrefund_,
             idoToken_,

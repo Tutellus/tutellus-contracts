@@ -6,18 +6,40 @@ import "contracts/utils/CoinCharger.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "contracts/interfaces/ITutellusManager.sol";
 import 'contracts/interfaces/ITutellusWhitelist.sol';
+import 'contracts/interfaces/ITutellusIDO.sol';
 
-contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
+contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
+    /// @inheritdoc ITutellusIDO
     uint256 public prefunded;
+
+    /// @inheritdoc ITutellusIDO
     uint256 public fundingAmount;
+
+    /// @inheritdoc ITutellusIDO
     uint256 public minPrefund;
+
+    /// @inheritdoc ITutellusIDO
     uint256 public startDate;
+
+    /// @inheritdoc ITutellusIDO
     uint256 public openDate;
+
+    /// @inheritdoc ITutellusIDO
     uint256 public endDate;
+
+    /// @inheritdoc ITutellusIDO
     address public idoToken;
+
+    /// @inheritdoc ITutellusIDO
     address public prefundToken;
+
+    /// @inheritdoc ITutellusIDO
     bytes32 public merkleRoot;
+
+    /// @inheritdoc ITutellusIDO
     string public uri;
+
+    /// @inheritdoc ITutellusIDO
     bool public closed;
 
     mapping(address => uint256) private _claimed;
@@ -25,29 +47,6 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
     mapping(address => uint256) private _prefunds;
     mapping(address => bool) private _termsAndConditions;
     mapping(address => mapping(address => bool)) private _operatorApprovals;
-
-    event Prefund(address indexed funder, uint256 amount);
-    event Withdraw(address indexed funder, uint256 amount);
-    event RemovePrefunder(address indexed funder);
-    event UpdateMerkleRoot(bytes32 merkleRoot, string uri);
-    event Claim(
-        uint256 index,
-        address account,
-        uint256 amount,
-        uint256 allocation,
-        uint256 withdraw,
-        uint256 energy
-    );
-    event WithdrawLeft(
-        uint256 index,
-        address account,
-        uint256 allocation,
-        uint256 withdraw,
-        uint256 energy
-    );
-    event Closed(bool closed);
-    event AcceptTermsAndConditions(address idoUser);
-    event OperatorApproval(address owner, address operator, bool approved);
 
     modifier isNotClosed() {
         require(!closed, "TutellusIDO: IDO is closed");
@@ -79,6 +78,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         _;
     }
 
+    /// @inheritdoc ITutellusIDO
     function initialize(
         address rolemanager_,
         uint256 fundingAmount_,
@@ -99,18 +99,22 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         openDate = openDate_;
     }
 
+    /// @inheritdoc ITutellusIDO
     function getPrefunded(address prefunder_) public view returns (uint256) {
         return _prefunds[prefunder_];
     }
 
+    /// @inheritdoc ITutellusIDO
     function getAcceptedTermsAndConditions(address account) public view returns (bool) {
         return _termsAndConditions[account];
     }
 
+    /// @inheritdoc ITutellusIDO
     function isOperator(address owner, address operator) public view returns (bool) {
         return _operatorApprovals[owner][operator];
     }
 
+    /// @inheritdoc ITutellusIDO
     function setOperator(
         address operator,
         bool approved
@@ -121,19 +125,23 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         emit OperatorApproval(owner, operator, approved);
     }
 
+    /// @inheritdoc ITutellusIDO
     function acceptTermsAndConditions() public isWhitelisted(msg.sender) {
         _termsAndConditions[msg.sender] = true;
         emit AcceptTermsAndConditions(msg.sender);
     }
 
+    /// @inheritdoc ITutellusIDO
     function claimed(address account) public view returns(uint256) {
         return _claimed[account];
     }
 
+    /// @inheritdoc ITutellusIDO
     function withdrawn(address account) public view returns(bool) {
         return _withdrawn[account];
     }
 
+    /// @inheritdoc ITutellusIDO
     function released(uint256 allocation) public view returns (uint256) {
         return
             block.timestamp > endDate ? allocation : block.timestamp > startDate
@@ -142,6 +150,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
                 : 0;
     }
 
+    /// @inheritdoc ITutellusIDO
     function available(address account, uint256 allocation)
         public
         view
@@ -150,11 +159,13 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         return released(allocation) - _claimed[account];
     }
 
+    /// @inheritdoc ITutellusIDO
     function open() public onlyRole(DEFAULT_ADMIN_ROLE) {
         closed = false;
         emit Closed(closed);
     }
 
+    /// @inheritdoc ITutellusIDO
     function updateMerkleRoot(bytes32 merkleRoot_, string memory uri_)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -166,7 +177,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         emit Closed(closed);
     }
 
-    //TBD: use msg.sender to approve(maxuint) and mapping with approved accounts
+    /// @inheritdoc ITutellusIDO
     function prefund(address prefunder_, uint256 prefundAmount_)
         public
         isOpen
@@ -181,6 +192,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         _prefund(prefundAmount_, prefunder_);
     }
 
+    /// @inheritdoc ITutellusIDO
     function withdrawAll() public isNotClosed {
         address prefunder_ = _msgSender();
         _withdraw(prefunder_, _prefunds[prefunder_]);
@@ -188,6 +200,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         emit RemovePrefunder(prefunder_);
     }
 
+    /// @inheritdoc ITutellusIDO
     function withdraw(uint256 amount_) public isNotClosed {
         address prefunder_ = _msgSender();
         _withdraw(prefunder_, amount_);
@@ -197,11 +210,12 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         );
     }
 
+    /// @inheritdoc ITutellusIDO
     function withdrawLeft(
         uint256 index_,
         address account_,
         uint256 allocation_,
-        uint256 withdraw_,
+        uint256 withdraw_, //TBD: change to refund
         uint256 energy_,
         bytes32[] calldata merkleProof_
     ) public acceptedTermsAndConditions(account_) {
@@ -226,11 +240,12 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         );
     }
 
+    /// @inheritdoc ITutellusIDO
     function claim(
         uint256 index_,
         address account_,
         uint256 allocation_,
-        uint256 withdraw_,
+        uint256 withdraw_, //TBD: change to refund
         uint256 energy_,
         bytes32[] calldata merkleProof_
     ) public acceptedTermsAndConditions(account_) {
@@ -257,6 +272,7 @@ contract TutellusIDO is UUPSUpgradeableByRole, CoinCharger {
         );
     }
 
+    /// @inheritdoc ITutellusIDO
     function sync() public onlyRole(DEFAULT_ADMIN_ROLE) {
         _sync(prefundToken, msg.sender, prefunded);
     }
