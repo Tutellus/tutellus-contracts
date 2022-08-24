@@ -120,7 +120,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         bool approved
     ) public virtual {
         address owner = _msgSender();
-        require(owner != operator, "ERC721: approve to caller");
+        require(owner != operator, "TutellusIDO: approve to caller");
         _operatorApprovals[owner][operator] = approved;
         emit OperatorApproval(owner, operator, approved);
     }

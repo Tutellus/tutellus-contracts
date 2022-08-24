@@ -42,7 +42,7 @@ let myManager, myFactory, myIDO, myUSDT, myTUT, myIdoToken, myWhitelist
 describe('IDOFactory & IDO', function () {
     beforeEach(async () => {
         accounts = await ethers.getSigners();
-        [owner, funder, prefunder0, prefunder1, prefunder2, prefunder3] = accounts
+        [owner, funder, prefunder0, prefunder1, prefunder2, prefunder3, notWhitelisted] = accounts
 
         const TutellusManager = await ethers.getContractFactory('TutellusManager')
         const TutellusIDOFactory = await ethers.getContractFactory('TutellusIDOFactory')
@@ -156,7 +156,8 @@ describe('IDOFactory & IDO', function () {
         myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
 
         await myManager.grantRole(MINTER_ROLE, owner.address)
-        await myManager.grantRole(UPGRADER_ROLE, owner.address)
+        await myManager.grantRole(UPGRADER_ROLE, owner.address) 
+        await myManager.grantRole(DEFAULT_ADMIN_ROLE, myFactory.address) 
         await myUSDT.mint(owner.address, ethers.utils.parseEther('1000000'))
         await myUSDT.mint(funder.address, ethers.utils.parseEther('1000000'))
         await myUSDT.mint(myIDO.address, ethers.utils.parseEther('1000000'))
@@ -184,6 +185,19 @@ describe('IDOFactory & IDO', function () {
                 (await myFactory.connect(funder)).createProxy(idoCalldata),
                 'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
             )
+        });
+
+        it('only DEFAULT_ADMIN_ROLE can updateMerkleRoot', async () => {
+            await expectRevert(
+                myFactory.connect(funder).updateMerkleRoot(myIDO.address, ethers.utils.id("merkleRoot"), "uri"),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+            )
+            const merkleRoot = ethers.utils.id("merkleRoot")
+            const uri = "uri"
+            await myFactory.updateMerkleRoot(myIDO.address, merkleRoot, uri)
+
+            expect(await myIDO.merkleRoot()).to.equal(merkleRoot)
+            expect(await myIDO.uri()).to.equal(uri)
         });
 
         it('can create multiple IDOs and upgrade individually', async () => {
@@ -286,11 +300,14 @@ describe('IDOFactory & IDO', function () {
             await (await myIDO.connect(funder)).acceptTermsAndConditions()
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
+            const acceptedTC = await myIDO.getAcceptedTermsAndConditions(funder.address)
 
             const funderBalancePost = await myUSDT.balanceOf(funder.address)
             const idoBalancePost = await myUSDT.balanceOf(myIDO.address)
 
+
             expect(prefunded.toString()).to.equal(prefundAmount.toString())
+            expect(acceptedTC).to.equal(true)
             expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount).toString())
             expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount).toString())
         });
@@ -298,7 +315,7 @@ describe('IDOFactory & IDO', function () {
         it('cant prefund if not open', async () => {
             const prefundAmount = ethers.utils.parseEther('5000')
 
-            const openDate = parseInt(Date.now() / 1000) + 10000000
+            const openDate = END_DATE
             const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
             const idoCalldata = await TutellusIDO.interface.encodeFunctionData(
                 'initialize',
@@ -446,6 +463,51 @@ describe('IDOFactory & IDO', function () {
             await (await myIDO.connect(funder)).prefund(funder.address, MIN_PREFUND)
             const prefunded = await myIDO.getPrefunded(funder.address)
             expect(prefunded.toString()).to.equal(MIN_PREFUND.toString())
+        });
+
+        it('reverts if operator is not operator', async () => {
+            const prefundAmount = ethers.utils.parseEther('10')
+            await myUSDT.connect(funder).approve(myIDO.address, ethers.constants.MaxUint256)
+            await myIDO.connect(funder).acceptTermsAndConditions()
+            await expectRevert(
+                myIDO.connect(owner).prefund(funder.address, prefundAmount),
+                'TutellusIDO: not prefunder or operator'
+            )
+            await expectRevert(
+                myIDO.connect(funder).setOperator(funder.address, true),
+                'TutellusIDO: approve to caller'
+            )
+            await myIDO.connect(funder).setOperator(owner.address, true)
+            const isOperator = await myIDO.isOperator(funder.address, owner.address)
+            expect(isOperator).to.equal(true)
+            await myIDO.connect(owner).prefund(funder.address, MIN_PREFUND.toString())
+            const prefunded = await myIDO.getPrefunded(funder.address)
+            expect(prefunded.toString()).to.equal(MIN_PREFUND.toString())
+        });
+
+        it('reverts if IDO is not open', async () => {
+            const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
+            const idoCalldata = TutellusIDO.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myIdoToken.address,
+                    myUSDT.address,
+                    START_DATE,
+                    END_DATE,
+                    END_DATE
+                ]
+            );
+            const response = await myFactory.createProxy(idoCalldata)
+            const receipt = await response.wait()
+            const notOpenIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
+            const prefundAmount = ethers.utils.parseEther('5000')
+            await expectRevert(
+                notOpenIDO.connect(funder).prefund(funder.address, prefundAmount),
+                'TutellusIDO: IDO is not open'
+            )
         });
     });
 
@@ -615,6 +677,7 @@ describe('IDOFactory & IDO', function () {
                 expect(idoBalance.toString()).to.equal(ethers.BigNumber.from(json[accounts[i].address].allocation).mul(ethers.BigNumber.from((i-2).toString())).div(divisionBN).toString())
                 let usdtBalancePre = await myUSDT.balanceOf(accounts[i].address)
                 expect(usdtBalancePre.toString()).to.equal('0')
+                expect(idoBalance.toString()).to.equal((await myIDO.claimed(accounts[i].address)).toString())
                 await myIDO.withdrawLeft(
                     CLAIMS[accounts[i].address].index,
                     accounts[i].address,
@@ -625,6 +688,8 @@ describe('IDOFactory & IDO', function () {
                 )
                 let usdtBalancePost = await myUSDT.balanceOf(accounts[i].address)
                 expect(usdtBalancePost.toString()).to.equal(json[accounts[i].address].refund)
+                const withdrawn = json[accounts[i].address].refund == "0" ? true : await myIDO.withdrawn(accounts[i].address)
+                expect(withdrawn).to.equal(true)
             }
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [END_DATE + 1000000])
@@ -641,6 +706,7 @@ describe('IDOFactory & IDO', function () {
                 expect(idoBalance.toString()).to.equal(ethers.BigNumber.from(json[accounts[i].address].allocation).toString())
                 let usdtBalance = await myUSDT.balanceOf(accounts[i].address)
                 expect(usdtBalance.toString()).to.equal(json[accounts[i].address].refund)
+                expect(idoBalance.toString()).to.equal((await myIDO.claimed(accounts[i].address)).toString())
             }
         });
 
@@ -687,6 +753,13 @@ describe('IDOFactory & IDO', function () {
             const balanceAdmin2 = await myUSDT.balanceOf(owner.address)
             expect(balanceAdmin1.add(balanceIDO1).toString()).to.equal(balanceAdmin2.toString())
             expect(balanceIDO2.add(balanceIDO1).toString()).to.equal(balanceIDO1.toString())
+        });
+
+        it('cant acceptTermsAndConditions if not whitelisted', async () => {
+            await expectRevert(
+                myIDO.connect(notWhitelisted).acceptTermsAndConditions(),
+                'TutellusIDO: address not whitelisted'
+            )
         });
     });
 })
