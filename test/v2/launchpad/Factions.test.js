@@ -27,6 +27,12 @@ let myEnergy
 let owner, person
 let myRewardsVaultV2
 let myFactionManager
+let myEnergyManager
+let myUniswapFactory
+let myWETH
+let myRouter
+let myWBTC
+let myUniswapPair
 
 let vuterinsStaking, vuterinsFarming, nakamotosStaking, nakamotosFarming, factionManager, myWhitelist, tree, whitelist, personClaim, ownerClaim
 
@@ -46,6 +52,10 @@ const ONE_ETHER = parseEther('1')
 const TWO_ETHER = parseEther('2')
 const SIX_ETHER = parseEther('6')
 const RAY = parseEther('1000000000')
+const ENERGY_MULTIPLIER_STAKING = parseEther('1')
+const ENERGY_MULTIPLIER_FARMING = '74208157286916090585833538'
+const TUT_AMOUNT = ethers.utils.parseEther('400000')
+const WBTC_AMOUNT = '300000000'
 
 const VUTERINS_STAKING_ID = ethers.utils.id('VUTERINS_STAKING')
 const VUTERINS_FARMING_ID = ethers.utils.id('VUTERINS_FARMING')
@@ -78,6 +88,35 @@ const setInstances = async (addresses) => {
         HoldersVault.at(addresses[4]),
         TreasuryVault.at(addresses[5]),
     ])
+}
+
+const deployPool = async () => {
+    const UniswapV2Factory = await ethers.getContractFactory('UniswapV2Factory')
+    const UniswapRouter = await ethers.getContractFactory('UniswapRouter')
+    const Token = await ethers.getContractFactory('Token')
+    const WETH = await ethers.getContractFactory('WETH')
+
+    myUniswapFactory = await UniswapV2Factory.deploy(owner)
+    myWETH = await WETH.deploy()
+    myRouter = await UniswapRouter.deploy(myUniswapFactory.address, myWETH.address)
+    myWBTC = await Token.deploy("Wrapped BTC", "WBTC")
+
+    await myToken.approve(myRouter.address, ethers.constants.MaxUint256)
+    await myWBTC.approve(myRouter.address, ethers.constants.MaxUint256)
+
+    await myRouter.addLiquidity(
+        myToken.address,
+        myWBTC.address,
+        TUT_AMOUNT,
+        WBTC_AMOUNT,
+        TUT_AMOUNT,
+        WBTC_AMOUNT,
+        owner,
+        Date.now()
+    )
+
+    const pairAddress = await myUniswapFactory.getPair(myToken.address, myWBTC.address)
+    myUniswapPair = await ethers.getContractAt('IUniswapV2Pair', pairAddress)
 }
 
 describe('Factions', function () {
@@ -166,16 +205,18 @@ describe('Factions', function () {
     })
     describe('Deploy', () => {
         it('Deploying Factions', async () => {
+            await deployPool()
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
 
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldataFarming = LaunchpadStaking.interface.encodeFunctionData('initialize', [myUniswapPair.address]);
             let initializeCalldataFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
     
-            await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-            await myManager.deploy(VUTERINS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
+            await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldataStaking)
+            await myManager.deploy(VUTERINS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldataFarming)
+            await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldataStaking)
+            await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldataFarming)
             await myManager.deploy(FACTION_MANAGER, FactionManager.bytecode, initializeCalldataFactionManager)
 
             vuterinsStaking = await myManager.get(VUTERINS_STAKING_ID)
@@ -195,10 +236,20 @@ describe('Factions', function () {
             await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
             await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
 
+            await myEnergyManager.setFactoryByType(ENERGY_MULTIPLIER_FARMING, 2)
             await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
             await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
-            await myEnergyManager.setMultiplierType(vuterinsFarming, 1)
-            await myEnergyManager.setMultiplierType(nakamotosFarming, 1)
+            await myEnergyManager.setMultiplierType(vuterinsFarming, 2)
+            await myEnergyManager.setMultiplierType(nakamotosFarming, 2)
+
+            const multiplierStaking = await myEnergyManager.getEnergyMultiplier(vuterinsStaking)
+            const multiplierFarming = await myEnergyManager.getEnergyMultiplier(vuterinsFarming)
+            const multiplierUnknown = await myEnergyManager.getEnergyMultiplier(owner)
+            const pairSupply = await myUniswapPair.totalSupply()
+            const multiplierFarming2 = TUT_AMOUNT.mul(parseEther('2')).div(pairSupply).mul(ENERGY_MULTIPLIER_FARMING)
+            expect(multiplierStaking.toString()).to.equal(ENERGY_MULTIPLIER_STAKING.toString())
+            expect(multiplierFarming.toString()).to.equal(multiplierFarming2.toString())
+            expect(multiplierUnknown.toString()).to.equal('0')
 
             myFactionManager = FactionManager.attach(factionManager)
             await myManager.grantRole(FACTIONS_ADMIN_ROLE, owner)
