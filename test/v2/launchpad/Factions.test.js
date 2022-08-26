@@ -121,7 +121,7 @@ const deployPool = async () => {
 
 describe('Factions', function () {
     before(async () => {
-        [owner, person] = await web3.eth.getAccounts()
+        [owner, person, notWhitelisted] = await web3.eth.getAccounts()
         whitelist = [owner, person];
         tree = getWhitelistTree(whitelist).toJSON();
     })
@@ -244,11 +244,17 @@ describe('Factions', function () {
 
             const multiplierStaking = await myEnergyManager.getEnergyMultiplier(vuterinsStaking)
             const multiplierFarming = await myEnergyManager.getEnergyMultiplier(vuterinsFarming)
+            const stakingContract = await ethers.getContractAt('TutellusLaunchpadStaking', vuterinsStaking)
+            const farmingContract = await ethers.getContractAt('TutellusLaunchpadStaking', vuterinsFarming)
+            const multiplierStaking3 = await stakingContract.getEnergyMultiplier()
+            const multiplierFarming3 = await farmingContract.getEnergyMultiplier()
             const multiplierUnknown = await myEnergyManager.getEnergyMultiplier(owner)
             const pairSupply = await myUniswapPair.totalSupply()
             const multiplierFarming2 = TUT_AMOUNT.mul(parseEther('2')).div(pairSupply).mul(ENERGY_MULTIPLIER_FARMING)
             expect(multiplierStaking.toString()).to.equal(ENERGY_MULTIPLIER_STAKING.toString())
             expect(multiplierFarming.toString()).to.equal(multiplierFarming2.toString())
+            expect(multiplierStaking3.toString()).to.equal(ENERGY_MULTIPLIER_STAKING.toString())
+            expect(multiplierFarming3.toString()).to.equal(multiplierFarming2.toString())
             expect(multiplierUnknown.toString()).to.equal('0')
 
             myFactionManager = FactionManager.attach(factionManager)
@@ -327,6 +333,13 @@ describe('Factions', function () {
             await expectRevert(
                 myFactionManagerArtifact.stake(VUTERINS_FACTION, owner, ONE_ETHER, { from: person }),
                 'TutellusFactionManager: account not authorized'
+            )
+        })
+        it('Cant stake from not whitelisted party', async () => {
+            const myFactionManagerArtifact = await FactionManagerArtifact.at(factionManager)
+            await expectRevert(
+                myFactionManagerArtifact.stake(VUTERINS_FACTION, notWhitelisted, ONE_ETHER, { from: notWhitelisted }),
+                'TutellusFactionManager: address not whitelisted'
             )
         })
         it('Cant deposit from non faction', async () => {
@@ -474,22 +487,35 @@ describe('Factions', function () {
             await myFactionManager.updateFaction(VUTERINS_FACTION, vuterinsStaking, vuterinsFarming)
             await myFactionManager.updateFaction(NAKAMOTOS_FACTION, nakamotosStaking, nakamotosFarming)
             await myToken.approve(myFactionManager.address, constants.MaxUint256)
+
+            const zeroLoss = await myFactionManager.getMigrateLoss(owner)
+            expect(zeroLoss.toString()).to.equal('0')
         })
         it('Can deposit into staking and migrate faction', async () => {
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            const block = await ethers.provider.getBlock()
+            const currentTimestamp = block.timestamp
+            await ethers.provider.send("evm_setNextBlockTimestamp", [currentTimestamp + 8640000])
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const energyBalancePre = await myEnergy.balanceOf(owner)
+            const expectedLoss = await myFactionManager.getMigrateLoss(owner)
             const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
+            const energyBalancePost = await myEnergy.balanceOf(owner)
+            const loss = energyBalancePre.sub(energyBalancePost)
+            expect(loss.toString()).to.equal(expectedLoss.toString())
+            expect(loss.toString()).to.not.equal('0')
 
             expectEvent(receipt, 'Unstake', {
                 id: NAKAMOTOS_FACTION,
                 account: owner,
-                amount: ONE_ETHER.toString()
+                amount: TWO_ETHER.toString()
             })
             expectEvent(receipt, 'Stake', {
                 id: VUTERINS_FACTION,
                 account: owner,
-                amount: ONE_ETHER.toString()
+                amount: TWO_ETHER.toString()
             })
             expectEvent(receipt, 'Migrate', {
                 id: NAKAMOTOS_FACTION,
@@ -504,7 +530,13 @@ describe('Factions', function () {
             await myFactionManager.authorize(person)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const energyBalancePre = await myEnergy.balanceOf(owner)
+            const expectedLoss = await myFactionManager.getMigrateLoss(owner)
             const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION, { from: person })
+            const energyBalancePost = await myEnergy.balanceOf(owner)
+            const loss = energyBalancePre.sub(energyBalancePost)
+            expect(loss.toString()).to.equal(expectedLoss.toString())
+            expect(loss.toString()).to.not.equal('0')
 
             expectEvent(receipt, 'Unstake', {
                 id: NAKAMOTOS_FACTION,
@@ -526,19 +558,29 @@ describe('Factions', function () {
         })
         it('Can deposit into farming and migrate faction', async () => {
             await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            const block = await ethers.provider.getBlock()
+            const currentTimestamp = block.timestamp
+            await ethers.provider.send("evm_setNextBlockTimestamp", [currentTimestamp + 8640000])
+            await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const energyBalancePre = await myEnergy.balanceOf(owner)
+            const expectedLoss = await myFactionManager.getMigrateLoss(owner)
             const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
+            const energyBalancePost = await myEnergy.balanceOf(owner)
+            const loss = energyBalancePre.sub(energyBalancePost)
+            expect(loss.toString()).to.equal(expectedLoss.toString())
+            expect(loss.toString()).to.not.equal('0')
 
             expectEvent(receipt, 'UnstakeLP', {
                 id: NAKAMOTOS_FACTION,
                 account: owner,
-                amount: ONE_ETHER.toString()
+                amount: TWO_ETHER.toString()
             })
             expectEvent(receipt, 'StakeLP', {
                 id: VUTERINS_FACTION,
                 account: owner,
-                amount: ONE_ETHER.toString()
+                amount: TWO_ETHER.toString()
             })
             expectEvent(receipt, 'Migrate', {
                 id: NAKAMOTOS_FACTION,
@@ -554,7 +596,13 @@ describe('Factions', function () {
             await myFactionManager.stakeLP(NAKAMOTOS_FACTION, owner, TWO_ETHER)
 
             const myFactionManagerArtifact = await FactionManagerArtifact.at(myFactionManager.address)
+            const energyBalancePre = await myEnergy.balanceOf(owner)
+            const expectedLoss = await myFactionManager.getMigrateLoss(owner)
             const receipt = await myFactionManagerArtifact.migrateFaction(owner, VUTERINS_FACTION)
+            const energyBalancePost = await myEnergy.balanceOf(owner)
+            const loss = energyBalancePre.sub(energyBalancePost)
+            expect(loss.toString()).to.equal(expectedLoss.toString())
+            expect(loss.toString()).to.not.equal('0')
 
             const {stakingContract, farmingContract} = await myFactionManager.faction(VUTERINS_FACTION)
 
