@@ -23,28 +23,31 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
     mapping(bytes32=>Snapshots) private _eventTotalSupplySnapshots;
     mapping(bytes32=>mapping(address=>Snapshots)) private _eventBalanceOfSnapshots;
 
-    
-
+    /// @inheritdoc ITutellusEnergy
     function initialize (
     ) public initializer {
       __ERC20SnapshotVariableAndStatic_init('Tutellus Energy', 'eTUT',  1e25); // 0.01 RAY = 1% yearly default
       __AccessControlProxyPausable_init(msg.sender);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function snapshot () public onlyRole(_SNAPSHOT_ROLE) returns (uint256) {
       return _snapshot();
     }
 
+    /// @inheritdoc ITutellusEnergy
     function getCurrentSnapshotId () public view returns (uint256) {
       return _getCurrentSnapshotId();
     }
 
+    /// @inheritdoc ITutellusEnergy
     function setRate (
       uint256 newRate
     ) public onlyRole(_ENERGY_MANAGER_ROLE) {
       _setRate(newRate);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function mint (
       address account,
       uint256 amount
@@ -52,6 +55,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
       mintStatic(account, amount);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function burn (
       address account,
       uint256 amount
@@ -68,6 +72,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
       }
     }
 
+    /// @inheritdoc ITutellusEnergy
     function mintStatic (
       address account,
       uint256 amount
@@ -75,6 +80,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
       _mintStatic(account, amount);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function burnStatic (
       address account,
       uint256 amount
@@ -95,6 +101,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
       _mint(account, amount);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function burnVariable (
       address account,
       uint256 amount
@@ -102,6 +109,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
       _burn(account, amount);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function mintEvent (
       bytes32 eventId,
       address account,
@@ -120,6 +128,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
       emit EventMint(eventId, account, amount);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function burnEvent (
       bytes32 eventId,
       address account,
@@ -153,6 +162,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
         super._beforeTokenTransfer(from, to, amount);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function eventBalanceOf (
       bytes32 eventId,
       address account
@@ -167,6 +177,7 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
       return snapshotted ? value + balanceOfAt(account, snapshotId) : eventBalanceOf(eventId, account);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function eventTotalSupply (
       bytes32 eventId
     ) public view returns (uint256) {
@@ -180,17 +191,20 @@ contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPS
     }
 
     // The following functions are overrides required by Solidity.
-    
+
+    /// @inheritdoc ITutellusEnergy
     function balanceOf (
       address account
     ) public view override (ITutellusEnergy, ERC20SnapshotVariableAndStatic) returns (uint256) {
       return super.balanceOf(account);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function scale ( uint256 amount ) public view override (ITutellusEnergy, ERC20VariableUpgradeable) returns ( uint256 ) {
       return super.scale(amount);
     }
 
+    /// @inheritdoc ITutellusEnergy
     function unscale ( uint256 amount ) public view override (ITutellusEnergy, ERC20VariableUpgradeable) returns ( uint256 ) {
       return super.unscale(amount);
     }
