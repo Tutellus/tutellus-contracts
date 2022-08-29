@@ -28,8 +28,29 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
 
     /** Events */
 
+    /**
+     * @notice Emitted when a new snapshot is created
+     * @param id Snapshot ID
+     * @param normalization Normalization in the moment of the snapshot
+     * @param totalSupply Unscaled total supply in the moment of the snapshot
+     */
     event Snapshot(uint256 id, uint256 normalization, uint256 totalSupply);
+
+    /**
+     * @notice Emitted when static tokens are minted
+     * @dev No time variable
+     * @param sender Address sending the tx to mint tokens
+     * @param account Address receiving tokens
+     * @param amount Minted amount
+     */
     event MintStatic(address sender, address account, uint256 amount);
+
+    /**
+     * @notice Emitted when static tokens are burnt
+     * @param sender Address sending the tx to burn tokens
+     * @param account Address whose tokens are burnt
+     * @param amount Burnt amount
+     */
     event BurnStatic(address sender, address account, uint256 amount);
 
     /** Snapshot methods */
@@ -52,12 +73,19 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
         return _currentSnapshotId.current();
     }
 
+    /// @notice Returns unscaled balanceOf in a snapshot
+    /// @param account Address to return balance
+    /// @param snapshotId Identificator for snapshot
+    /// @return balance Unscaled balance in snaphsot
     function balanceOfAt(address account, uint256 snapshotId) public view virtual returns (uint256) {
         (bool snapshotted, uint256 value) = _valueAt(snapshotId, _accountBalanceSnapshots[account]);
 
         return snapshotted ? value : balanceOf(account);
     }
 
+    /// @notice Returns unscaled totalSupply in a snapshot
+    /// @param snapshotId Identificator for snapshot
+    /// @return totalSupply Unscaled totalSupply in snaphsot
     function totalSupplyAt(uint256 snapshotId) public view virtual returns (uint256) {
         (bool snapshotted, uint256 value) = _valueAt(snapshotId, _totalSupplySnapshots);
 
@@ -161,7 +189,7 @@ abstract contract ERC20SnapshotVariableAndStatic is ERC20VariableUpgradeable {
 
     function balanceOf (
       address account
-    ) public view override returns (uint256) {
+    ) public virtual view override returns (uint256) {
       return super.balanceOf(account) + staticBalanceOf[account];
     }
 

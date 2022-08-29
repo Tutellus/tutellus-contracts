@@ -26,8 +26,32 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
     // event Mint(address sender, address account, uint256 amount);
     // event Burn(address sender, address account, uint256 amount);
 
+    /**
+     * @notice Emitted when variable tokens are minted
+     * @dev Time variable
+     * @param sender Address sending the tx to mint tokens
+     * @param account Address receiving tokens
+     * @param amount Unscaled amount minted in the moment of the tx
+     * @param amountScaled Scaled amount minted
+     */
     event MintVariable(address sender, address account, uint256 amount, uint256 amountScaled);
+
+    /**
+     * @notice Emitted when variable tokens are burnt
+     * @dev Time variable
+     * @param sender Address sending the tx to burn tokens
+     * @param account Address whose tokens are burnt
+     * @param amount Unscaled amount burnt in the moment of the tx
+     * @param amountScaled Scaled amount burnt
+     */
     event BurnVariable(address sender, address account, uint256 amount, uint256 amountScaled);
+
+    /**
+     * @notice Emitted when proxy is initialized
+     * @param rate The interest rate, in ray
+     * @param normalization Ray, 1e27
+     * @param lastUpdateTimestamp The timestamp of the last update of the interest
+     */
     event Init(uint256 rate, uint256 normalization, uint256 lastUpdateTimestamp);
 
     function __ERC20Variable_init(string memory name_, string memory symbol_, uint256 rate_) internal onlyInitializing {
@@ -76,11 +100,21 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
         return 18;
     }
 
-    function scale(uint256 amount) public view returns (uint256) {
+    /**
+     * @notice Returns the scaled equivalent of amount
+     * @param amount Unscaled amount to transform
+     * @return scaledAmount Scaled amount
+     */
+    function scale(uint256 amount) public view virtual returns (uint256) {
       return _scaleTo(amount, _getNormalization());
     }
 
-    function unscale(uint256 amount) public view returns (uint256) {
+    /**
+     * @notice Returns the unscaled equivalent of amount
+     * @param amount Scaled amount to transform
+     * @return unscaledAmount Unscaled amount
+     */
+    function unscale(uint256 amount) public view virtual returns (uint256) {
       return _unscaleTo(amount, _getNormalization());
     }
 
@@ -103,6 +137,10 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
       return MathUtils.calculateLinearInterest(rate, timestamp).rayMul(_normalization);
     }
 
+    /**
+     * @notice Returns the amount of tokens owned by `account`.
+     * @dev Returns the unscaled balance
+     */
     function balanceOf(address account) public view virtual override returns (uint256) {
       uint256 scaledBalance = scaledBalanceOf(account);
 
@@ -113,10 +151,18 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
       return unscale(scaledBalance);
     }
 
+    /**
+     * @notice Returns the amount of tokens owned by `account`.
+     * @dev Returns the scaled balance as stored in mapping.
+     */
     function scaledBalanceOf(address account) public view virtual returns (uint256) {
       return _balances[account];
     }
 
+    /**
+     * @notice Returns the amount of tokens in existence.
+     * @dev Unscaled total supply
+     */
     function totalSupply() public view virtual override returns (uint256) {
       uint256 scaledSupply = scaledTotalSupply();
 
@@ -127,6 +173,10 @@ contract ERC20VariableUpgradeable is Initializable, ContextUpgradeable, IERC20Up
       return unscale(scaledSupply);
     }
 
+    /**
+     * @notice Returns the amount of tokens in existence.
+     * @dev Scaled total supply
+     */
     function scaledTotalSupply() public view virtual returns (uint256) {
       return _totalSupply;
     }

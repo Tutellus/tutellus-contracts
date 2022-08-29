@@ -1,48 +1,125 @@
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.9;
+
 interface ITutellusEnergy {
-  function DEFAULT_ADMIN_ROLE (  ) external view returns ( bytes32 );
-  function ENERGY_MANAGER_ROLE (  ) external view returns ( bytes32 );
-  function ENERGY_MINTER_ROLE (  ) external view returns ( bytes32 );
-  function PAUSER_ROLE (  ) external view returns ( bytes32 );
-  function UPGRADER_ROLE (  ) external view returns ( bytes32 );
-  function allowance ( address owner, address spender ) external view returns ( uint256 );
-  function approve ( address spender, uint256 amount ) external returns ( bool );
+
+  /// @notice Emitted when event tokens are minted
+  /// @param eventId Identificator of event
+  /// @param account Address receiving tokens
+  /// @param amount Minted amount
+  event EventMint(bytes32 eventId, address account, uint256 amount);
+
+  /// @notice Emitted when event tokens are burnt
+  /// @param eventId Identificator of event
+  /// @param account Address whose tokens are burnt
+  /// @param amount Burnt amount
+  event EventBurn(bytes32 eventId, address account, uint256 amount);
+
+  /// @notice Returns unscaled balanceOf for some event
+  /// @dev Unscaled balanceOf + staticBalanceOf
+  /// @param account Address to return balance
+  /// @return balance Balance
   function balanceOf ( address account ) external view returns ( uint256 );
-  function balanceOfAt ( address account, uint256 snapshotId ) external view returns ( uint256 );
+  
+  /// @notice Destroys amount tokens of account reducing total supply
+  /// @dev Burns first static balance and then variable if needed
+  /// @param account Address to burn tokens from
+  /// @param amount Amount of tokens to burn
   function burn ( address account, uint256 amount ) external;
+
+  /// @notice Destroys balanceOf tokens of account reducing total supply
+  /// @dev Burns all static and variable
+  /// @param account Address to burn all its tokens from
   function burnAll ( address account ) external;
+
+  /// @notice Destroys amount tokens related to an event of account reducing total supply
+  /// @param eventId Identificator of an event
+  /// @param account Address to burn tokens from
+  /// @param amount Amount of tokens to burn
   function burnEvent ( bytes32 eventId, address account, uint256 amount ) external;
+
+  /// @notice Destroys amount static tokens of account reducing total supply
+  /// @param account Address to burn tokens from
+  /// @param amount Amount of static tokens to burn
   function burnStatic ( address account, uint256 amount ) external;
+
+  /// @notice Destroys amount variable tokens of account reducing total supply
+  /// @param account Address to burn tokens from
+  /// @param amount Amount of variable tokens to burn
   function burnVariable ( address account, uint256 amount ) external;
-  function config (  ) external view returns ( address );
-  function decimals (  ) external view returns ( uint8 );
-  function decreaseAllowance ( address spender, uint256 subtractedValue ) external returns ( bool );
-  function hasRole ( bytes32 role, address account ) external view returns ( bool );
-  function implementation (  ) external view returns ( address );
-  function increaseAllowance ( address spender, uint256 addedValue ) external returns ( bool );
+
+  /// @notice Returns unscaled balanceOf for some event
+  /// @dev Unscaled balanceOf + event static balance
+  /// @param eventId Identificator for event
+  /// @param account Address to return balance
+  /// @return balance Balance
+  function eventBalanceOf ( bytes32 eventId, address account ) external view returns ( uint256 );
+
+  /// @notice Returns unscaled balanceOf for some event in a snapshot
+  /// @dev Unscaled balanceOfAt + event static balance
+  /// @param eventId Identificator for event
+  /// @param account Address to return balance
+  /// @param snapshotId Identificator for snapshot
+  /// @return balance Balance
+  function eventBalanceOfAt ( bytes32 eventId, address account, uint256 snapshotId ) external view returns ( uint256 );
+  
+  /// @notice Returns total supply of tokens for some event
+  /// @param eventId Identificator for event
+  /// @return eventSupply Balance
+  function eventTotalSupply ( bytes32 eventId ) external view returns ( uint256 );
+  
+  /// @notice Returns total supply of tokens for some event in a snapshot
+  /// @param eventId Identificator for event
+  /// @param snapshotId Identificator for snapshot
+  /// @return eventSupply Balance
+  function eventTotalSupplyAt ( bytes32 eventId, uint256 snapshotId ) external view returns ( uint256 );
+  
+  /// @notice Returns identificator of current snapshot
+  /// @return id Current snapshot identificator
+  function getCurrentSnapshotId (  ) external view returns ( uint256 );
+  
+  /// @notice Initialize proxy
   function initialize (  ) external;
-  function lastUpdateTimestamp (  ) external view returns ( uint40 );
+
+  /// @notice Creates amount tokens and assigns them to account increasing total supply
+  /// @dev Mints static tokens, using mint to keep standard
+  /// @param account Address of the receiver of tokens
+  /// @param amount Amount of static tokens to mint
   function mint ( address account, uint256 amount ) external;
+
+  /// @notice Creates amount event tokens and assigns them to account increasing total supply
+  /// @param eventId Identificator for event
+  /// @param account Address of the receiver of tokens
+  /// @param amount Amount of tokens to mint
   function mintEvent ( bytes32 eventId, address account, uint256 amount ) external;
+
+  /// @notice Creates amount tokens and assigns them to account increasing total supply
+  /// @dev Mints static tokens
+  /// @param account Address of the receiver of tokens
+  /// @param amount Amount of static tokens to mint
   function mintStatic ( address account, uint256 amount ) external;
+
+  /// @notice Creates amount tokens and assigns them to account increasing total supply
+  /// @dev Mints variable tokens
+  /// @param account Address of the receiver of tokens
+  /// @param amount Amount of variable tokens to mint
   function mintVariable ( address account, uint256 amount ) external;
-  function name (  ) external view returns ( string memory );
-  function pause (  ) external;
-  function paused (  ) external view returns ( bool );
-  function rate (  ) external view returns ( uint256 );
+
+  /// @notice Returns the scaled equivalent of amount
+  /// @param amount Unscaled amount to transform
+  /// @return scaledAmount Scaled amount
   function scale ( uint256 amount ) external view returns ( uint256 );
-  function scaledBalanceOf ( address account ) external view returns ( uint256 );
-  function scaledTotalSupply (  ) external view returns ( uint256 );
+
+  /// @notice Updates params to unscale
+  /// @dev Sets rate and lastUpdateTimestamp
+  /// @param newRate The new interest rate, in ray
   function setRate ( uint256 newRate ) external;
-  function staticBalanceOf ( address ) external view returns ( uint256 );
-  function staticTotalSupply (  ) external view returns ( uint256 );
-  function symbol (  ) external view returns ( string memory );
-  function totalSupply (  ) external view returns ( uint256 );
-  function totalSupplyAt ( uint256 snapshotId ) external view returns ( uint256 );
-  function transfer ( address to, uint256 amount ) external returns ( bool );
-  function transferFrom ( address from, address to, uint256 amount ) external returns ( bool );
-  function unpause (  ) external;
+
+  /// @notice Creates a new snapshot
+  function snapshot (  ) external returns ( uint256 );
+
+  /// @notice Returns the unscaled equivalent of amount
+  /// @param amount scaled amount to transform
+  /// @return scaledAmount Unscaled amount
   function unscale ( uint256 amount ) external view returns ( uint256 );
-  function updateManager ( address manager ) external;
-  function upgradeTo ( address newImplementation ) external;
-  function upgradeToAndCall ( address newImplementation, bytes calldata data ) external;
 }

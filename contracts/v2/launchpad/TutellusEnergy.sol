@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import 'contracts/utils/UUPSUpgradeableByRole.sol';
 import 'contracts/utils/ERC20SnapshotVariableAndStatic.sol';
+import 'contracts/interfaces/ITutellusEnergy.sol';
 
 /**
  * @title TutellusEnergy
@@ -10,7 +11,7 @@ import 'contracts/utils/ERC20SnapshotVariableAndStatic.sol';
  * @author Tutellus 
  **/
 
-contract TutellusEnergy is ERC20SnapshotVariableAndStatic, UUPSUpgradeableByRole {
+contract TutellusEnergy is ITutellusEnergy, ERC20SnapshotVariableAndStatic, UUPSUpgradeableByRole {
 
     bytes32 private constant _ENERGY_MANAGER_ROLE = keccak256('ENERGY_MANAGER_ROLE');
     bytes32 private constant _ENERGY_MINTER_ROLE = keccak256('ENERGY_MINTER_ROLE');
@@ -22,8 +23,7 @@ contract TutellusEnergy is ERC20SnapshotVariableAndStatic, UUPSUpgradeableByRole
     mapping(bytes32=>Snapshots) private _eventTotalSupplySnapshots;
     mapping(bytes32=>mapping(address=>Snapshots)) private _eventBalanceOfSnapshots;
 
-    event EventMint(bytes32 eventId, address account, uint256 amount);
-    event EventBurn(bytes32 eventId, address account, uint256 amount);
+    
 
     function initialize (
     ) public initializer {
@@ -177,5 +177,21 @@ contract TutellusEnergy is ERC20SnapshotVariableAndStatic, UUPSUpgradeableByRole
         (bool snapshotted, uint256 value) = _valueAt(snapshotId, _eventTotalSupplySnapshots[eventId]);
 
         return snapshotted ? value + totalSupplyAt(snapshotId) : eventTotalSupply(eventId);
+    }
+
+    // The following functions are overrides required by Solidity.
+    
+    function balanceOf (
+      address account
+    ) public view override (ITutellusEnergy, ERC20SnapshotVariableAndStatic) returns (uint256) {
+      return super.balanceOf(account);
+    }
+
+    function scale ( uint256 amount ) public view override (ITutellusEnergy, ERC20VariableUpgradeable) returns ( uint256 ) {
+      return super.scale(amount);
+    }
+
+    function unscale ( uint256 amount ) public view override (ITutellusEnergy, ERC20VariableUpgradeable) returns ( uint256 ) {
+      return super.unscale(amount);
     }
   }
