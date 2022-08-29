@@ -69,12 +69,14 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         }
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function authorize(
         address account
     ) public {
         authorized[msg.sender] = account;
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function updateFaction (
         bytes32 id,
         address stakingContract,
@@ -85,6 +87,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         isFactionContract[farmingContract] = true;
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function stake (
         bytes32 id,
         address account,
@@ -98,6 +101,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit Stake(id, account, amount, energy);
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function stakeLP (
         bytes32 id,
         address account,
@@ -110,6 +114,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit StakeLP(id, account, amount, energy);
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function unstake (
         address account,
         uint256 amount
@@ -123,6 +128,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit Unstake(id, account, amount, energy);
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function unstakeLP (
         address account,
         uint256 amount
@@ -136,6 +142,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit UnstakeLP(id, account, amount, energy);
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function getMigrateLoss (address account) public view returns(uint) {
         bytes32 id = factionOf[account];
         if (id == 0x00) return 0;
@@ -161,6 +168,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         return energyInterface.balanceOf(account) - newBalance;
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function migrateFaction (
         address account,
         bytes32 to
@@ -205,6 +213,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         emit Migrate(id, to, account);
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function depositFrom (
         address account,
         uint256 amount,
@@ -215,6 +224,7 @@ contract TutellusFactionManager is ITutellusFactionManager, UUPSUpgradeableByRol
         tokenInterace.transferFrom(account, msg.sender, amount);
     }
 
+    /// @inheritdoc ITutellusFactionManager
     function initialize () public initializer {
         __AccessControlProxyPausable_init(msg.sender);
     }
