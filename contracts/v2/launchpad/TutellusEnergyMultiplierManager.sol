@@ -5,36 +5,38 @@ import 'contracts/utils/UUPSUpgradeableByRole.sol';
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import 'contracts/interfaces/ITutellusManager.sol';
 import 'contracts/interfaces/ITutellusLaunchpadStaking.sol';
+import 'contracts/interfaces/ITutellusEnergyMultiplierManager.sol';
 
-contract TutellusEnergyMultiplierManager is UUPSUpgradeableByRole {
+contract TutellusEnergyMultiplierManager is ITutellusEnergyMultiplierManager, UUPSUpgradeableByRole {
 
     bytes32 public constant ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE = keccak256('ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE');
 
     mapping(address => uint8) private _multiplierType;
     mapping(uint8 => uint256) private _factorByType;
 
-    event SetMultiplierType(address energyContract, uint8 multiplierType);
-    event SetFactor(uint256 factor, uint8 multiplierType);
-
     constructor() {
         _disableInitializers();
     }
 
+    /// @inheritdoc ITutellusEnergyMultiplierManager
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
         _factorByType[1] = 1;
         _factorByType[2] = 1;
     }
 
+    /// @inheritdoc ITutellusEnergyMultiplierManager
     function getEnergyMultiplier(address _contract) public view returns(uint256) {
         return _getEnergyMultiplier(_contract);
     }
 
+    /// @inheritdoc ITutellusEnergyMultiplierManager
     function setMultiplierType(address _contract, uint8 _type) public onlyRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE) {
         _multiplierType[_contract] = _type;
         emit SetMultiplierType(_contract, _type);
     }
 
+    /// @inheritdoc ITutellusEnergyMultiplierManager
     function setFactoryByType(uint256 factor, uint8 _type) public onlyRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE) {
         _factorByType[_type] = factor;
         emit SetFactor(factor, _type);
