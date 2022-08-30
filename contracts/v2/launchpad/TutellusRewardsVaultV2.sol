@@ -22,12 +22,14 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
   uint256 internal _lastReleasedOffset;
   uint256 internal _globalOffset;
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function initialize() public initializer {
     __AccessControlProxyPausable_init(msg.sender);
     _lastUpdate = block.number;
     emit Init(_lastUpdate, _lastReleasedOffset);
   }
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function add(address account, uint256[] memory allocations) public onlyRole(_REWARDS_MANAGER_ROLE) {
     accounts[totalAccounts] = account;
     totalAccounts++;
@@ -35,6 +37,7 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
     emit NewAddress(account, allocations[allocations.length - 1]);
   }
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function setRewardPerBlock(uint256 value) public onlyRole(_REWARDS_MANAGER_ROLE) {
     _globalOffset = totalReleased();
     _lastUpdate = block.number;
@@ -42,10 +45,12 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
     emit NewRewardPerBlock(rewardPerBlock);
   }
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function totalReleased() public view returns (uint256) {
     return _globalOffset + _releasedLastUpdate();
   }
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function setAllocations(uint256[] memory allocations) public onlyRole(_REWARDS_MANAGER_ROLE) {
     require(allocations.length == totalAccounts, 'TutellusRewardsVaultV2: allocation array must have same length as number of accounts');
     uint256 sum = 0;
@@ -61,10 +66,12 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
     require(sum == 100 ether, 'TutellusRewardsVaultV2: total allocation must be 100 ether');
   }
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function available(address account) public view returns (uint256) {
     return released(account) - distributed[account];
   }
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function released(address account) public view returns (uint256) {
     uint256 releasedAfterOffset = (totalReleased() - _lastReleasedOffset) * allocation[account] / 100 ether;
     return releasedAfterOffset + _releasedOffset[account];
@@ -74,6 +81,7 @@ contract TutellusRewardsVaultV2 is ITutellusRewardsVaultV2, UUPSUpgradeableByRol
     return rewardPerBlock * (block.number - _lastUpdate);
   }
 
+  /// @inheritdoc ITutellusRewardsVaultV2
   function distribute(address account, uint256 amount) public {
     require(amount <= available(msg.sender), 'TutellusRewardsVaultV2: amount exceeds available');
     distributed[msg.sender] += amount;
