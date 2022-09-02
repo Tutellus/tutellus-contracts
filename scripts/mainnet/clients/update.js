@@ -6,8 +6,7 @@ const { parseEther, isAddress } = require('ethers/lib/utils');
 const { getBalanceTree, concatJson } = require('../../../utils/balanceTree');
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
-const json1 = {
-}
+const json1 = {}
 
 const checkWallets = (json) => {
     const wallets = Object.keys(json);
