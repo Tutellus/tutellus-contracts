@@ -27,8 +27,8 @@ const TUT_ADDRESS = '0x930f169A87545a8c6a3e7934d42d1582c03e1b35'
 const LP_ADDRESS = '0xfd5447D667eB6960fA326cfa68b7936f52940cA7'
 const MANAGER_ADDRESS = '0x0e75e4D2041287813a693971634400EAe765910C'
 const USDT_ADDRESS = '0x790CA413c421f253F9fB89aE8546a594287BB8ee'
-const LAUNCHPAD_ADMIN_ROLE_ADDRESS = ''
-const WHITELIST_ADMIN_ROLE_ADDRESS = ''
+const LAUNCHPAD_ADMIN_ROLE_ADDRESS = '0x0000000000000000000000000000000000000000'
+const WHITELIST_ADMIN_ROLE_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 async function main () {
     //Factories
@@ -52,24 +52,28 @@ async function main () {
     await response.wait()
     const energyAddress = await myManager.get(ENERGY_ID)
     console.log("TutellusEnergy:", energyAddress)
+    await upgrades.forceImport(energyAddress, TutellusEnergy, { kind: 'uups' })
 
     //RewardsVaultV2
     response = await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, emptyInitializeCalldata)
     await response.wait()
     const rewardsAddr = await myManager.get(LAUNCHPAD_REWARDS_ID)
     console.log("RewardsVaultV2:", rewardsAddr)
+    await upgrades.forceImport(rewardsAddr, RewardsVaultV2, { kind: 'uups' })
 
     //TutellusWhitelist
     response = await myManager.deploy(WHITELIST_ID, TutellusWhitelist.bytecode, emptyInitializeCalldata)
     await response.wait()
     const whitelistAddr = await myManager.get(WHITELIST_ID)
     console.log("TutellusWhitelist:", whitelistAddr)
+    await upgrades.forceImport(whitelistAddr, TutellusWhitelist, { kind: 'uups' })
 
     //TutellusEnergyMultiplierManager
     response = await myManager.deploy(ENERGY_MULTIPLIER_MANAGER_ID, TutellusEnergyMultiplierManager.bytecode, emptyInitializeCalldata)
     await response.wait()
     const energyMasterAddr = await myManager.get(ENERGY_MULTIPLIER_MANAGER_ID)
     console.log("TutellusEnergyMultiplierManager:", energyMasterAddr)
+    await upgrades.forceImport(energyMasterAddr, TutellusEnergyMultiplierManager, { kind: 'uups' })
     const myEnergyManager = TutellusEnergyMultiplierManager.attach(energyMasterAddr)
 
     //FactionManager
@@ -123,6 +127,9 @@ async function main () {
         '\nAltcoinersFarming:', altcoinersFarming,
     )
 
+    await upgrades.forceImport(nakamotosStaking, LaunchpadStaking, { kind: 'uups' })
+    await upgrades.forceImport(factionManager, FactionManager, { kind: 'uups' })
+
     const myFactionManager = FactionManager.attach(factionManager)
 
     //TutellusIDOFactory
@@ -136,6 +143,7 @@ async function main () {
     await response.wait()
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
     console.log("IDOFactory:", idoFactoryAddr)
+    await upgrades.forceImport(idoFactoryAddr, TutellusIDOFactory, { kind: 'uups' })
 
     console.log('-- DEPLOYED --')
 
