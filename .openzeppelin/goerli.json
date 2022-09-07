@@ -27,7 +27,7 @@
     }
   ],
   "impls": {
-    "8127cfac29f4ed105c4a9ec8e8629925957a4aced64b2d24ccf806eef40992fe": {
+    "bdc349ed4956c7281037df7f7ac46978f9c300d8aa386edbe79048f8d7991b32": {
       "address": "0x4a2EbCe38Bf877b85d08b80c71511F932CEB6228",
       "layout": {
         "storage": [
@@ -81,33 +81,17 @@
             "src": "contracts/utils/AccessControlProxyPausable.sol:10"
           },
           {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC1967UpgradeUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "UUPSUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
-          },
-          {
             "label": "faction",
             "offset": 0,
-            "slot": "202",
-            "type": "t_mapping(t_bytes32,t_struct(Faction)19675_storage)",
+            "slot": "102",
+            "type": "t_mapping(t_bytes32,t_struct(Faction)19046_storage)",
             "contract": "TutellusFactionManager",
             "src": "contracts/v2/launchpad/TutellusFactionManager.sol:21"
           },
           {
             "label": "factionOf",
             "offset": 0,
-            "slot": "203",
+            "slot": "103",
             "type": "t_mapping(t_address,t_bytes32)",
             "contract": "TutellusFactionManager",
             "src": "contracts/v2/launchpad/TutellusFactionManager.sol:22"
@@ -115,7 +99,7 @@
           {
             "label": "authorized",
             "offset": 0,
-            "slot": "204",
+            "slot": "104",
             "type": "t_mapping(t_address,t_address)",
             "contract": "TutellusFactionManager",
             "src": "contracts/v2/launchpad/TutellusFactionManager.sol:23"
@@ -123,7 +107,7 @@
           {
             "label": "isFactionContract",
             "offset": 0,
-            "slot": "205",
+            "slot": "105",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "TutellusFactionManager",
             "src": "contracts/v2/launchpad/TutellusFactionManager.sol:24"
@@ -162,11 +146,11 @@
             "label": "mapping(address => bytes32)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_bytes32,t_struct(Faction)19675_storage)": {
+          "t_mapping(t_bytes32,t_struct(Faction)19046_storage)": {
             "label": "mapping(bytes32 => struct TutellusFactionManager.Faction)",
             "numberOfBytes": "32"
           },
-          "t_struct(Faction)19675_storage": {
+          "t_struct(Faction)19046_storage": {
             "label": "struct TutellusFactionManager.Faction",
             "members": [
               {
@@ -195,7 +179,7 @@
         }
       }
     },
-    "30f07708cd82daf30216dde337cadec695ca8f8186e57ad96727b891767d72cd": {
+    "41c6a140315954d6382f9f9495250a8d3e286e89c0a55ca64aa9f2d757db092a": {
       "address": "0x4dD28c07A87578eF72a4e8b3C462Ba8D17d60B56",
       "layout": {
         "storage": [
@@ -249,33 +233,17 @@
             "src": "contracts/utils/AccessControlProxyPausable.sol:10"
           },
           {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC1967UpgradeUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "UUPSUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
-          },
-          {
             "label": "autoreward",
-            "offset": 0,
-            "slot": "202",
+            "offset": 20,
+            "slot": "101",
             "type": "t_bool",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:18"
           },
           {
             "label": "token",
-            "offset": 1,
-            "slot": "202",
+            "offset": 0,
+            "slot": "102",
             "type": "t_address",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:20"
@@ -283,7 +251,7 @@
           {
             "label": "balance",
             "offset": 0,
-            "slot": "203",
+            "slot": "103",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:22"
@@ -291,7 +259,7 @@
           {
             "label": "minFee",
             "offset": 0,
-            "slot": "204",
+            "slot": "104",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:23"
@@ -299,7 +267,7 @@
           {
             "label": "maxFee",
             "offset": 0,
-            "slot": "205",
+            "slot": "105",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:24"
@@ -307,7 +275,7 @@
           {
             "label": "accRewardsPerShare",
             "offset": 0,
-            "slot": "206",
+            "slot": "106",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:25"
@@ -315,7 +283,7 @@
           {
             "label": "_released",
             "offset": 0,
-            "slot": "207",
+            "slot": "107",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:27"
@@ -323,7 +291,7 @@
           {
             "label": "lastUpdate",
             "offset": 0,
-            "slot": "208",
+            "slot": "108",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:29"
@@ -331,7 +299,7 @@
           {
             "label": "feeInterval",
             "offset": 0,
-            "slot": "209",
+            "slot": "109",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:30"
@@ -339,7 +307,7 @@
           {
             "label": "stakers",
             "offset": 0,
-            "slot": "210",
+            "slot": "110",
             "type": "t_uint256",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:31"
@@ -347,15 +315,15 @@
           {
             "label": "data",
             "offset": 0,
-            "slot": "211",
-            "type": "t_mapping(t_address,t_struct(Data)20525_storage)",
+            "slot": "111",
+            "type": "t_mapping(t_address,t_struct(Data)19896_storage)",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:46"
           },
           {
             "label": "__gap",
             "offset": 0,
-            "slot": "212",
+            "slot": "112",
             "type": "t_array(t_uint256)45_storage",
             "contract": "TutellusLaunchpadStaking",
             "src": "contracts/v2/launchpad/TutellusLaunchpadStaking.sol:272"
@@ -382,11 +350,11 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_mapping(t_address,t_struct(Data)20525_storage)": {
+          "t_mapping(t_address,t_struct(Data)19896_storage)": {
             "label": "mapping(address => struct TutellusLaunchpadStaking.Data)",
             "numberOfBytes": "32"
           },
-          "t_struct(Data)20525_storage": {
+          "t_struct(Data)19896_storage": {
             "label": "struct TutellusLaunchpadStaking.Data",
             "members": [
               {
@@ -451,7 +419,7 @@
         }
       }
     },
-    "ea2ade3a29eac7151f52d4df8585158afeb46790db41b5997e3f8aff3b8857b3": {
+    "aa28b83d81422f5faf979fe6a317371ef4ffd49fbaefbea02475ace68bb42cd2": {
       "address": "0xcd96fd185D4c3B4dBcD0BbC1BC0B5b2352ccfeB1",
       "layout": {
         "storage": [
@@ -505,25 +473,9 @@
             "src": "contracts/utils/AccessControlProxyPausable.sol:10"
           },
           {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC1967UpgradeUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "UUPSUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
-          },
-          {
             "label": "_multiplierType",
             "offset": 0,
-            "slot": "202",
+            "slot": "102",
             "type": "t_mapping(t_address,t_uint8)",
             "contract": "TutellusEnergyMultiplierManager",
             "src": "contracts/v2/launchpad/TutellusEnergyMultiplierManager.sol:14"
@@ -531,7 +483,7 @@
           {
             "label": "_factorByType",
             "offset": 0,
-            "slot": "203",
+            "slot": "103",
             "type": "t_mapping(t_uint8,t_uint256)",
             "contract": "TutellusEnergyMultiplierManager",
             "src": "contracts/v2/launchpad/TutellusEnergyMultiplierManager.sol:15"
@@ -573,7 +525,7 @@
         }
       }
     },
-    "49d9ba07422a6fa772a9b453a0c5262baa1abf4ab9243d20680b458494c5d0b7": {
+    "e3b8fc83882f6c20d86d1a428d180af188d3a922e9f373d317bc63618d26db5b": {
       "address": "0x05ef6c094245976613B11618aB553DD5876f8A16",
       "layout": {
         "storage": [
@@ -627,25 +579,9 @@
             "src": "contracts/utils/AccessControlProxyPausable.sol:10"
           },
           {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC1967UpgradeUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "UUPSUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
-          },
-          {
             "label": "fixedImplementation",
             "offset": 0,
-            "slot": "202",
+            "slot": "102",
             "type": "t_address",
             "contract": "TutellusIDOFactory",
             "src": "contracts/v2/ido/TutellusIDOFactory.sol:11"
@@ -679,7 +615,7 @@
         }
       }
     },
-    "d2368d37d4c89c113821ee97265bc360c7d839d53695c0ece30f132496ee53da": {
+    "c1ea8a28dea25c8e35fe31b89ab927cce14261a05f4fc4af12625f21fd6ad9c4": {
       "address": "0xc1cFc242E2Df2B2a7bF7d2011a7b5B80a4d510C9",
       "layout": {
         "storage": [
@@ -733,25 +669,9 @@
             "src": "contracts/utils/AccessControlProxyPausable.sol:10"
           },
           {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC1967UpgradeUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "UUPSUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
-          },
-          {
             "label": "accounts",
             "offset": 0,
-            "slot": "202",
+            "slot": "102",
             "type": "t_mapping(t_uint256,t_address)",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:13"
@@ -759,7 +679,7 @@
           {
             "label": "distributed",
             "offset": 0,
-            "slot": "203",
+            "slot": "103",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:14"
@@ -767,7 +687,7 @@
           {
             "label": "allocation",
             "offset": 0,
-            "slot": "204",
+            "slot": "104",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:15"
@@ -775,7 +695,7 @@
           {
             "label": "_releasedOffset",
             "offset": 0,
-            "slot": "205",
+            "slot": "105",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:16"
@@ -783,7 +703,7 @@
           {
             "label": "rewardPerBlock",
             "offset": 0,
-            "slot": "206",
+            "slot": "106",
             "type": "t_uint256",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:18"
@@ -791,7 +711,7 @@
           {
             "label": "totalAccounts",
             "offset": 0,
-            "slot": "207",
+            "slot": "107",
             "type": "t_uint256",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:19"
@@ -799,7 +719,7 @@
           {
             "label": "_lastUpdate",
             "offset": 0,
-            "slot": "208",
+            "slot": "108",
             "type": "t_uint256",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:21"
@@ -807,7 +727,7 @@
           {
             "label": "_lastReleasedOffset",
             "offset": 0,
-            "slot": "209",
+            "slot": "109",
             "type": "t_uint256",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:22"
@@ -815,7 +735,7 @@
           {
             "label": "_globalOffset",
             "offset": 0,
-            "slot": "210",
+            "slot": "110",
             "type": "t_uint256",
             "contract": "TutellusRewardsVaultV2",
             "src": "contracts/v2/launchpad/TutellusRewardsVaultV2.sol:23"
@@ -857,7 +777,7 @@
         }
       }
     },
-    "f50ce103756f87c27fc6b9f1fb0e0dfd98e59fd346a1fe08dc46948f845189d1": {
+    "7ec5f0409a55af1bd378a4b110f675c8199880ddea3b6e19a5ca1142d341401c": {
       "address": "0x84C7B87c4f124ec0554EF44104D94B439744fd07",
       "layout": {
         "storage": [
@@ -911,25 +831,9 @@
             "src": "contracts/utils/AccessControlProxyPausable.sol:10"
           },
           {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ERC1967UpgradeUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "UUPSUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
-          },
-          {
             "label": "merkleRoot",
             "offset": 0,
-            "slot": "202",
+            "slot": "102",
             "type": "t_bytes32",
             "contract": "TutellusWhitelist",
             "src": "contracts/v2/TutellusWhitelist.sol:18"
@@ -937,7 +841,7 @@
           {
             "label": "uri",
             "offset": 0,
-            "slot": "203",
+            "slot": "103",
             "type": "t_string_storage",
             "contract": "TutellusWhitelist",
             "src": "contracts/v2/TutellusWhitelist.sol:21"
@@ -945,7 +849,7 @@
           {
             "label": "_whitelisted",
             "offset": 0,
-            "slot": "204",
+            "slot": "104",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "TutellusWhitelist",
             "src": "contracts/v2/TutellusWhitelist.sol:23"
@@ -953,7 +857,7 @@
           {
             "label": "active",
             "offset": 0,
-            "slot": "205",
+            "slot": "105",
             "type": "t_bool",
             "contract": "TutellusWhitelist",
             "src": "contracts/v2/TutellusWhitelist.sol:25"

@@ -4,7 +4,7 @@ CONTRACT_NAME = "TutellusIDOFactory"
 
 async function main() {
     const Factory = await ethers.getContractFactory(CONTRACT_NAME);
-    const proxy = await upgrades.deployProxy(Factory, { kind: "uups", unsafeAllow: "constructor" });
+    const proxy = await upgrades.deployProxy(Factory, { kind: "uups", unsafeAllow: ["constructor", "delegatecall"] });
     await proxy.deployed();
     console.log("Proxy deployed to:", proxy.address);
 }

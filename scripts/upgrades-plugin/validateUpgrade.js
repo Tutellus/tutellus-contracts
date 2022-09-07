@@ -5,7 +5,7 @@ CONTRACT_NAME = "TutellusIDOFactory"
 
 async function main() {
     const Factory = await ethers.getContractFactory(CONTRACT_NAME);
-    const result = await upgrades.validateUpgrade(PROXY_ADDRESS, Factory, { kind: "uups", unsafeAllow: "constructor" })
+    const result = await upgrades.validateUpgrade(PROXY_ADDRESS, Factory, { kind: "uups", unsafeAllow: ["constructor", "delegatecall"] })
     console.log("Valid")
 }
 
