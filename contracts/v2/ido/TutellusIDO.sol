@@ -188,6 +188,12 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
+    function updateIdoToken(address idoToken_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        idoToken = idoToken_;
+        emit UpdateIdoToken(idoToken);
+    }
+
+    /// @inheritdoc ITutellusIDO
     function prefund(address prefunder_, uint256 prefundAmount_)
         public
         isOpen

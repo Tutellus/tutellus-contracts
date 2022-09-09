@@ -26,6 +26,10 @@ interface ITutellusIDO {
     /// @param uri IPFS CID (ipfs://<CID>)
     event UpdateMerkleRoot(bytes32 merkleRoot, string uri);
 
+    /// @notice Emitted when IDO token is updated
+    /// @param idoToken Address of ERC20 IDO token
+    event UpdateIdoToken(address idoToken);
+
     /// @notice Emitted when claims of project vested token
     /// @param index Index of leave in merkle tree
     /// @param account Address of the prefunder
@@ -246,8 +250,11 @@ interface ITutellusIDO {
     /// @dev Closes automatically the IDO
     /// @param merkleRoot Root hash of the merkle tree
     /// @param uri IPFS CID (ipfs://<CID>)
-    function updateMerkleRoot(bytes32 merkleRoot, string calldata uri)
-        external;
+    function updateMerkleRoot(bytes32 merkleRoot, string calldata uri) external;
+
+    /// @notice Set idoToken address
+    /// @param idoToken Address of ERC20 IDO token
+    function updateIdoToken(address idoToken) external;
 
     // function upgradeTo(address newImplementation) external;
 

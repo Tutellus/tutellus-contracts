@@ -221,6 +221,19 @@ describe('IDOFactory & IDO', function () {
             expect(await myIDO.uri()).to.equal(uri)
         });
 
+        it('only DEFAULT_ADMIN_ROLE can updateIdoToken', async () => {
+        const Token = await ethers.getContractFactory("Token");
+        const newIdoToken = await Token.deploy("Tutellus IDO 2", "IDO2")
+            await expectRevert(
+                myIDO.connect(funder).updateIdoToken(newIdoToken.address),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+            )
+            expect(await myIDO.idoToken()).to.equal(myIdoToken.address)
+            await myIDO.updateIdoToken(newIdoToken.address)
+
+            expect(await myIDO.idoToken()).to.equal(newIdoToken.address)
+        });
+
         it('only can updateMerkleRoot if closed', async () => {
             await expectRevert(
                 myFactory.updateMerkleRoot(myIDO.address, ethers.utils.id("merkleRoot"), "uri"),
