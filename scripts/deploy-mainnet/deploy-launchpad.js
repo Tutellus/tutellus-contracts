@@ -9,7 +9,6 @@ const ALTCOINERS_FARMING_ID = ethers.utils.id('ALTCOINERS_FARMING')
 const VUTERINS_FACTION = ethers.utils.id('VUTERINS_FACTION')
 const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
 const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
-const IDO_USDT_ID = ethers.utils.id("IDO_USDT");
 const ENERGY_ID = ethers.utils.id('ENERGY')
 const WHITELIST_ID = ethers.utils.id('WHITELIST')
 const ENERGY_MULTIPLIER_MANAGER_ID = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER')
@@ -26,7 +25,6 @@ const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 const TUT_ADDRESS = '0x930f169A87545a8c6a3e7934d42d1582c03e1b35'
 const LP_ADDRESS = '0xfd5447D667eB6960fA326cfa68b7936f52940cA7'
 const MANAGER_ADDRESS = '0x0e75e4D2041287813a693971634400EAe765910C'
-const USDT_ADDRESS = '0x790CA413c421f253F9fB89aE8546a594287BB8ee'
 const LAUNCHPAD_ADMIN_ROLE_ADDRESS = '0x0000000000000000000000000000000000000000'
 const WHITELIST_ADMIN_ROLE_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -149,8 +147,6 @@ async function main () {
 
     //Config
     const signers = await ethers.getSigners()
-    response = await myManager.setId(IDO_USDT_ID, USDT_ADDRESS);
-    await response.wait()
     response = await myManager.grantRole(ENERGY_MINTER_ROLE, nakamotosStaking)
     await response.wait()
     response = await myManager.grantRole(ENERGY_MINTER_ROLE, vuterinsStaking)
