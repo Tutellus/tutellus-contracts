@@ -112,6 +112,10 @@ interface ITutellusIDO {
     /// @return claimedAmount Amount already claimed
     function claimed(address account) external view returns (uint256);
 
+    /// @notice Close an IDO to start with distribution
+    /// @dev Sets closed to true
+    function close() external;
+
     /// @notice Returns whether or not an IDO is closed
     /// @return closed True if closed, false if not closed
     function closed() external view returns (bool);

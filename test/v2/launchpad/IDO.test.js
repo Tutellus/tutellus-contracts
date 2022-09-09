@@ -187,11 +187,46 @@ describe('IDOFactory & IDO', function () {
             )
         });
 
+        it('only DEFAULT_ADMIN_ROLE can close', async () => {
+            await expectRevert(
+                myIDO.connect(funder).close(),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+            )
+            await myIDO.close()
+
+            expect(await myIDO.closed()).to.equal(true)
+        });
+
+        it('only DEFAULT_ADMIN_ROLE can close from factory', async () => {
+            await expectRevert(
+                myFactory.connect(funder).closeIDO(myIDO.address),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+            )
+            await myFactory.closeIDO(myIDO.address)
+
+            expect(await myIDO.closed()).to.equal(true)
+        });
+
         it('only DEFAULT_ADMIN_ROLE can updateMerkleRoot', async () => {
+            await myIDO.close()
             await expectRevert(
                 myFactory.connect(funder).updateMerkleRoot(myIDO.address, ethers.utils.id("merkleRoot"), "uri"),
                 'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
             )
+            const merkleRoot = ethers.utils.id("merkleRoot")
+            const uri = "uri"
+            await myFactory.updateMerkleRoot(myIDO.address, merkleRoot, uri)
+
+            expect(await myIDO.merkleRoot()).to.equal(merkleRoot)
+            expect(await myIDO.uri()).to.equal(uri)
+        });
+
+        it('only can updateMerkleRoot if closed', async () => {
+            await expectRevert(
+                myFactory.updateMerkleRoot(myIDO.address, ethers.utils.id("merkleRoot"), "uri"),
+                'TutellusIDO: IDO is not closed'
+            )
+            await myIDO.close()
             const merkleRoot = ethers.utils.id("merkleRoot")
             const uri = "uri"
             await myFactory.updateMerkleRoot(myIDO.address, merkleRoot, uri)
@@ -366,7 +401,7 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
-            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await myIDO.close()
             await (await myIDO.connect(funder)).acceptTermsAndConditions()
 
             await expectRevert(
@@ -394,7 +429,6 @@ describe('IDOFactory & IDO', function () {
             const idoBalancePre = await myUSDT.balanceOf(myIDO.address)
 
             await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
-            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
 
             await myWhitelist.remove(funder.address)
             await myIDO.open()
@@ -548,7 +582,7 @@ describe('IDOFactory & IDO', function () {
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
 
-            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await myIDO.close()
 
             await expectRevert(
                 (await myIDO.connect(funder)).withdraw(withdrawAmount),
@@ -634,7 +668,7 @@ describe('IDOFactory & IDO', function () {
             await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
             const prefunded = await myIDO.getPrefunded(funder.address)
 
-            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await myIDO.close()
 
             await expectRevert(
                 (await myIDO.connect(funder)).withdrawAll(),
@@ -661,6 +695,7 @@ describe('IDOFactory & IDO', function () {
         it('can claim', async () => {
             let slot = (END_DATE - START_DATE) / 4
             let divisionBN = ethers.BigNumber.from('4')
+            await myIDO.close()
             await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
             for (let i = 2; i < 6; i++) {
                 await (await myIDO.connect(accounts[i])).acceptTermsAndConditions()
@@ -711,6 +746,7 @@ describe('IDOFactory & IDO', function () {
         });
 
         it('cant claim with wrong proof', async () => {
+            await myIDO.close()
             await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
             await (await myIDO.connect(accounts[2])).acceptTermsAndConditions()
             await expectRevert(

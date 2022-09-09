@@ -35,6 +35,10 @@ interface ITutellusIDOFactory {
     /// @param uri IPFS CID (ipfs://<CID>)
     event UpdateMerkleRoot(address ido, bytes32 merkleRoot, string uri);
 
+    /// @notice Emitted when an IDO is closed
+    /// @param ido IDO to updateMerkleRoot
+    event CloseIDO(address ido);
+
     /// @notice Deploy a new IDO
     /// @dev Deploy a proxy whose implementation is fixedImplementation
     /// @param initializeCalldata Encoded TutellusIDO.initialize call data
@@ -73,4 +77,8 @@ interface ITutellusIDOFactory {
         bytes32 merkleRoot,
         string calldata uri
     ) external;
+
+    /// @notice Close an IDO
+    /// @param ido IDO to updateMerkleRoot
+    function closeIDO(address ido) external;
 }

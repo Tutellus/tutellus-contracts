@@ -29,6 +29,12 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     }
 
     /// @inheritdoc ITutellusIDOFactory
+    function closeIDO(address ido) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        TutellusIDO(ido).close();
+        emit CloseIDO(ido);
+    }
+
+    /// @inheritdoc ITutellusIDOFactory
     function createProxy(bytes calldata initializeCalldata)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)

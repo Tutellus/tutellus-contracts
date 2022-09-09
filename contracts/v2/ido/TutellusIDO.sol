@@ -53,6 +53,11 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         _;
     }
 
+    modifier isClosed() {
+        require(closed, "TutellusIDO: IDO is not closed");
+        _;
+    }
+
     modifier isOpen() {
         require(block.timestamp > openDate, "TutellusIDO: IDO is not open");
         _;
@@ -166,15 +171,20 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
+    function close() public onlyRole(DEFAULT_ADMIN_ROLE) {
+        closed = true;
+        emit Closed(closed);
+    }
+
+    /// @inheritdoc ITutellusIDO
     function updateMerkleRoot(bytes32 merkleRoot_, string memory uri_)
         public
+        isClosed
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         merkleRoot = merkleRoot_;
         uri = uri_;
-        closed = true;
         emit UpdateMerkleRoot(merkleRoot, uri);
-        emit Closed(closed);
     }
 
     /// @inheritdoc ITutellusIDO
