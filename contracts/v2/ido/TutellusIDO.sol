@@ -206,6 +206,11 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
+    function withdrawProject(address projectWallet, uint fundAmount) public onlyRole(IDO_ADMIN_ROLE) {
+        _transfer(prefundToken, projectWallet, fundAmount);
+    }
+
+    /// @inheritdoc ITutellusIDO
     function prefund(address prefunder_, uint256 prefundAmount_)
         public
         isOpen

@@ -273,6 +273,12 @@ interface ITutellusIDO {
     /// @notice Withdraw all prefunded amount
     function withdrawAll() external;
 
+    /// @notice Withdraw project funds after closing IDO
+    /// @dev open in case prefunded < fundingAmount
+    /// @param projectWallet Address of the project
+    /// @param fundAmount Amount of prefundToken to transfer
+    function withdrawProject(address projectWallet, uint fundAmount) external;
+
     /// @notice Claim prefunded amount not used for allocation
     /// @dev Can be claimed by thirds
     /// @param index Index of leave in merkle tree

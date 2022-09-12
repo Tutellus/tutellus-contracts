@@ -44,7 +44,7 @@ let myManager, myFactory, myIDO, myUSDT, myTUT, myIdoToken, myWhitelist
 describe('IDOFactory & IDO', function () {
     beforeEach(async () => {
         accounts = await ethers.getSigners();
-        [owner, funder, prefunder0, prefunder1, prefunder2, prefunder3, notWhitelisted] = accounts
+        [owner, funder, prefunder0, prefunder1, prefunder2, prefunder3, notWhitelisted, project] = accounts
 
         const TutellusManager = await ethers.getContractFactory('TutellusManager')
         const TutellusIDOFactory = await ethers.getContractFactory('TutellusIDOFactory')
@@ -704,6 +704,44 @@ describe('IDOFactory & IDO', function () {
             expect(prefundedAfterWithdraw.toString()).to.equal(prefundAmount.sub(withdrawAmount).toString())
             expect(funderBalancePre.toString()).to.equal(funderBalancePost.add(prefundAmount.sub(withdrawAmount)).toString())
             expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount.sub(withdrawAmount)).toString())
+        });
+    });
+
+    describe('IDO (withdrawProject)', function () {
+
+        it('can withdrawProject', async () => {
+            await myUSDT.connect(funder).approve(myIDO.address, ethers.constants.MaxUint256)
+            await myIDO.connect(funder).acceptTermsAndConditions()
+            await myIDO.connect(funder).prefund(funder.address, FUNDING_AMOUNT)
+            await myIDO.close()
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+
+            const balancePre = await myUSDT.balanceOf(project.address)
+            await myIDO.withdrawProject(project.address, FUNDING_AMOUNT)
+            const balancePost = await myUSDT.balanceOf(project.address)
+
+            const funded = balancePost.sub(balancePre)
+            expect(funded.toString()).to.equal(FUNDING_AMOUNT.toString())            
+        });
+
+        it('only IDO_ADMIN_ROLE can withdrawProject', async () => {
+            await myUSDT.connect(funder).approve(myIDO.address, ethers.constants.MaxUint256)
+            await myIDO.connect(funder).acceptTermsAndConditions()
+            await myIDO.connect(funder).prefund(funder.address, FUNDING_AMOUNT)
+            await myIDO.close()
+            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+
+            await expectRevert(
+                myIDO.connect(funder).withdrawProject(project.address, FUNDING_AMOUNT),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_ADMIN_ROLE
+            )
+
+            const balancePre = await myUSDT.balanceOf(project.address)
+            await myIDO.withdrawProject(project.address, FUNDING_AMOUNT)
+            const balancePost = await myUSDT.balanceOf(project.address)
+
+            const funded = balancePost.sub(balancePre)
+            expect(funded.toString()).to.equal(FUNDING_AMOUNT.toString())            
         });
     });
 
