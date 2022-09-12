@@ -7,27 +7,42 @@ import "contracts/interfaces/ITutellusRewardsVaultV2.sol";
 import "contracts/interfaces/ITutellusManager.sol";
 import "contracts/interfaces/ITutellusFactionManager.sol";
 import "contracts/interfaces/ITutellusEnergyMultiplierManager.sol";
+import "contracts/interfaces/ITutellusLaunchpadStaking.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
-contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
+contract TutellusLaunchpadStaking is ITutellusLaunchpadStaking, UUPSUpgradeableByRole {
     bytes32 public constant LAUNCHPAD_ADMIN_ROLE =
         keccak256("LAUNCHPAD_ADMIN_ROLE");
     bytes32 public constant LAUNCHPAD_REWARDS = keccak256("LAUNCHPAD_REWARDS");
 
+    /// @inheritdoc ITutellusLaunchpadStaking
     bool public autoreward;
 
+    /// @inheritdoc ITutellusLaunchpadStaking
     address public token;
 
+    /// @inheritdoc ITutellusLaunchpadStaking
     uint256 public balance;
+
+    /// @inheritdoc ITutellusLaunchpadStaking
     uint256 public minFee;
+
+    /// @inheritdoc ITutellusLaunchpadStaking
     uint256 public maxFee;
+
+    /// @inheritdoc ITutellusLaunchpadStaking
     uint256 public accRewardsPerShare;
 
     uint256 internal _released;
 
+    /// @inheritdoc ITutellusLaunchpadStaking
     uint256 public lastUpdate;
+
+    /// @inheritdoc ITutellusLaunchpadStaking
     uint256 public feeInterval;
+
+    /// @inheritdoc ITutellusLaunchpadStaking
     uint256 public stakers;
 
     struct Data {
@@ -41,42 +56,8 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
         uint256 energyDebt;
     }
 
+    /// @inheritdoc ITutellusLaunchpadStaking
     mapping(address => Data) public data;
-
-    event Init(uint256 lastUpdate, address token);
-    event Claim(address account);
-    event Deposit(address account, uint256 amount, uint256 energyMinted);
-    event Withdraw(
-        address account,
-        uint256 amount,
-        uint256 burned,
-        uint256 energyBurned
-    );
-    event Rewards(address account, uint256 amount);
-
-    event SyncBalance(address account, uint256 amount);
-    event ToggleAutoreward(bool autoreward);
-    event Update(
-        uint256 balance,
-        uint256 accRewardsPerShare,
-        uint256 lastUpdate,
-        uint256 stakers
-    );
-    event UpdateData(
-        address account,
-        uint256 amount,
-        uint256 rewardDebt,
-        uint256 notClaimed,
-        uint256 endInterval
-    );
-    event SetFees(uint256 minFee, uint256 maxFee, uint256 feeInterval);
-    event Migrate(
-        address from,
-        address to,
-        address account,
-        uint256 amount,
-        bytes response
-    );
 
     modifier onlyFactionManager() {
         require(
@@ -85,18 +66,6 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
             "TutellusLaunchpadStaking: only faction manager"
         );
         _;
-    }
-
-    function initialize(address tkn) public initializer {
-        __AccessControlProxyPausable_init(msg.sender);
-        // minFee = 1e17;
-        // maxFee = 1e19;
-        // feeInterval = 1296000;
-        autoreward = true;
-        lastUpdate = block.number;
-        token = tkn;
-
-        emit Init(lastUpdate, token);
     }
 
     modifier update() {
@@ -112,15 +81,67 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
         _;
     }
 
-    // Updates rewards for an account
-    function _updateRewards(address account) internal {
-        Data storage user = data[account];
-        uint256 diff = accRewardsPerShare - user.rewardDebt;
-        user.notClaimed += (diff * user.amount) / 1 ether;
-        user.rewardDebt = accRewardsPerShare;
+    /// @inheritdoc ITutellusLaunchpadStaking
+    function initialize(address tkn) public initializer {
+        __AccessControlProxyPausable_init(msg.sender);
+        autoreward = true;
+        lastUpdate = block.number;
+        token = tkn;
+
+        emit Init(lastUpdate, token);
     }
 
-    // Sets maximum and minimum fees, and fees interval
+    /// @inheritdoc ITutellusLaunchpadStaking
+    function getFee(address account) public view returns (uint256) {
+        Data memory user = data[account];
+        uint256 fee = block.number < user.endInterval
+            ? user.feeInterval > 0
+                ? (user.maxFee * (user.endInterval - block.number)) /
+                    user.feeInterval
+                : user.minFee
+            : user.minFee;
+        return fee > user.minFee ? fee : user.minFee;
+    }
+
+    /// @inheritdoc ITutellusLaunchpadStaking
+    function getBlocksLeft(address account) public view returns (uint256) {
+        if (block.number > data[account].endInterval) {
+            return 0;
+        } else {
+            return data[account].endInterval - block.number;
+        }
+    }
+
+    /// @inheritdoc ITutellusLaunchpadStaking
+    function pendingRewards(address account) public view returns (uint256) {
+        Data memory user = data[account];
+        uint256 rewards = user.notClaimed;
+        if (balance > 0) {
+            ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(
+                ITutellusManager(config).get(LAUNCHPAD_REWARDS)
+            );
+            uint256 released = rewardsInterface.released(address(this)) -
+                _released;
+            uint256 total = ((released * 1 ether) / balance);
+            rewards +=
+                ((accRewardsPerShare - user.rewardDebt + total) * user.amount) /
+                1 ether;
+        }
+        return rewards;
+    }
+
+    /// @inheritdoc ITutellusLaunchpadStaking
+    function getUserBalance(address account) public view returns (uint256) {
+        Data memory user = data[account];
+        return user.amount;
+    }
+
+    /// @inheritdoc ITutellusLaunchpadStaking
+    function getEnergyMultiplier() public view returns (uint256) {
+        return _getEnergyMultiplier();
+    }
+
+    /// @inheritdoc ITutellusLaunchpadStaking
     function setFees(
         uint256 minFee_,
         uint256 maxFee_,
@@ -140,7 +161,13 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
         emit SetFees(minFee, maxFee, feeInterval);
     }
 
-    // Deposits tokens for staking
+    /// @inheritdoc ITutellusLaunchpadStaking
+    function toggleAutoreward() public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
+        autoreward = !autoreward;
+        emit ToggleAutoreward(autoreward);
+    }
+
+    /// @inheritdoc ITutellusLaunchpadStaking
     function deposit(address account, uint256 amount)
         public
         update
@@ -194,7 +221,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
         return energyScaled;
     }
 
-    // Withdraws tokens from staking
+    /// @inheritdoc ITutellusLaunchpadStaking
     function withdraw(address account, uint256 amount)
         public
         update
@@ -264,7 +291,7 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
         return (amount, energyShare);
     }
 
-    // Claims rewards
+    /// @inheritdoc ITutellusLaunchpadStaking
     function claim(address account) public update {
         Data storage user = data[account];
 
@@ -288,10 +315,20 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
         emit Claim(account);
     }
 
-    // Toggles autoreward
-    function toggleAutoreward() public onlyRole(LAUNCHPAD_ADMIN_ROLE) {
-        autoreward = !autoreward;
-        emit ToggleAutoreward(autoreward);
+    function _getEnergyMultiplier() internal view returns (uint256) {
+        address _energyManager = ITutellusManager(config).get(
+            keccak256("ENERGY_MULTIPLIER_MANAGER")
+        );
+        return
+            ITutellusEnergyMultiplierManager(_energyManager)
+                .getEnergyMultiplier(address(this));
+    }
+
+    function _updateRewards(address account) internal {
+        Data storage user = data[account];
+        uint256 diff = accRewardsPerShare - user.rewardDebt;
+        user.notClaimed += (diff * user.amount) / 1 ether;
+        user.rewardDebt = accRewardsPerShare;
     }
 
     function _reward(address account) internal {
@@ -304,64 +341,6 @@ contract TutellusLaunchpadStaking is UUPSUpgradeableByRole {
             rewardsInterface.distribute(account, amount);
             emit Rewards(account, amount);
         }
-    }
-
-    // Gets current fee for a user
-    function getFee(address account) public view returns (uint256) {
-        Data memory user = data[account];
-        uint256 fee = block.number < user.endInterval
-            ? user.feeInterval > 0
-                ? (user.maxFee * (user.endInterval - block.number)) /
-                    user.feeInterval
-                : user.minFee
-            : user.minFee;
-        return fee > user.minFee ? fee : user.minFee;
-    }
-
-    // Gets blocks until endInverval
-    function getBlocksLeft(address account) public view returns (uint256) {
-        if (block.number > data[account].endInterval) {
-            return 0;
-        } else {
-            return data[account].endInterval - block.number;
-        }
-    }
-
-    // Gets user pending rewards
-    function pendingRewards(address account) public view returns (uint256) {
-        Data memory user = data[account];
-        uint256 rewards = user.notClaimed;
-        if (balance > 0) {
-            ITutellusRewardsVaultV2 rewardsInterface = ITutellusRewardsVaultV2(
-                ITutellusManager(config).get(LAUNCHPAD_REWARDS)
-            );
-            uint256 released = rewardsInterface.released(address(this)) -
-                _released;
-            uint256 total = ((released * 1 ether) / balance);
-            rewards +=
-                ((accRewardsPerShare - user.rewardDebt + total) * user.amount) /
-                1 ether;
-        }
-        return rewards;
-    }
-
-    // Gets user staking balance
-    function getUserBalance(address account) public view returns (uint256) {
-        Data memory user = data[account];
-        return user.amount;
-    }
-
-    function getEnergyMultiplier() public view returns (uint256) {
-        return _getEnergyMultiplier();
-    }
-
-    function _getEnergyMultiplier() internal view returns (uint256) {
-        address _energyManager = ITutellusManager(config).get(
-            keccak256("ENERGY_MULTIPLIER_MANAGER")
-        );
-        return
-            ITutellusEnergyMultiplierManager(_energyManager)
-                .getEnergyMultiplier(address(this));
     }
 
     /**

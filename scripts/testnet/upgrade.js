@@ -2,13 +2,13 @@ const bre = require('hardhat');
 const ethers = bre.ethers;
 const { utils } = ethers;
 
-const ID = utils.id('LAUNCHPAD_REWARDS');
-const CONTRACT_NAME = 'TutellusRewardsVaultV2';
+const ID = utils.id('WHITELIST');
+const CONTRACT_NAME = 'TutellusWhitelist';
 
 async function main () {
   bre.run('compile');
   const Manager = await ethers.getContractFactory('TutellusManager');
-  const myManager = Manager.attach('0x9b77Cb09d5E61D44fEf00e59Cfcc8Af67DAe9A45');
+  const myManager = Manager.attach('0x0e75e4D2041287813a693971634400EAe765910C');
 
   console.log('Deploying new implementation...')
   const Contract = await ethers.getContractFactory(CONTRACT_NAME);
