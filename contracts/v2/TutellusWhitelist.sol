@@ -32,17 +32,19 @@ contract TutellusWhitelist is ITutellusWhitelist, UUPSUpgradeableByRole {
         address account,
         bytes32[] calldata merkleProof
     ) external whenNotPaused {
-        require(!_whitelisted[account], "TutellusWhitelist: account already whitelisted");
         bytes32 node = keccak256(abi.encodePacked(index, account));
         require(MerkleProofUpgradeable.verify(merkleProof, merkleRoot, node), "TutellusWhitelist: invalid proof.");
-        _whitelisted[account] = true;
-        emit Add(account);
+        _whitelist(account);
     }
 
     /// @inheritdoc ITutellusWhitelist
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
         active = true;
+    }
+
+    function addFromRole(address account) public onlyRole(WHITELIST_ADMIN_ROLE) {
+        _whitelist(account);
     }
 
     /// @inheritdoc ITutellusWhitelist
@@ -76,4 +78,9 @@ contract TutellusWhitelist is ITutellusWhitelist, UUPSUpgradeableByRole {
         return active ? _whitelisted[account] : true;
     }
 
+    function _whitelist(address account) internal {
+        require(!_whitelisted[account], "TutellusWhitelist: account already whitelisted");
+        _whitelisted[account] = true;
+        emit Add(account);
+    }
 }

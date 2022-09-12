@@ -95,6 +95,33 @@ describe('Whitelist', function () {
             expect(isWhitelisted).eq(false);
         })
     })
+    describe('addFromRole', () => {
+        beforeEach(async () => {
+            await myManager.grantRole(WHITELIST_ADMIN_ROLE, owner.address);
+        })
+        it('can addFromRole', async () => {
+            const personClaim = tree.claims[person.address];
+            await myWhitelist.addFromRole(
+                person.address,
+            );
+            const isWhitelisted = await myWhitelist.whitelisted(person.address);
+            expect(isWhitelisted).eq(true);
+
+            // check adding twice
+            await expectRevert(
+                myWhitelist.addFromRole(
+                    person.address,
+                ),
+                'TutellusWhitelist: account already whitelisted'
+            );
+        })
+        it('only role can addFromRole', async () => {
+            await expectRevert(
+                myWhitelist.connect(person).addFromRole(person.address),
+                `AccessControlProxyPausable: account ${person.address.toLowerCase()} is missing role ${WHITELIST_ADMIN_ROLE.toLowerCase()}`
+            );
+        })
+    })
     describe('remove', () => {
         beforeEach(async () => {
             await myManager.grantRole(WHITELIST_ADMIN_ROLE, owner.address);
