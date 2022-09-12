@@ -5,8 +5,8 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgrad
 import "contracts/utils/CoinCharger.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "contracts/interfaces/ITutellusManager.sol";
-import 'contracts/interfaces/ITutellusWhitelist.sol';
-import 'contracts/interfaces/ITutellusIDO.sol';
+import "contracts/interfaces/ITutellusWhitelist.sol";
+import "contracts/interfaces/ITutellusIDO.sol";
 
 contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     /// @inheritdoc ITutellusIDO
@@ -63,23 +63,28 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         _;
     }
 
-    modifier isWhitelisted (
-        address account
-    ) {
+    modifier isWhitelisted(address account) {
         require(
             _isWhitelisted(account),
-            'TutellusIDO: address not whitelisted'
+            "TutellusIDO: address not whitelisted"
         );
         _;
     }
 
     modifier isPrefunderOrOperator(address prefunder) {
-        require(_msgSender() == prefunder || _operatorApprovals[prefunder][_msgSender()], "TutellusIDO: not prefunder or operator");
+        require(
+            _msgSender() == prefunder ||
+                _operatorApprovals[prefunder][_msgSender()],
+            "TutellusIDO: not prefunder or operator"
+        );
         _;
     }
 
     modifier acceptedTermsAndConditions(address account) {
-        require(_termsAndConditions[account], 'TutellusIDO: address not accepted terms and conditions');
+        require(
+            _termsAndConditions[account],
+            "TutellusIDO: address not accepted terms and conditions"
+        );
         _;
     }
 
@@ -110,20 +115,25 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function getAcceptedTermsAndConditions(address account) public view returns (bool) {
+    function getAcceptedTermsAndConditions(address account)
+        public
+        view
+        returns (bool)
+    {
         return _termsAndConditions[account];
     }
 
     /// @inheritdoc ITutellusIDO
-    function isOperator(address owner, address operator) public view returns (bool) {
+    function isOperator(address owner, address operator)
+        public
+        view
+        returns (bool)
+    {
         return _operatorApprovals[owner][operator];
     }
 
     /// @inheritdoc ITutellusIDO
-    function setOperator(
-        address operator,
-        bool approved
-    ) public virtual {
+    function setOperator(address operator, bool approved) public virtual {
         address owner = _msgSender();
         require(owner != operator, "TutellusIDO: approve to caller");
         _operatorApprovals[owner][operator] = approved;
@@ -137,12 +147,12 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function claimed(address account) public view returns(uint256) {
+    function claimed(address account) public view returns (uint256) {
         return _claimed[account];
     }
 
     /// @inheritdoc ITutellusIDO
-    function withdrawn(address account) public view returns(bool) {
+    function withdrawn(address account) public view returns (bool) {
         return _withdrawn[account];
     }
 
@@ -188,7 +198,10 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function updateIdoToken(address idoToken_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function updateIdoToken(address idoToken_)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
         idoToken = idoToken_;
         emit UpdateIdoToken(idoToken);
     }
@@ -247,13 +260,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
             _withdrawn[account_] = true;
             _transfer(prefundToken, account_, withdraw_);
         }
-        emit WithdrawLeft(
-            index_,
-            account_,
-            allocation_,
-            withdraw_,
-            energy_
-        );
+        emit WithdrawLeft(index_, account_, allocation_, withdraw_, energy_);
     }
 
     /// @inheritdoc ITutellusIDO
@@ -329,8 +336,10 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         );
     }
 
-    function _isWhitelisted(address account) internal view returns(bool) {
-        address whitelist = ITutellusManager(config).get(keccak256("WHITELIST"));
+    function _isWhitelisted(address account) internal view returns (bool) {
+        address whitelist = ITutellusManager(config).get(
+            keccak256("WHITELIST")
+        );
         return ITutellusWhitelist(whitelist).whitelisted(account);
     }
 }

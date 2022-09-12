@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
-import 'contracts/interfaces/ITutellusIDOFactory.sol';
+import "contracts/interfaces/ITutellusIDOFactory.sol";
 import "./TutellusIDO.sol";
 
 contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
@@ -17,13 +17,20 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     }
 
     /// @inheritdoc ITutellusIDOFactory
-    function updateImplementation(address newImplementation) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function updateImplementation(address newImplementation)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
         fixedImplementation = newImplementation;
         emit NewImplementation(newImplementation);
     }
 
     /// @inheritdoc ITutellusIDOFactory
-    function updateMerkleRoot(address ido, bytes32 merkleRoot, string memory uri) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function updateMerkleRoot(
+        address ido,
+        bytes32 merkleRoot,
+        string memory uri
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         TutellusIDO(ido).updateMerkleRoot(merkleRoot, uri);
         emit UpdateMerkleRoot(ido, merkleRoot, uri);
     }
@@ -44,11 +51,10 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     }
 
     /// @inheritdoc ITutellusIDOFactory
-    function createProxyWithCustomImplementation(address implementation, bytes calldata initializeCalldata)
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-        returns (address proxy)
-    {
+    function createProxyWithCustomImplementation(
+        address implementation,
+        bytes calldata initializeCalldata
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) returns (address proxy) {
         (proxy) = _createProxy(implementation, initializeCalldata);
     }
 
@@ -56,10 +62,9 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
         address implementation,
         bytes calldata initializeCalldata
     ) private whenNotPaused returns (address proxyAddress) {
-        proxyAddress = address(new ERC1967Proxy(
-            implementation,
-            initializeCalldata
-        )); 
+        proxyAddress = address(
+            new ERC1967Proxy(implementation, initializeCalldata)
+        );
 
         (
             address roleManager_,
@@ -72,7 +77,16 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
             uint256 openDate_
         ) = abi.decode(
                 initializeCalldata[4:],
-                (address, uint256, uint256, address, address, uint256, uint256, uint256)
+                (
+                    address,
+                    uint256,
+                    uint256,
+                    address,
+                    address,
+                    uint256,
+                    uint256,
+                    uint256
+                )
             );
 
         emit NewIDO(
