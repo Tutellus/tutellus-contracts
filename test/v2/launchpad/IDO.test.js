@@ -21,6 +21,8 @@ const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
 const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
 const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
+const IDO_FACTORY_ADMIN_ROLE = ethers.utils.id('IDO_FACTORY_ADMIN_ROLE')
+const IDO_ADMIN_ROLE = ethers.utils.id('IDO_ADMIN_ROLE')
 const LAUNCHPAD_IDO_FACTORY = ethers.utils.id("LAUNCHPAD_IDO_FACTORY");
 const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 const NAKAMOTOS_STAKING_ID = ethers.utils.id('NAKAMOTOS_STAKING')
@@ -151,13 +153,15 @@ describe('IDOFactory & IDO', function () {
                 0
             ]
         );
+        await myManager.grantRole(IDO_FACTORY_ADMIN_ROLE, owner.address)
         const response = await myFactory.createProxy(idoCalldata)
         const receipt = await response.wait()
         myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
 
+        await myManager.grantRole(IDO_ADMIN_ROLE, myFactory.address)
+        await myManager.grantRole(IDO_ADMIN_ROLE, owner.address)
         await myManager.grantRole(MINTER_ROLE, owner.address)
         await myManager.grantRole(UPGRADER_ROLE, owner.address) 
-        await myManager.grantRole(DEFAULT_ADMIN_ROLE, myFactory.address) 
         await myUSDT.mint(owner.address, ethers.utils.parseEther('1000000'))
         await myUSDT.mint(funder.address, ethers.utils.parseEther('1000000'))
         await myUSDT.mint(myIDO.address, ethers.utils.parseEther('1000000'))
@@ -166,7 +170,7 @@ describe('IDOFactory & IDO', function () {
 
     describe('Factory', function () {
 
-        it('only DEFAULT_ADMIN_ROLE can create an IDO', async () => {
+        it('only IDO_FACTORY_ADMIN_ROLE can create an IDO', async () => {
             const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
             const idoCalldata = await TutellusIDO.interface.encodeFunctionData(
                 'initialize',
@@ -183,35 +187,35 @@ describe('IDOFactory & IDO', function () {
             );
             await expectRevert(
                 (await myFactory.connect(funder)).createProxy(idoCalldata),
-                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_FACTORY_ADMIN_ROLE
             )
         });
 
-        it('only DEFAULT_ADMIN_ROLE can close', async () => {
+        it('only IDO_ADMIN_ROLE can close', async () => {
             await expectRevert(
                 myIDO.connect(funder).close(),
-                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_ADMIN_ROLE
             )
             await myIDO.close()
 
             expect(await myIDO.closed()).to.equal(true)
         });
 
-        it('only DEFAULT_ADMIN_ROLE can close from factory', async () => {
+        it('only IDO_FACTORY_ADMIN_ROLE can close from factory', async () => {
             await expectRevert(
                 myFactory.connect(funder).closeIDO(myIDO.address),
-                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_FACTORY_ADMIN_ROLE
             )
             await myFactory.closeIDO(myIDO.address)
 
             expect(await myIDO.closed()).to.equal(true)
         });
 
-        it('only DEFAULT_ADMIN_ROLE can updateMerkleRoot', async () => {
+        it('only IDO_FACTORY_ADMIN_ROLE can updateMerkleRoot', async () => {
             await myIDO.close()
             await expectRevert(
                 myFactory.connect(funder).updateMerkleRoot(myIDO.address, ethers.utils.id("merkleRoot"), "uri"),
-                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_FACTORY_ADMIN_ROLE
             )
             const merkleRoot = ethers.utils.id("merkleRoot")
             const uri = "uri"
@@ -221,12 +225,12 @@ describe('IDOFactory & IDO', function () {
             expect(await myIDO.uri()).to.equal(uri)
         });
 
-        it('only DEFAULT_ADMIN_ROLE can updateIdoToken', async () => {
+        it('only IDO_ADMIN_ROLE can updateIdoToken', async () => {
         const Token = await ethers.getContractFactory("Token");
         const newIdoToken = await Token.deploy("Tutellus IDO 2", "IDO2")
             await expectRevert(
                 myIDO.connect(funder).updateIdoToken(newIdoToken.address),
-                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_ADMIN_ROLE
             )
             expect(await myIDO.idoToken()).to.equal(myIdoToken.address)
             await myIDO.updateIdoToken(newIdoToken.address)
@@ -325,12 +329,12 @@ describe('IDOFactory & IDO', function () {
             expect(await customIdo.idoVersion()).to.equal("IDO-V2")
         });
 
-        it('only DEFAULT_ADMIN_ROLE can create an IDO', async () => {
+        it('only IDO_FACTORY_ADMIN_ROLE can create an IDO', async () => {
             const IDOV2Mock = await ethers.getContractFactory('IDOV2Mock')
             const customImplementation = await IDOV2Mock.deploy()
             await expectRevert(
                 myFactory.connect(funder).updateImplementation(customImplementation.address),
-                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_FACTORY_ADMIN_ROLE
             )
             await myFactory.updateImplementation(customImplementation.address)
         });
@@ -788,13 +792,13 @@ describe('IDOFactory & IDO', function () {
             expect(balanceIDO2.add(balanceIDO1).toString()).to.equal(balanceIDO1.toString())
         });
 
-        it('only default admin role can sync', async () => {
+        it('only IDO_ADMIN_ROLE can sync', async () => {
             const balanceIDO1 = await myUSDT.balanceOf(myIDO.address)
             const balanceAdmin1 = await myUSDT.balanceOf(owner.address)
 
             await expectRevert(
                 (await myIDO.connect(funder)).sync(),
-                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + DEFAULT_ADMIN_ROLE
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_ADMIN_ROLE
             )
 
             await myIDO.sync()

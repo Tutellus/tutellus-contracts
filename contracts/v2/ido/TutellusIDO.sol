@@ -48,6 +48,8 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     mapping(address => bool) private _termsAndConditions;
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
+    bytes32 public constant IDO_ADMIN_ROLE = keccak256("IDO_ADMIN_ROLE");
+
     modifier isNotClosed() {
         require(!closed, "TutellusIDO: IDO is closed");
         _;
@@ -175,13 +177,13 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function open() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function open() public onlyRole(IDO_ADMIN_ROLE) {
         closed = false;
         emit Closed(closed);
     }
 
     /// @inheritdoc ITutellusIDO
-    function close() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function close() public onlyRole(IDO_ADMIN_ROLE) {
         closed = true;
         emit Closed(closed);
     }
@@ -190,7 +192,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     function updateMerkleRoot(bytes32 merkleRoot_, string memory uri_)
         public
         isClosed
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(IDO_ADMIN_ROLE)
     {
         merkleRoot = merkleRoot_;
         uri = uri_;
@@ -198,10 +200,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function updateIdoToken(address idoToken_)
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function updateIdoToken(address idoToken_) public onlyRole(IDO_ADMIN_ROLE) {
         idoToken = idoToken_;
         emit UpdateIdoToken(idoToken);
     }
@@ -296,7 +295,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function sync() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function sync() public onlyRole(IDO_ADMIN_ROLE) {
         _sync(prefundToken, msg.sender, prefunded);
     }
 

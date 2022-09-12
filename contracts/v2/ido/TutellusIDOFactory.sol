@@ -10,6 +10,9 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     /// @inheritdoc ITutellusIDOFactory
     address public fixedImplementation;
 
+    bytes32 public constant IDO_FACTORY_ADMIN_ROLE =
+        keccak256("IDO_FACTORY_ADMIN_ROLE");
+
     /// @inheritdoc ITutellusIDOFactory
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
@@ -19,7 +22,7 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     /// @inheritdoc ITutellusIDOFactory
     function updateImplementation(address newImplementation)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(IDO_FACTORY_ADMIN_ROLE)
     {
         fixedImplementation = newImplementation;
         emit NewImplementation(newImplementation);
@@ -30,13 +33,13 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
         address ido,
         bytes32 merkleRoot,
         string memory uri
-    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) external onlyRole(IDO_FACTORY_ADMIN_ROLE) {
         TutellusIDO(ido).updateMerkleRoot(merkleRoot, uri);
         emit UpdateMerkleRoot(ido, merkleRoot, uri);
     }
 
     /// @inheritdoc ITutellusIDOFactory
-    function closeIDO(address ido) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function closeIDO(address ido) external onlyRole(IDO_FACTORY_ADMIN_ROLE) {
         TutellusIDO(ido).close();
         emit CloseIDO(ido);
     }
@@ -44,7 +47,7 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     /// @inheritdoc ITutellusIDOFactory
     function createProxy(bytes calldata initializeCalldata)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(IDO_FACTORY_ADMIN_ROLE)
         returns (address proxy)
     {
         (proxy) = _createProxy(fixedImplementation, initializeCalldata);
@@ -54,7 +57,7 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     function createProxyWithCustomImplementation(
         address implementation,
         bytes calldata initializeCalldata
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) returns (address proxy) {
+    ) public onlyRole(IDO_FACTORY_ADMIN_ROLE) returns (address proxy) {
         (proxy) = _createProxy(implementation, initializeCalldata);
     }
 

@@ -15,6 +15,8 @@ const ENERGY_MULTIPLIER_MANAGER_ID = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER'
 const ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE = ethers.utils.id('ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE')
 const WHITELIST_ADMIN_ROLE = ethers.utils.id('WHITELIST_ADMIN_ROLE')
 const FACTION_MANAGER = ethers.utils.id('FACTION_MANAGER')
+const IDO_FACTORY_ADMIN_ROLE = ethers.utils.id('IDO_FACTORY_ADMIN_ROLE')
+const IDO_ADMIN_ROLE = ethers.utils.id('IDO_ADMIN_ROLE')
 const FACTION_MANAGER_ROLE = ethers.utils.id('FACTION_MANAGER_ROLE')
 const FACTIONS_ADMIN_ROLE = ethers.utils.id('FACTIONS_ADMIN_ROLE')
 const ENERGY_MINTER_ROLE = ethers.utils.id('ENERGY_MINTER_ROLE')
@@ -25,8 +27,7 @@ const LAUNCHPAD_REWARDS_ID = ethers.utils.id('LAUNCHPAD_REWARDS')
 const TUT_ADDRESS = '0x930f169A87545a8c6a3e7934d42d1582c03e1b35'
 const LP_ADDRESS = '0xfd5447D667eB6960fA326cfa68b7936f52940cA7'
 const MANAGER_ADDRESS = '0x0e75e4D2041287813a693971634400EAe765910C'
-const LAUNCHPAD_ADMIN_ROLE_ADDRESS = '0x0000000000000000000000000000000000000000'
-const WHITELIST_ADMIN_ROLE_ADDRESS = '0x0000000000000000000000000000000000000000'
+const MS_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 async function main () {
     //Factories
@@ -159,9 +160,15 @@ async function main () {
     await response.wait()
     response = await myManager.grantRole(ENERGY_MINTER_ROLE, altcoinersFarming)
     await response.wait()
-    response = await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, LAUNCHPAD_ADMIN_ROLE_ADDRESS)
+    response = await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, MS_ADDRESS)
     await response.wait()
-    response = await myManager.grantRole(WHITELIST_ADMIN_ROLE, WHITELIST_ADMIN_ROLE_ADDRESS)
+    response = await myManager.grantRole(IDO_FACTORY_ADMIN_ROLE, MS_ADDRESS)
+    await response.wait()
+    response = await myManager.grantRole(IDO_ADMIN_ROLE, MS_ADDRESS)
+    await response.wait()
+    response = await myManager.grantRole(IDO_ADMIN_ROLE, idoFactoryAddr)
+    await response.wait()
+    response = await myManager.grantRole(WHITELIST_ADMIN_ROLE, MS_ADDRESS)
     await response.wait()
     response = await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, signers[0].address)
     await response.wait()
