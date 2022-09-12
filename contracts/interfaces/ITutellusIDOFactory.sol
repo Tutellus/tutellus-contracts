@@ -2,7 +2,6 @@
 pragma solidity ^0.8.9;
 
 interface ITutellusIDOFactory {
-
     /// @notice Emitted when a new IDO is deployed
     /// @param proxy Address of the proxy
     /// @param roleManager Address of AccessControl contract

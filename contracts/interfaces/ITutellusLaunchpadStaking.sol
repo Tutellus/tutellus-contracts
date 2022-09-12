@@ -2,9 +2,8 @@
 pragma solidity ^0.8.9;
 
 interface ITutellusLaunchpadStaking {
-
     /// @notice Emitted when proxy contract is initialized
-    /// @param lastUpdate Deploy block number 
+    /// @param lastUpdate Deploy block number
     /// @param token Address of the ERC20 token to handle
     event Init(uint256 lastUpdate, address token);
 
@@ -21,7 +20,7 @@ interface ITutellusLaunchpadStaking {
 
     /// @notice Emitted when an account withdraws deposited amount of token
     /// @param account Address of the staker
-    /// @param amount Amount of token to withdraw 
+    /// @param amount Amount of token to withdraw
     /// @param burned Amount of token burnt as fee
     /// @param energyBurned Amount of energy token burnt (derived from amount)
     event Withdraw(
@@ -176,7 +175,7 @@ interface ITutellusLaunchpadStaking {
 
     /// @notice Withdraw deposited amount of token
     /// @param account Address of the staker
-    /// @param amount Amount of token to withdraw 
+    /// @param amount Amount of token to withdraw
     function withdraw(address account, uint256 amount)
         external
         returns (uint256, uint256);

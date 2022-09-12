@@ -11,7 +11,10 @@ import "contracts/interfaces/ITutellusLaunchpadStaking.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
-contract TutellusLaunchpadStaking is ITutellusLaunchpadStaking, UUPSUpgradeableByRole {
+contract TutellusLaunchpadStaking is
+    ITutellusLaunchpadStaking,
+    UUPSUpgradeableByRole
+{
     bytes32 public constant LAUNCHPAD_ADMIN_ROLE =
         keccak256("LAUNCHPAD_ADMIN_ROLE");
     bytes32 public constant LAUNCHPAD_REWARDS = keccak256("LAUNCHPAD_REWARDS");

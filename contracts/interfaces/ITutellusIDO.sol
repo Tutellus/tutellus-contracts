@@ -2,7 +2,6 @@
 pragma solidity ^0.8.9;
 
 interface ITutellusIDO {
-
     /// @notice Emitted when a prefund is done
     /// @dev Can be done from operator
     /// @param funder Address of the prefunder
@@ -99,7 +98,7 @@ interface ITutellusIDO {
     /// @param index Index of leave in merkle tree
     /// @param account Address of the prefunder
     /// @param allocation Amount of total allocation
-    /// @param refund Amount of total refund 
+    /// @param refund Amount of total refund
     /// @param energy Amount of energy when IDO closed
     /// @param merkleProof Array of merkleProofs
     function claim(
@@ -127,16 +126,16 @@ interface ITutellusIDO {
     // function config() external view returns (address);
 
     /// @notice Returns vesting end time date
-    /// @return endDate 
+    /// @return endDate
     function endDate() external view returns (uint256);
 
     /// @notice Returns amount needed by the project
-    /// @return fundingAmount 
+    /// @return fundingAmount
     function fundingAmount() external view returns (uint256);
 
     /// @notice Returns total prefunded amount
     /// @param account Address of the launchpad user
-    /// @return accepted True if accepted, false if not 
+    /// @return accepted True if accepted, false if not
     function getAcceptedTermsAndConditions(address account)
         external
         view
@@ -153,7 +152,7 @@ interface ITutellusIDO {
     //     returns (bool);
 
     /// @notice Returns address of the project token
-    /// @return idoToken 
+    /// @return idoToken
     function idoToken() external view returns (address);
 
     // function implementation() external view returns (address);
@@ -188,11 +187,11 @@ interface ITutellusIDO {
         returns (bool);
 
     /// @notice Returns root hash of the merkle tree
-    /// @return merkleRoot 
+    /// @return merkleRoot
     function merkleRoot() external view returns (bytes32);
 
     /// @notice Returns minimum prefunded amount allowed
-    /// @return minPrefund 
+    /// @return minPrefund
     function minPrefund() external view returns (uint256);
 
     /// @notice Reopen IDO in case of mistake closing
@@ -200,7 +199,7 @@ interface ITutellusIDO {
     function open() external;
 
     /// @notice Returns IDO open time date
-    /// @return openDate 
+    /// @return openDate
     function openDate() external view returns (uint256);
 
     // function pause() external;
@@ -214,11 +213,11 @@ interface ITutellusIDO {
     function prefund(address prefunder, uint256 prefundAmount) external;
 
     /// @notice Address of the token used to fund the project
-    /// @return prefundToken 
+    /// @return prefundToken
     function prefundToken() external view returns (address);
 
     /// @notice Returns total prefunded amount
-    /// @return prefunded 
+    /// @return prefunded
     function prefunded() external view returns (uint256);
 
     // function proxiableUUID() external view returns (bytes32);
@@ -277,14 +276,15 @@ interface ITutellusIDO {
     /// @dev open in case prefunded < fundingAmount
     /// @param projectWallet Address of the project
     /// @param fundAmount Amount of prefundToken to transfer
-    function withdrawProject(address projectWallet, uint fundAmount) external;
+    function withdrawProject(address projectWallet, uint256 fundAmount)
+        external;
 
     /// @notice Claim prefunded amount not used for allocation
     /// @dev Can be claimed by thirds
     /// @param index Index of leave in merkle tree
     /// @param account Address of the prefunder
     /// @param allocation Amount of total allocation
-    /// @param refund Amount of total refund 
+    /// @param refund Amount of total refund
     /// @param energy Amount of energy when IDO closed
     /// @param merkleProof Array of merkleProofs
     function withdrawLeft(
