@@ -138,7 +138,10 @@ interface ITutellusLaunchpadStaking {
 
     /// @notice Initializes proxy
     /// @param tkn Address of token to handle
-    function initialize(address tkn) external;
+    /// @param minFee Fee after endInterval
+    /// @param maxFee Fee in deposit block number
+    /// @param feeInterval Amount of blocks to get minFee when withdraw
+    function initialize(address tkn, uint minFee, uint maxFee, uint feeInterval) external;
 
     /// @notice Block number of last update
     function lastUpdate() external view returns (uint256);

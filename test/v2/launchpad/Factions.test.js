@@ -209,8 +209,8 @@ describe('Factions', function () {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
 
-            let initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
-            let initializeCalldataFarming = LaunchpadStaking.interface.encodeFunctionData('initialize', [myUniswapPair.address]);
+            let initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
+            let initializeCalldataFarming = LaunchpadStaking.interface.encodeFunctionData('initialize', [myUniswapPair.address, "0", "0", "0"]);
             let initializeCalldataFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
     
             await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldataStaking)
@@ -272,7 +272,7 @@ describe('Factions', function () {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
 
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
             let initializeCalldataFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
     
             await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
@@ -355,7 +355,7 @@ describe('Factions', function () {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
 
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
             let initializeCalldataFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
     
             await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
@@ -448,7 +448,7 @@ describe('Factions', function () {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             const FactionManager = await ethers.getContractFactory('TutellusFactionManager')
 
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
             let initializeCalldataFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
     
             await myManager.deploy(VUTERINS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)

@@ -87,8 +87,8 @@ async function main () {
     await myLaunchpadStakingImp.deployed()
     console.log("LaunchpadStaking:", myLaunchpadStakingImp.address)
     const launchpadStakingImp = myLaunchpadStakingImp.address
-    const initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [TUT_ADDRESS])
-    const initializeCalldataFarming = LaunchpadStaking.interface.encodeFunctionData('initialize', [LP_ADDRESS])
+    const initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [TUT_ADDRESS, "100000000000000000", "10000000000000000000", "1296000"])
+    const initializeCalldataFarming = LaunchpadStaking.interface.encodeFunctionData('initialize', [LP_ADDRESS, 0, 0, 0])
     // NAKAMOTOS
     response = await myManager.deployProxyWithImplementation(NAKAMOTOS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
     await response.wait()

@@ -143,7 +143,7 @@ describe('Launchpad Staking', function () {
     describe('Deploy', () => {
         it('Deploying Launchpad Staking', async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
@@ -176,7 +176,7 @@ describe('Launchpad Staking', function () {
     describe('Deposit', () => {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
@@ -222,7 +222,7 @@ describe('Launchpad Staking', function () {
     describe('Withdraw', () => {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
@@ -348,7 +348,7 @@ describe('Launchpad Staking', function () {
     describe('Claim', () => {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
@@ -407,7 +407,7 @@ describe('Launchpad Staking', function () {
     describe('Sets', () => {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
@@ -488,7 +488,7 @@ describe('Launchpad Staking', function () {
     describe('Autoreward', () => {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
-            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address]);
+            let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
     
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)

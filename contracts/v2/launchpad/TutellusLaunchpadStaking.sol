@@ -85,11 +85,14 @@ contract TutellusLaunchpadStaking is
     }
 
     /// @inheritdoc ITutellusLaunchpadStaking
-    function initialize(address tkn) public initializer {
+    function initialize(address tkn, uint minFee_, uint maxFee_, uint feeInterval_) public initializer {
         __AccessControlProxyPausable_init(msg.sender);
         autoreward = true;
         lastUpdate = block.number;
         token = tkn;
+        minFee = minFee_;
+        maxFee = maxFee_;
+        feeInterval = feeInterval_;
 
         emit Init(lastUpdate, token);
     }

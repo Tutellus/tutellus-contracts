@@ -82,7 +82,7 @@ describe('IDOFactory & IDO', function () {
         await myFactionManagerImp.deployed()
         const launchpadStakingImp = myLaunchpadStakingImp.address
         const factionManagerImp = myFactionManagerImp.address
-        const initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myTUT.address])
+        const initializeCalldataStaking = LaunchpadStaking.interface.encodeFunctionData('initialize', [myTUT.address, "0", "0", "0"])
         await myManager.deployProxyWithImplementation(FACTION_MANAGER, factionManagerImp, initializeCalldata)
         // NAKAMOTOS
         await myManager.deployProxyWithImplementation(NAKAMOTOS_STAKING_ID, launchpadStakingImp, initializeCalldataStaking)
