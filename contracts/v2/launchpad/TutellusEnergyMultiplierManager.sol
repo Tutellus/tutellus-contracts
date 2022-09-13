@@ -24,8 +24,8 @@ contract TutellusEnergyMultiplierManager is
     /// @inheritdoc ITutellusEnergyMultiplierManager
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
-        _factorByType[1] = 1;
-        _factorByType[2] = 1;
+        _factorByType[1] = 1 ether;
+        _factorByType[2] = uint256(7 ether) / 3;
     }
 
     /// @inheritdoc ITutellusEnergyMultiplierManager
@@ -61,11 +61,11 @@ contract TutellusEnergyMultiplierManager is
         returns (uint256 multiplier)
     {
         if (_multiplierType[_contract] == 1) {
-            multiplier = _getMultiplierStaking() * _factorByType[1];
+            multiplier = _getMultiplierStaking() * _factorByType[1] / 1 ether;
         } else if (_multiplierType[_contract] == 2) {
             multiplier =
                 _getEnergyMultiplierFarming(_contract) *
-                _factorByType[2];
+                _factorByType[2] / 1 ether;
         }
     }
 

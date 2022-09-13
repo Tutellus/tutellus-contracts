@@ -53,7 +53,7 @@ const TWO_ETHER = parseEther('2')
 const SIX_ETHER = parseEther('6')
 const RAY = parseEther('1000000000')
 const ENERGY_MULTIPLIER_STAKING = parseEther('1')
-const ENERGY_MULTIPLIER_FARMING = '74208157286916090585833538'
+const ENERGY_MULTIPLIER_FARMING = '2333333333333333333'
 const TUT_AMOUNT = ethers.utils.parseEther('400000')
 const WBTC_AMOUNT = '300000000'
 
@@ -236,7 +236,6 @@ describe('Factions', function () {
             await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
             await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
 
-            await myEnergyManager.setFactoryByType(ENERGY_MULTIPLIER_FARMING, 2)
             await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
             await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
             await myEnergyManager.setMultiplierType(vuterinsFarming, 2)
@@ -250,7 +249,7 @@ describe('Factions', function () {
             const multiplierFarming3 = await farmingContract.getEnergyMultiplier()
             const multiplierUnknown = await myEnergyManager.getEnergyMultiplier(owner)
             const pairSupply = await myUniswapPair.totalSupply()
-            const multiplierFarming2 = TUT_AMOUNT.mul(parseEther('2')).div(pairSupply).mul(ENERGY_MULTIPLIER_FARMING)
+            const multiplierFarming2 = TUT_AMOUNT.mul(parseEther('2')).div(pairSupply).mul(ENERGY_MULTIPLIER_FARMING).div(ONE_ETHER)
             expect(multiplierStaking.toString()).to.equal(ENERGY_MULTIPLIER_STAKING.toString())
             expect(multiplierFarming.toString()).to.equal(multiplierFarming2.toString())
             expect(multiplierStaking3.toString()).to.equal(ENERGY_MULTIPLIER_STAKING.toString())
