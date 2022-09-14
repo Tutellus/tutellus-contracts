@@ -236,6 +236,7 @@ describe('Factions', function () {
             await myRewardsVaultV2.add(nakamotosStaking, [parseEther('33'), parseEther('33'), parseEther('34')])
             await myRewardsVaultV2.add(nakamotosFarming, [parseEther('25'), parseEther('25'), parseEther('25'), parseEther('25')])
 
+            await myEnergyManager.setFactoryByType(ENERGY_MULTIPLIER_FARMING, 2)
             await myEnergyManager.setMultiplierType(vuterinsStaking, 1)
             await myEnergyManager.setMultiplierType(nakamotosStaking, 1)
             await myEnergyManager.setMultiplierType(vuterinsFarming, 2)
