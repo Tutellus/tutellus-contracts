@@ -11,8 +11,8 @@ const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
 const TWO_WEI_BN = ethers.BigNumber.from("2");
 const HUNDRED_BN = ethers.utils.parseEther("100");
-const STANDARD_LIMIT_BN = ethers.utils.parseEther("100");
-const BOOSTER_LIMIT_BN = ethers.utils.parseEther("600");
+const STANDARD_LIMIT_BN = ethers.utils.parseEther("1000");
+const BOOSTER_LIMIT_BN = ethers.utils.parseEther("20000");
 const VUTERINS_FACTION = ethers.utils.id("VUTERINS_FACTION");
 const NAKAMOTOS_FACTION = ethers.utils.id("NAKAMOTOS_FACTION");
 const ALTCOINERS_FACTION = ethers.utils.id("ALTCOINERS_FACTION");
@@ -24,8 +24,8 @@ let RESERVES_TUT, LP_TOTAL_SUPPLY;
 // VARIABLE INPUTS
 const POAP_ID =
     "0x920fe3daba3d7e2f76b6bf2cd29ede1505083df5202d94862a7bb5c8bb3b4806";
-const IDO = "0x3a00d1b1F4Fa768801Dd416E43930808C72c80e9";
-const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.25");
+const IDO = "0xC5AeF3e5490A6e874E64f4C83a1cb6ECb039D36e";
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.1");
 const N_SUPERBOOSTERS = 1;
 let N_SUPERBOOSTERS_LEFT = N_SUPERBOOSTERS;
 let ONLY_RESULTS = false;
