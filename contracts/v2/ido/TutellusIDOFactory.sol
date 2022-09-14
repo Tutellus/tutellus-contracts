@@ -45,25 +45,27 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     }
 
     /// @inheritdoc ITutellusIDOFactory
-    function createProxy(bytes calldata initializeCalldata)
+    function createProxy(bytes calldata initializeCalldata, bytes32 id)
         public
         onlyRole(IDO_FACTORY_ADMIN_ROLE)
         returns (address proxy)
     {
-        (proxy) = _createProxy(fixedImplementation, initializeCalldata);
+        (proxy) = _createProxy(fixedImplementation, initializeCalldata, id);
     }
 
     /// @inheritdoc ITutellusIDOFactory
     function createProxyWithCustomImplementation(
         address implementation,
-        bytes calldata initializeCalldata
+        bytes calldata initializeCalldata,
+        bytes32 id
     ) public onlyRole(IDO_FACTORY_ADMIN_ROLE) returns (address proxy) {
-        (proxy) = _createProxy(implementation, initializeCalldata);
+        (proxy) = _createProxy(implementation, initializeCalldata, id);
     }
 
     function _createProxy(
         address implementation,
-        bytes calldata initializeCalldata
+        bytes calldata initializeCalldata,
+        bytes32 id
     ) private whenNotPaused returns (address proxyAddress) {
         proxyAddress = address(
             new ERC1967Proxy(implementation, initializeCalldata)
@@ -96,6 +98,7 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
 
         emit NewIDO(
             proxyAddress,
+            id,
             roleManager_,
             fundingAmount_,
             minPrefund_,

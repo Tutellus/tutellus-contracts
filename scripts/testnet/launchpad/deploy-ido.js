@@ -10,7 +10,9 @@ const TIME_OFFSET = 0
 const OPEN_DATE = 1664211600
 const START_DATE = 1672419600
 const END_DATE = 1698339600
+const CLIFF_TIME = 3600
 const IDO_TOKEN_AMOUNT = ethers.utils.parseEther("5250000");
+const PROJECT_ID = ethers.utils.id("uuid")
 
 async function main() {
     bre.run("compile");
@@ -21,7 +23,7 @@ async function main() {
     const TutellusIDO = await ethers.getContractFactory("TutellusIDO");
     const Token = await ethers.getContractFactory("Token");
 
-    const myIdoToken = await Token.deploy("TokenTrotter", "TKT")
+    const myIdoToken = await Token.deploy("Borrar", "BRR")
     await myIdoToken.deployed()
     const myManager = Manager.attach(MANAGER_ADDR);
     const idoFactoryAddr = await myManager.get(LAUNCHPAD_IDO_FACTORY);
@@ -29,9 +31,9 @@ async function main() {
     const myIdoFactory = TutellusIDOFactory.attach(idoFactoryAddr);
     const initializeCalldata = TutellusIDO.interface.encodeFunctionData(
         "initialize",
-        [MANAGER_ADDR, FUNDING_AMOUNT, MIN_PREFUND, myIdoToken.address, idoUsdtAddr, START_DATE, END_DATE, OPEN_DATE]
+        [MANAGER_ADDR, FUNDING_AMOUNT, MIN_PREFUND, myIdoToken.address, idoUsdtAddr, START_DATE, END_DATE, OPEN_DATE, CLIFF_TIME]
     );
-    const response = await myIdoFactory.createProxy(initializeCalldata);
+    const response = await myIdoFactory.createProxy(initializeCalldata, PROJECT_ID);
     const receipt = await response.wait()
 
     console.log(

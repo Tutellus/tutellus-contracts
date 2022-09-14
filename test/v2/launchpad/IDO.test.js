@@ -33,6 +33,7 @@ const NAKAMOTOS_FACTION = ethers.utils.id('NAKAMOTOS_FACTION')
 const ALTCOINERS_FACTION = ethers.utils.id('ALTCOINERS_FACTION')
 const WHITELIST_ADMIN_ROLE = ethers.utils.id('WHITELIST_ADMIN_ROLE');
 const WHITELIST_ID = ethers.utils.id('WHITELIST');
+const PROJECT_ID = ethers.utils.id('UUID');
 const FUNDING_AMOUNT = ethers.utils.parseEther('10000')
 const MIN_PREFUND = ethers.utils.parseEther('100')
 let START_DATE, END_DATE, CLIFF_TIME
@@ -156,7 +157,7 @@ describe('IDOFactory & IDO', function () {
             ]
         );
         await myManager.grantRole(IDO_FACTORY_ADMIN_ROLE, owner.address)
-        const response = await myFactory.createProxy(idoCalldata)
+        const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
         const receipt = await response.wait()
         myIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
 
@@ -189,7 +190,7 @@ describe('IDOFactory & IDO', function () {
                 ]
             );
             await expectRevert(
-                (await myFactory.connect(funder)).createProxy(idoCalldata),
+                (await myFactory.connect(funder)).createProxy(idoCalldata, PROJECT_ID),
                 'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_FACTORY_ADMIN_ROLE
             )
         });
@@ -300,10 +301,10 @@ describe('IDOFactory & IDO', function () {
                     0
                 ]
             );
-            const response = await myFactory.createProxy(idoCalldata)
+            const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
             const receipt = await response.wait()
             let myIDO1 = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
-            const response2 = await myFactory.createProxy(idoCalldata)
+            const response2 = await myFactory.createProxy(idoCalldata, PROJECT_ID)
             const receipt2 = await response2.wait()
             const myIDO2 = await ethers.getContractAt('TutellusIDO', receipt2.events[2].args['proxy'])
             const myProxy1 = await ethers.getContractAt('UUPSUpgradeableByRole', myIDO1.address)
@@ -334,7 +335,7 @@ describe('IDOFactory & IDO', function () {
                     0
                 ]
             );
-            const response = await myFactory.createProxyWithCustomImplementation(customImplementation.address, idoCalldata)
+            const response = await myFactory.createProxyWithCustomImplementation(customImplementation.address, idoCalldata, PROJECT_ID)
             const receipt = await response.wait()
             const customIdo = await ethers.getContractAt('IDOV2Mock', receipt.events[1].args['proxy'])
             expect(await customIdo.idoVersion()).to.equal("IDO-V2")
@@ -358,7 +359,7 @@ describe('IDOFactory & IDO', function () {
                     0
                 ]
             );
-            const response = await myFactory.createProxy(idoCalldata)
+            const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
             const receipt = await response.wait()
             const customIdo = await ethers.getContractAt('IDOV2Mock', receipt.events[1].args['proxy'])
             expect(await customIdo.idoVersion()).to.equal("IDO-V2")
@@ -418,7 +419,7 @@ describe('IDOFactory & IDO', function () {
                     0
                 ]
             );
-            const response = await myFactory.createProxy(idoCalldata)
+            const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
             const receipt = await response.wait()
             const newIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
 
@@ -588,7 +589,7 @@ describe('IDOFactory & IDO', function () {
                     0
                 ]
             );
-            const response = await myFactory.createProxy(idoCalldata)
+            const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
             const receipt = await response.wait()
             const notOpenIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
             const prefundAmount = ethers.utils.parseEther('5000')
@@ -872,7 +873,7 @@ describe('IDOFactory & IDO', function () {
                     cliffTime
                 ]
             );
-            const response = await myFactory.createProxy(idoCalldata)
+            const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
             const receipt = await response.wait()
             const cliffIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
             await cliffIDO.connect(accounts[2]).acceptTermsAndConditions()

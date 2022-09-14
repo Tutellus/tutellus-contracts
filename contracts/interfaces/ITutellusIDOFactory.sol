@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 interface ITutellusIDOFactory {
     /// @notice Emitted when a new IDO is deployed
     /// @param proxy Address of the proxy
+    /// @param id Project identificator
     /// @param roleManager Address of AccessControl contract
     /// @param fundingAmount Amount needed by the project
     /// @param minPrefund Minimum amount for a prefunder to participate
@@ -15,6 +16,7 @@ interface ITutellusIDOFactory {
     /// @param cliffTime Amount of no claimable time from startDate
     event NewIDO(
         address indexed proxy,
+        bytes32 indexed id,
         address roleManager,
         uint256 fundingAmount,
         uint256 minPrefund,
@@ -43,8 +45,9 @@ interface ITutellusIDOFactory {
     /// @notice Deploy a new IDO
     /// @dev Deploy a proxy whose implementation is fixedImplementation
     /// @param initializeCalldata Encoded TutellusIDO.initialize call data
+    /// @param id Project identificator
     /// @return proxy Address of the proxy
-    function createProxy(bytes calldata initializeCalldata)
+    function createProxy(bytes calldata initializeCalldata, bytes32 id)
         external
         returns (address proxy);
 
@@ -52,10 +55,12 @@ interface ITutellusIDOFactory {
     /// @dev Deploy a proxy whose implementation is a custom contract
     /// @param implementation Address of the custom implementation
     /// @param initializeCalldata Encoded TutellusIDO.initialize call data
+    /// @param id Project identificator
     /// @return proxy Address of the proxy
     function createProxyWithCustomImplementation(
         address implementation,
-        bytes calldata initializeCalldata
+        bytes calldata initializeCalldata,
+        bytes32 id
     ) external returns (address proxy);
 
     /// @notice Returns address of the implementation contract for IDOs

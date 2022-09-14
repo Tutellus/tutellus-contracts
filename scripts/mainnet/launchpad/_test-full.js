@@ -38,7 +38,7 @@ async function main() {
     );
     response = await manager.grantRole(ethers.utils.id("IDO_FACTORY_ADMIN_ROLE"), accounts[0].address)
     await response.wait()
-    response = await factory.createProxy(idoInitializeCalldata);
+    response = await factory.createProxy(idoInitializeCalldata, ethers.utils.id("uuid"));
     let receipt = await response.wait()
     const myIdo = TutellusIDO.attach(receipt.events[2].args.proxy)
 
