@@ -77,7 +77,8 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
             address prefundToken_,
             uint256 startDate_,
             uint256 endDate_,
-            uint256 openDate_
+            uint256 openDate_,
+            uint256 cliffTime_
         ) = abi.decode(
                 initializeCalldata[4:],
                 (
@@ -86,6 +87,7 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
                     uint256,
                     address,
                     address,
+                    uint256,
                     uint256,
                     uint256,
                     uint256
@@ -101,7 +103,8 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
             prefundToken_,
             startDate_,
             endDate_,
-            openDate_
+            openDate_,
+            cliffTime_
         );
     }
 }

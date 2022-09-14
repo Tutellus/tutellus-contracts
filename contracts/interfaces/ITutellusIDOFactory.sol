@@ -12,6 +12,7 @@ interface ITutellusIDOFactory {
     /// @param startDate Vesting start time date
     /// @param endDate Vesting end time date
     /// @param openDate Open time for IDO
+    /// @param cliffTime Amount of no claimable time from startDate
     event NewIDO(
         address indexed proxy,
         address roleManager,
@@ -21,7 +22,8 @@ interface ITutellusIDOFactory {
         address prefundToken,
         uint256 startDate,
         uint256 endDate,
-        uint256 openDate
+        uint256 openDate,
+        uint256 cliffTime
     );
 
     /// @notice Emitted when fixedImplementation is updated
