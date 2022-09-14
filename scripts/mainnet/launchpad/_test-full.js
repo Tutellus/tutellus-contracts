@@ -31,9 +31,10 @@ async function main() {
     const MIN_PREFUND = ethers.utils.parseEther("0");
     const START_DATE = parseInt(Date.now()/1000)
     const END_DATE = START_DATE + 1000000
+    const CLIFF_TIME = 3600
     const idoInitializeCalldata = TutellusIDO.interface.encodeFunctionData(
         "initialize",
-        [manager.address, FUNDING_AMOUNT, MIN_PREFUND, ethers.constants.AddressZero, USDT_ADDRESS, START_DATE, END_DATE, 0]
+        [manager.address, FUNDING_AMOUNT, MIN_PREFUND, ethers.constants.AddressZero, USDT_ADDRESS, START_DATE, END_DATE, 0, CLIFF_TIME]
     );
     response = await manager.grantRole(ethers.utils.id("IDO_FACTORY_ADMIN_ROLE"), accounts[0].address)
     await response.wait()
