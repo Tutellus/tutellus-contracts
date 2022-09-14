@@ -13,7 +13,8 @@ contract IDOV2Mock is UUPSUpgradeableByRole {
         address prefundToken_,
         uint256 startDate_,
         uint256 endDate_,
-        uint256 openDate_
+        uint256 openDate_,
+        uint256 cliffTime_
     ) public pure {
         rolemanager_;
         fundingAmount_;
@@ -23,6 +24,7 @@ contract IDOV2Mock is UUPSUpgradeableByRole {
         startDate_;
         endDate_;
         openDate_;
+        cliffTime_;
     }
 
     function idoVersion() public pure returns(string memory) {

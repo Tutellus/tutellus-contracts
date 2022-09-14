@@ -19,10 +19,13 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     uint256 public minPrefund;
 
     /// @inheritdoc ITutellusIDO
+    uint256 public openDate;
+
+    /// @inheritdoc ITutellusIDO
     uint256 public startDate;
 
     /// @inheritdoc ITutellusIDO
-    uint256 public openDate;
+    uint256 public cliffTime;
 
     /// @inheritdoc ITutellusIDO
     uint256 public endDate;
@@ -90,6 +93,11 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         _;
     }
 
+    modifier isClaimTime() {
+        require(block.timestamp >= startDate + cliffTime, "TutellusIDO: not claim time");
+        _;
+    }
+
     /// @inheritdoc ITutellusIDO
     function initialize(
         address rolemanager_,
@@ -99,7 +107,8 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         address prefundToken_,
         uint256 startDate_,
         uint256 endDate_,
-        uint256 openDate_
+        uint256 openDate_,
+        uint256 cliffTime_
     ) public initializer {
         __AccessControlProxyPausable_init(rolemanager_);
         fundingAmount = fundingAmount_;
@@ -109,6 +118,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         startDate = startDate_;
         endDate = endDate_;
         openDate = openDate_;
+        cliffTime = cliffTime_;
     }
 
     /// @inheritdoc ITutellusIDO
@@ -278,7 +288,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         uint256 withdraw_, //TBD: change to refund
         uint256 energy_,
         bytes32[] calldata merkleProof_
-    ) public acceptedTermsAndConditions(account_) {
+    ) public isClaimTime acceptedTermsAndConditions(account_) {
         _verifyMerkle(
             index_,
             account_,

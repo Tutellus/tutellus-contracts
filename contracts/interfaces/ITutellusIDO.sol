@@ -115,6 +115,10 @@ interface ITutellusIDO {
     /// @return claimedAmount Amount already claimed
     function claimed(address account) external view returns (uint256);
 
+    /// @notice Returns time of cliff (no claimable)
+    /// @return cliffTime
+    function cliffTime() external view returns (uint256);
+
     /// @notice Close an IDO to start with distribution
     /// @dev Sets closed to true
     function close() external;
@@ -166,6 +170,7 @@ interface ITutellusIDO {
     /// @param startDate Vesting start time date
     /// @param endDate Vesting end time date
     /// @param openDate Open time for IDO
+    /// @param cliffTime Amount of no claimable time from startDate
     function initialize(
         address rolemanager,
         uint256 fundingAmount,
@@ -174,7 +179,8 @@ interface ITutellusIDO {
         address prefundToken,
         uint256 startDate,
         uint256 endDate,
-        uint256 openDate
+        uint256 openDate,
+        uint256 cliffTime
     ) external;
 
     /// @notice Returns if an address is operator of an owner
