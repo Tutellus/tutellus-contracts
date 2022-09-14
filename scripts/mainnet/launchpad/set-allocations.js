@@ -77,6 +77,11 @@ async function main() {
     const tx = await myRewardsVault.setAllocations(allocations);
     await tx.wait();
     console.log('Allocations set.');
+    const rewardPerBlock = ethers.utils.parseEther("21000000").div((ethers.BigNumber.from("31556926").mul(ethers.BigNumber.from("5")).div(ethers.BigNumber.from("2"))))
+    const tx2 = await myRewardsVault.setRewardPerBlock(rewardPerBlock);
+    await tx2.wait();
+    console.log(await myRewardsVault.rewardPerBlock())
+    console.log('RewardPerBlock set.');
     const renounce = await myManager.renounceRole(ethers.utils.id('REWARDS_MANAGER_ROLE'), accounts[0].address)
     await renounce.wait()
     console.log('Renounced role');
