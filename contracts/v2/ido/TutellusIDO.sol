@@ -216,6 +216,15 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
+    function updateVesting(uint256 startDate_, uint256 endDate_, uint256 openDate_, uint256 cliffTime_) public onlyRole(IDO_ADMIN_ROLE) {
+        startDate = startDate_;
+        endDate = endDate_;
+        openDate = openDate_;
+        cliffTime = cliffTime_;
+        emit UpdateVesting(openDate_, startDate_, endDate_, cliffTime_);
+    }
+
+    /// @inheritdoc ITutellusIDO
     function withdrawProject(address projectWallet, uint256 fundAmount)
         public
         onlyRole(IDO_ADMIN_ROLE)

@@ -29,6 +29,18 @@ interface ITutellusIDO {
     /// @param idoToken Address of ERC20 IDO token
     event UpdateIdoToken(address idoToken);
 
+    /// @notice Emitted when vesting configuration dates are updated
+    /// @param startDate Vesting start time date
+    /// @param endDate Vesting end time date
+    /// @param openDate Open time for IDO
+    /// @param cliffTime Amount of no claimable time from startDate
+    event UpdateVesting(
+        uint256 startDate,
+        uint256 endDate,
+        uint256 openDate,
+        uint256 cliffTime
+    );
+
     /// @notice Emitted when claims of project vested token
     /// @param index Index of leave in merkle tree
     /// @param account Address of the prefunder
@@ -150,16 +162,9 @@ interface ITutellusIDO {
     /// @return prefunded Amount prefunded
     function getPrefunded(address prefunder) external view returns (uint256);
 
-    // function hasRole(bytes32 role, address account)
-    //     external
-    //     view
-    //     returns (bool);
-
     /// @notice Returns address of the project token
     /// @return idoToken
     function idoToken() external view returns (address);
-
-    // function implementation() external view returns (address);
 
     /// @notice Initializes proxy
     /// @param rolemanager Address of AccessControl contract
@@ -208,10 +213,6 @@ interface ITutellusIDO {
     /// @return openDate
     function openDate() external view returns (uint256);
 
-    // function pause() external;
-
-    // function paused() external view returns (bool);
-
     /// @notice Prefund an IDO
     /// @dev prefundAmount must be greater than minPrefund
     /// @param prefunder Address of the prefunder
@@ -225,8 +226,6 @@ interface ITutellusIDO {
     /// @notice Returns total prefunded amount
     /// @return prefunded
     function prefunded() external view returns (uint256);
-
-    // function proxiableUUID() external view returns (bytes32);
 
     /// @notice Returns released amount from total allocation
     /// @param allocation Total allocation amount
@@ -247,10 +246,6 @@ interface ITutellusIDO {
     /// @dev In case someone transfers by mistake
     function sync() external;
 
-    // function unpause() external;
-
-    // function updateManager(address manager) external;
-
     /// @notice Set merkle root used to verify JSON in uri
     /// @dev Closes automatically the IDO
     /// @param merkleRoot Root hash of the merkle tree
@@ -261,10 +256,12 @@ interface ITutellusIDO {
     /// @param idoToken Address of ERC20 IDO token
     function updateIdoToken(address idoToken) external;
 
-    // function upgradeTo(address newImplementation) external;
-
-    // function upgradeToAndCall(address newImplementation, bytes calldata data)
-    //     external;
+    /// @notice Set vesting times configuration
+    /// @param startDate Vesting start time date
+    /// @param endDate Vesting end time date
+    /// @param openDate Open time for IDO
+    /// @param cliffTime Amount of no claimable time from startDate
+    function updateVesting(uint256 openDate, uint256 startDate, uint256 endDate, uint256 cliffTime) external;
 
     /// @notice Returns IPFS CID (ipfs://<CID>)
     /// @return uri

@@ -241,6 +241,35 @@ describe('IDOFactory & IDO', function () {
             expect(await myIDO.idoToken()).to.equal(newIdoToken.address)
         });
 
+        it('only IDO_ADMIN_ROLE can updateVesting', async () => {
+            const offset = 100
+            await expectRevert(
+                myIDO.connect(funder).updateVesting(
+                    START_DATE + offset,
+                    END_DATE + offset,
+                    0 + offset,
+                    0 + offset
+                ),
+                'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_ADMIN_ROLE
+            )
+            expect((await myIDO.startDate()).toString()).to.equal(START_DATE.toString())
+            expect((await myIDO.endDate()).toString()).to.equal(END_DATE.toString())
+            expect((await myIDO.openDate()).toString()).to.equal("0")
+            expect((await myIDO.cliffTime()).toString()).to.equal("0")
+            
+            await myIDO.updateVesting(
+                START_DATE + offset,
+                END_DATE + offset,
+                0 + offset,
+                0 + offset
+            )
+
+            expect((await myIDO.startDate()).toString()).to.equal((START_DATE + offset).toString())
+            expect((await myIDO.endDate()).toString()).to.equal((END_DATE + offset).toString())
+            expect((await myIDO.openDate()).toString()).to.equal((0 + offset).toString())
+            expect((await myIDO.cliffTime()).toString()).to.equal((0 + offset).toString())
+        });
+
         it('only can updateMerkleRoot if closed', async () => {
             await expectRevert(
                 myFactory.updateMerkleRoot(myIDO.address, ethers.utils.id("merkleRoot"), "uri"),
