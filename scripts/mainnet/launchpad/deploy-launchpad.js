@@ -44,22 +44,22 @@ async function main () {
     const myManager = await ethers.getContractAt('TutellusManager', MANAGER_ADDRESS)
     const emptyInitializeCalldata = FactionManager.interface.encodeFunctionData('initialize', [])
 
-    //TutellusEnergy
-    const energyImplementation = await TutellusEnergy.deploy()
-    await energyImplementation.deployed()
-    console.log("TutellusEnergy implementation:", energyImplementation.address)
-    let response = await myManager.deployProxyWithImplementation(ENERGY_ID, energyImplementation.address, emptyInitializeCalldata)
-    await response.wait()
-    const energyAddress = await myManager.get(ENERGY_ID)
-    console.log("TutellusEnergy:", energyAddress)
-    await upgrades.forceImport(energyAddress, TutellusEnergy, { kind: 'uups' })
-
     //RewardsVaultV2
-    response = await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, emptyInitializeCalldata)
+    let response = await myManager.deploy(LAUNCHPAD_REWARDS_ID, RewardsVaultV2.bytecode, emptyInitializeCalldata)
     await response.wait()
     const rewardsAddr = await myManager.get(LAUNCHPAD_REWARDS_ID)
     console.log("RewardsVaultV2:", rewardsAddr)
     await upgrades.forceImport(rewardsAddr, RewardsVaultV2, { kind: 'uups' })
+
+    //TutellusEnergy
+    const energyImplementation = await TutellusEnergy.deploy()
+    await energyImplementation.deployed()
+    console.log("TutellusEnergy implementation:", energyImplementation.address)
+    response = await myManager.deployProxyWithImplementation(ENERGY_ID, energyImplementation.address, emptyInitializeCalldata)
+    await response.wait()
+    const energyAddress = await myManager.get(ENERGY_ID)
+    console.log("TutellusEnergy:", energyAddress)
+    await upgrades.forceImport(energyAddress, TutellusEnergy, { kind: 'uups' })
 
     //TutellusWhitelist
     response = await myManager.deploy(WHITELIST_ID, TutellusWhitelist.bytecode, emptyInitializeCalldata)
