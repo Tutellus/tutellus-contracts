@@ -49,7 +49,6 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     mapping(address => bool) private _withdrawn;
     mapping(address => uint256) private _prefunds;
     mapping(address => bool) private _termsAndConditions;
-    mapping(address => mapping(address => bool)) private _operatorApprovals;
 
     bytes32 public constant IDO_ADMIN_ROLE = keccak256("IDO_ADMIN_ROLE");
 
@@ -76,11 +75,10 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         _;
     }
 
-    modifier isPrefunderOrOperator(address prefunder) {
+    modifier isPrefunder(address prefunder) {
         require(
-            _msgSender() == prefunder ||
-                _operatorApprovals[prefunder][_msgSender()],
-            "TutellusIDO: not prefunder or operator"
+            _msgSender() == prefunder,
+            "TutellusIDO: not prefunder"
         );
         _;
     }
@@ -103,22 +101,14 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         address rolemanager_,
         uint256 fundingAmount_,
         uint256 minPrefund_,
-        address idoToken_,
         address prefundToken_,
-        uint256 startDate_,
-        uint256 endDate_,
-        uint256 openDate_,
-        uint256 cliffTime_
+        uint256 openDate_
     ) public initializer {
         __AccessControlProxyPausable_init(rolemanager_);
         fundingAmount = fundingAmount_;
         minPrefund = minPrefund_;
-        idoToken = idoToken_;
         prefundToken = prefundToken_;
-        startDate = startDate_;
-        endDate = endDate_;
         openDate = openDate_;
-        cliffTime = cliffTime_;
     }
 
     /// @inheritdoc ITutellusIDO
@@ -133,23 +123,6 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         returns (bool)
     {
         return _termsAndConditions[account];
-    }
-
-    /// @inheritdoc ITutellusIDO
-    function isOperator(address owner, address operator)
-        public
-        view
-        returns (bool)
-    {
-        return _operatorApprovals[owner][operator];
-    }
-
-    /// @inheritdoc ITutellusIDO
-    function setOperator(address operator, bool approved) public virtual {
-        address owner = _msgSender();
-        require(owner != operator, "TutellusIDO: approve to caller");
-        _operatorApprovals[owner][operator] = approved;
-        emit OperatorApproval(owner, operator, approved);
     }
 
     /// @inheritdoc ITutellusIDO
@@ -216,12 +189,17 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function updateVesting(uint256 startDate_, uint256 endDate_, uint256 openDate_, uint256 cliffTime_) public onlyRole(IDO_ADMIN_ROLE) {
+    function updateOpenDate(uint256 openDate_) public onlyRole(IDO_ADMIN_ROLE) {
+        openDate = openDate_;
+        emit UpdateOpenDate(openDate_);
+    }
+
+    /// @inheritdoc ITutellusIDO
+    function updateVesting(uint256 startDate_, uint256 endDate_, uint256 cliffTime_) public onlyRole(IDO_ADMIN_ROLE) {
         startDate = startDate_;
         endDate = endDate_;
-        openDate = openDate_;
         cliffTime = cliffTime_;
-        emit UpdateVesting(openDate_, startDate_, endDate_, cliffTime_);
+        emit UpdateVesting(startDate_, endDate_, cliffTime_);
     }
 
     /// @inheritdoc ITutellusIDO
@@ -238,7 +216,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         isOpen
         isNotClosed
         acceptedTermsAndConditions(prefunder_)
-        isPrefunderOrOperator(prefunder_)
+        isPrefunder(prefunder_)
     {
         require(
             prefundAmount_ + _prefunds[prefunder_] >= minPrefund,
@@ -298,6 +276,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         uint256 energy_,
         bytes32[] calldata merkleProof_
     ) public isClaimTime acceptedTermsAndConditions(account_) {
+        require((startDate != 0) && (endDate != 0), "TutellusIDO: Wrong vesting dates");
         _verifyMerkle(
             index_,
             account_,

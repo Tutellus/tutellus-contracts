@@ -8,24 +8,16 @@ interface ITutellusIDOFactory {
     /// @param roleManager Address of AccessControl contract
     /// @param fundingAmount Amount needed by the project
     /// @param minPrefund Minimum amount for a prefunder to participate
-    /// @param idoToken Address of the project token
     /// @param prefundToken Address of the token to prefund
-    /// @param startDate Vesting start time date
-    /// @param endDate Vesting end time date
     /// @param openDate Open time for IDO
-    /// @param cliffTime Amount of no claimable time from startDate
     event NewIDO(
         address indexed proxy,
         bytes32 indexed id,
         address roleManager,
         uint256 fundingAmount,
         uint256 minPrefund,
-        address idoToken,
         address prefundToken,
-        uint256 startDate,
-        uint256 endDate,
-        uint256 openDate,
-        uint256 cliffTime
+        uint256 openDate
     );
 
     /// @notice Emitted when fixedImplementation is updated
@@ -82,6 +74,24 @@ interface ITutellusIDOFactory {
         address ido,
         bytes32 merkleRoot,
         string calldata uri
+    ) external;
+
+    /// @notice Update merkle root and vesting dates in IDO
+    /// @param ido IDO to updateMerkleRoot
+    /// @param merkleRoot Root hash of the merkle tree
+    /// @param uri IPFS CID (ipfs://<CID>)
+    /// @param startDate Vesting start time date
+    /// @param endDate Vesting end time date
+    /// @param cliffTime Amount of no claimable time from startDate
+    /// @param idoToken Address of ERC20 IDO token
+    function updateMerkleRootAndVesting(
+        address ido,
+        bytes32 merkleRoot,
+        string memory uri,
+        uint256 startDate, 
+        uint256 endDate, 
+        uint256 cliffTime,
+        address idoToken
     ) external;
 
     /// @notice Close an IDO

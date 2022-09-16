@@ -32,13 +32,17 @@ interface ITutellusIDO {
     /// @notice Emitted when vesting configuration dates are updated
     /// @param startDate Vesting start time date
     /// @param endDate Vesting end time date
-    /// @param openDate Open time for IDO
     /// @param cliffTime Amount of no claimable time from startDate
     event UpdateVesting(
         uint256 startDate,
         uint256 endDate,
-        uint256 openDate,
         uint256 cliffTime
+    );
+
+    /// @notice Emitted when openDate is updated
+    /// @param openDate Open time for IDO
+    event UpdateOpenDate(
+        uint256 openDate
     );
 
     /// @notice Emitted when claims of project vested token
@@ -79,13 +83,6 @@ interface ITutellusIDO {
     /// @notice Emitted when launchpad user accepts T&C
     /// @param idoUser Address of the launchpad user
     event AcceptTermsAndConditions(address idoUser);
-
-    /// @notice Emitted when an prefunder approves an operator
-    /// @dev Operator can prefund on behalf of prefunder
-    /// @param owner Address of the prefunder
-    /// @param operator Address of the operator
-    /// @param approved Allowance status
-    event OperatorApproval(address owner, address operator, bool approved);
 
     //   function DEFAULT_ADMIN_ROLE (  ) external view returns ( bytes32 );
     //   function PAUSER_ROLE (  ) external view returns ( bytes32 );
@@ -170,32 +167,15 @@ interface ITutellusIDO {
     /// @param rolemanager Address of AccessControl contract
     /// @param fundingAmount Amount needed by the project
     /// @param minPrefund Minimum amount for a prefunder to participate
-    /// @param idoToken Address of the project token
     /// @param prefundToken Address of the token to prefund
-    /// @param startDate Vesting start time date
-    /// @param endDate Vesting end time date
     /// @param openDate Open time for IDO
-    /// @param cliffTime Amount of no claimable time from startDate
     function initialize(
         address rolemanager,
         uint256 fundingAmount,
         uint256 minPrefund,
-        address idoToken,
         address prefundToken,
-        uint256 startDate,
-        uint256 endDate,
-        uint256 openDate,
-        uint256 cliffTime
+        uint256 openDate
     ) external;
-
-    /// @notice Returns if an address is operator of an owner
-    /// @param owner Address of the prefunder
-    /// @param operator Address of the operator
-    /// @return isOperator True if operator, false if not
-    function isOperator(address owner, address operator)
-        external
-        view
-        returns (bool);
 
     /// @notice Returns root hash of the merkle tree
     /// @return merkleRoot
@@ -232,12 +212,6 @@ interface ITutellusIDO {
     /// @return released Amount released
     function released(uint256 allocation) external view returns (uint256);
 
-    /// @notice Set an address as operator
-    /// @dev Operator is allowed to prefund on behalf of prefunder
-    /// @param operator Address of the prefunder
-    /// @param approved Amount to prefund
-    function setOperator(address operator, bool approved) external;
-
     /// @notice Returns vesting start time date
     /// @return startDate
     function startDate() external view returns (uint256);
@@ -259,9 +233,12 @@ interface ITutellusIDO {
     /// @notice Set vesting times configuration
     /// @param startDate Vesting start time date
     /// @param endDate Vesting end time date
-    /// @param openDate Open time for IDO
     /// @param cliffTime Amount of no claimable time from startDate
-    function updateVesting(uint256 openDate, uint256 startDate, uint256 endDate, uint256 cliffTime) external;
+    function updateVesting(uint256 startDate, uint256 endDate, uint256 cliffTime) external;
+
+    /// @notice Set openDate
+    /// @param openDate Open time for IDO
+    function updateOpenDate(uint256 openDate) external;
 
     /// @notice Returns IPFS CID (ipfs://<CID>)
     /// @return uri

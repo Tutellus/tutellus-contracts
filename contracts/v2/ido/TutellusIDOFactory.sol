@@ -29,11 +29,26 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
     }
 
     /// @inheritdoc ITutellusIDOFactory
+    function updateMerkleRootAndVesting(
+        address ido,
+        bytes32 merkleRoot,
+        string memory uri,
+        uint256 startDate, 
+        uint256 endDate, 
+        uint256 cliffTime,
+        address idoToken
+    ) external onlyRole(IDO_FACTORY_ADMIN_ROLE) {
+        TutellusIDO(ido).updateVesting(startDate, endDate, cliffTime);
+        TutellusIDO(ido).updateIdoToken(idoToken);
+        updateMerkleRoot(ido, merkleRoot, uri);
+    }
+
+    /// @inheritdoc ITutellusIDOFactory
     function updateMerkleRoot(
         address ido,
         bytes32 merkleRoot,
         string memory uri
-    ) external onlyRole(IDO_FACTORY_ADMIN_ROLE) {
+    ) public onlyRole(IDO_FACTORY_ADMIN_ROLE) {
         TutellusIDO(ido).updateMerkleRoot(merkleRoot, uri);
         emit UpdateMerkleRoot(ido, merkleRoot, uri);
     }
@@ -75,12 +90,8 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
             address roleManager_,
             uint256 fundingAmount_,
             uint256 minPrefund_,
-            address idoToken_,
             address prefundToken_,
-            uint256 startDate_,
-            uint256 endDate_,
-            uint256 openDate_,
-            uint256 cliffTime_
+            uint256 openDate_
         ) = abi.decode(
                 initializeCalldata[4:],
                 (
@@ -88,10 +99,6 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
                     uint256,
                     uint256,
                     address,
-                    address,
-                    uint256,
-                    uint256,
-                    uint256,
                     uint256
                 )
             );
@@ -102,12 +109,8 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
             roleManager_,
             fundingAmount_,
             minPrefund_,
-            idoToken_,
             prefundToken_,
-            startDate_,
-            endDate_,
-            openDate_,
-            cliffTime_
+            openDate_
         );
     }
 }

@@ -148,12 +148,8 @@ describe('IDOFactory & IDO', function () {
                 myManager.address,
                 FUNDING_AMOUNT,
                 MIN_PREFUND,
-                myIdoToken.address,
                 myUSDT.address,
-                START_DATE,
-                END_DATE,
-                0,
-                CLIFF_TIME
+                0
             ]
         );
         await myManager.grantRole(IDO_FACTORY_ADMIN_ROLE, owner.address)
@@ -181,11 +177,7 @@ describe('IDOFactory & IDO', function () {
                     myManager.address,
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
-                    myIdoToken.address,
                     myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    0,
                     0
                 ]
             );
@@ -236,7 +228,7 @@ describe('IDOFactory & IDO', function () {
                 myIDO.connect(funder).updateIdoToken(newIdoToken.address),
                 'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_ADMIN_ROLE
             )
-            expect(await myIDO.idoToken()).to.equal(myIdoToken.address)
+            expect(await myIDO.idoToken()).to.equal(ethers.constants.AddressZero)
             await myIDO.updateIdoToken(newIdoToken.address)
 
             expect(await myIDO.idoToken()).to.equal(newIdoToken.address)
@@ -248,26 +240,22 @@ describe('IDOFactory & IDO', function () {
                 myIDO.connect(funder).updateVesting(
                     START_DATE + offset,
                     END_DATE + offset,
-                    0 + offset,
                     0 + offset
                 ),
                 'AccessControlProxyPausable: account ' + String(funder.address).toLowerCase() + ' is missing role ' + IDO_ADMIN_ROLE
             )
-            expect((await myIDO.startDate()).toString()).to.equal(START_DATE.toString())
-            expect((await myIDO.endDate()).toString()).to.equal(END_DATE.toString())
-            expect((await myIDO.openDate()).toString()).to.equal("0")
+            expect((await myIDO.startDate()).toString()).to.equal("0")
+            expect((await myIDO.endDate()).toString()).to.equal("0")
             expect((await myIDO.cliffTime()).toString()).to.equal("0")
             
             await myIDO.updateVesting(
                 START_DATE + offset,
                 END_DATE + offset,
-                0 + offset,
                 0 + offset
             )
 
             expect((await myIDO.startDate()).toString()).to.equal((START_DATE + offset).toString())
             expect((await myIDO.endDate()).toString()).to.equal((END_DATE + offset).toString())
-            expect((await myIDO.openDate()).toString()).to.equal((0 + offset).toString())
             expect((await myIDO.cliffTime()).toString()).to.equal((0 + offset).toString())
         });
 
@@ -293,11 +281,7 @@ describe('IDOFactory & IDO', function () {
                     myManager.address,
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
-                    myIdoToken.address,
                     myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    0,
                     0
                 ]
             );
@@ -327,11 +311,7 @@ describe('IDOFactory & IDO', function () {
                     myManager.address,
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
-                    myIdoToken.address,
                     myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    0,
                     0
                 ]
             );
@@ -351,11 +331,7 @@ describe('IDOFactory & IDO', function () {
                     myManager.address,
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
-                    myIdoToken.address,
                     myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    0,
                     0
                 ]
             );
@@ -411,12 +387,8 @@ describe('IDOFactory & IDO', function () {
                     myManager.address,
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
-                    myIdoToken.address,
                     myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    openDate,
-                    0
+                    openDate
                 ]
             );
             const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
@@ -553,26 +525,6 @@ describe('IDOFactory & IDO', function () {
             expect(prefunded.toString()).to.equal(MIN_PREFUND.toString())
         });
 
-        it('reverts if operator is not operator', async () => {
-            const prefundAmount = ethers.utils.parseEther('10')
-            await myUSDT.connect(funder).approve(myIDO.address, ethers.constants.MaxUint256)
-            await myIDO.connect(funder).acceptTermsAndConditions()
-            await expectRevert(
-                myIDO.connect(owner).prefund(funder.address, prefundAmount),
-                'TutellusIDO: not prefunder or operator'
-            )
-            await expectRevert(
-                myIDO.connect(funder).setOperator(funder.address, true),
-                'TutellusIDO: approve to caller'
-            )
-            await myIDO.connect(funder).setOperator(owner.address, true)
-            const isOperator = await myIDO.isOperator(funder.address, owner.address)
-            expect(isOperator).to.equal(true)
-            await myIDO.connect(owner).prefund(funder.address, MIN_PREFUND.toString())
-            const prefunded = await myIDO.getPrefunded(funder.address)
-            expect(prefunded.toString()).to.equal(MIN_PREFUND.toString())
-        });
-
         it('reverts if IDO is not open', async () => {
             const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
             const idoCalldata = TutellusIDO.interface.encodeFunctionData(
@@ -581,12 +533,8 @@ describe('IDOFactory & IDO', function () {
                     myManager.address,
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
-                    myIdoToken.address,
                     myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    END_DATE,
-                    0
+                    END_DATE
                 ]
             );
             const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
@@ -788,8 +736,8 @@ describe('IDOFactory & IDO', function () {
         it('can claim', async () => {
             let slot = (END_DATE - START_DATE) / 4
             let divisionBN = ethers.BigNumber.from('4')
-            await myIDO.close()
-            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await myFactory.closeIDO(myIDO.address)
+            await myFactory.updateMerkleRootAndVesting(myIDO.address, TREE.toJSON().merkleRoot, '', START_DATE, END_DATE, CLIFF_TIME, myIdoToken.address)
             for (let i = 2; i < 6; i++) {
                 await (await myIDO.connect(accounts[i])).acceptTermsAndConditions()
                 await ethers.provider.send("evm_setNextBlockTimestamp", [START_DATE + ((i-2) * slot)])
@@ -839,8 +787,8 @@ describe('IDOFactory & IDO', function () {
         });
 
         it('cant claim with wrong proof', async () => {
-            await myIDO.close()
-            await myIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await myFactory.closeIDO(myIDO.address)
+            await myFactory.updateMerkleRootAndVesting(myIDO.address, TREE.toJSON().merkleRoot, '', START_DATE, END_DATE, CLIFF_TIME, myIdoToken.address)
             await (await myIDO.connect(accounts[2])).acceptTermsAndConditions()
             await ethers.provider.send("evm_setNextBlockTimestamp", [END_DATE + 1000000])
             await expectRevert(
@@ -865,20 +813,16 @@ describe('IDOFactory & IDO', function () {
                     myManager.address,
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
-                    myIdoToken.address,
                     myUSDT.address,
-                    START_DATE,
-                    END_DATE,
-                    0,
-                    cliffTime
+                    0
                 ]
             );
             const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
             const receipt = await response.wait()
             const cliffIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
             await cliffIDO.connect(accounts[2]).acceptTermsAndConditions()
-            await cliffIDO.close()
-            await cliffIDO.updateMerkleRoot(TREE.toJSON().merkleRoot, '')
+            await myFactory.closeIDO(cliffIDO.address)
+            await myFactory.updateMerkleRootAndVesting(cliffIDO.address, TREE.toJSON().merkleRoot, '', START_DATE, END_DATE, cliffTime, myIdoToken.address)
             await myIdoToken.mint(cliffIDO.address, FUNDING_AMOUNT)
 
             await cliffIDO.withdrawLeft(
