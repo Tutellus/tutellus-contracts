@@ -9,8 +9,8 @@ const { readFile } = require("fs/promises");
 const path = require("path");
 const { getIdoTree } = require("../../../utils/idoTree");
 const ONE_BN = ethers.utils.parseEther("1");
-const IDO = "0x140541a4EB3f17c2C756419c5d2A5149b5434bE6";
-const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.25");
+const IDO = "0x540F0d9AF18B43B3dC80E3191f905C5e19F1732B";
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.5");
 const jsonPath =
     "../../../examples/testnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
