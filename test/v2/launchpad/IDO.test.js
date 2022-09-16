@@ -376,6 +376,20 @@ describe('IDOFactory & IDO', function () {
             expect(idoBalancePost.toString()).to.equal(idoBalancePre.add(prefundAmount).toString())
         });
 
+        it('cant prefund for thirds', async () => {
+            const prefundAmount = ethers.utils.parseEther('5000')
+
+            await (await myUSDT.connect(funder)).approve(myIDO.address, ethers.constants.MaxUint256)
+            await (await myIDO.connect(funder)).acceptTermsAndConditions()
+
+            await expectRevert(
+                myIDO.connect(prefunder2).prefund(funder.address, prefundAmount),
+                'TutellusIDO: not prefunder'
+            )
+
+            await (await myIDO.connect(funder)).prefund(funder.address, prefundAmount)
+        });
+
         it('cant prefund if not open', async () => {
             const prefundAmount = ethers.utils.parseEther('5000')
 
@@ -388,7 +402,7 @@ describe('IDOFactory & IDO', function () {
                     FUNDING_AMOUNT,
                     MIN_PREFUND,
                     myUSDT.address,
-                    openDate
+                    0
                 ]
             );
             const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
@@ -400,6 +414,7 @@ describe('IDOFactory & IDO', function () {
             
             await myUSDT.connect(funder).approve(newIDO.address, ethers.constants.MaxUint256)
             await newIDO.connect(funder).acceptTermsAndConditions()
+            await newIDO.updateOpenDate(openDate)
 
             await expectRevert(
                 newIDO.connect(funder).prefund(funder.address, prefundAmount),
@@ -861,6 +876,68 @@ describe('IDOFactory & IDO', function () {
                 CLAIMS[accounts[2].address].energy,
                 CLAIMS[accounts[2].address].proof
             )
+
+            await ethers.provider.send("evm_setNextBlockTimestamp", [END_DATE])
+
+            await cliffIDO.claim(
+                CLAIMS[accounts[2].address].index,
+                accounts[2].address,
+                CLAIMS[accounts[2].address].allocation,
+                CLAIMS[accounts[2].address].refund,
+                CLAIMS[accounts[2].address].energy,
+                CLAIMS[accounts[2].address].proof
+            )
+
+            let idoBalance = await myIdoToken.balanceOf(accounts[2].address)
+            expect(idoBalance.toString()).to.equal(ethers.BigNumber.from(json[accounts[2].address].allocation).toString())
+            expect(idoBalance.toString()).to.equal((await cliffIDO.claimed(accounts[2].address)).toString())
+        });
+
+        it('cant claim if vesting dates arent setted', async () => {
+            const TutellusIDO = await ethers.getContractFactory('TutellusIDO')
+            const idoCalldata = TutellusIDO.interface.encodeFunctionData(
+                'initialize',
+                [
+                    myManager.address,
+                    FUNDING_AMOUNT,
+                    MIN_PREFUND,
+                    myUSDT.address,
+                    0
+                ]
+            );
+            const response = await myFactory.createProxy(idoCalldata, PROJECT_ID)
+            const receipt = await response.wait()
+            const cliffIDO = await ethers.getContractAt('TutellusIDO', receipt.events[2].args['proxy'])
+            await cliffIDO.connect(accounts[2]).acceptTermsAndConditions()
+            await myFactory.closeIDO(cliffIDO.address)
+            await myFactory.updateMerkleRoot(cliffIDO.address, TREE.toJSON().merkleRoot, '')
+
+            await expectRevert(
+                cliffIDO.claim(
+                    CLAIMS[accounts[2].address].index,
+                    accounts[2].address,
+                    CLAIMS[accounts[2].address].allocation,
+                    CLAIMS[accounts[2].address].refund,
+                    CLAIMS[accounts[2].address].energy,
+                    CLAIMS[accounts[2].address].proof
+                ),
+                "TutellusIDO: Wrong vesting dates"
+            )
+
+            await myFactory.updateMerkleRootAndVesting(cliffIDO.address, TREE.toJSON().merkleRoot, '', START_DATE, END_DATE, CLIFF_TIME, myIdoToken.address)
+            await myIdoToken.mint(cliffIDO.address, FUNDING_AMOUNT)
+
+            await cliffIDO.withdrawLeft(
+                CLAIMS[accounts[2].address].index,
+                accounts[2].address,
+                CLAIMS[accounts[2].address].allocation,
+                CLAIMS[accounts[2].address].refund,
+                CLAIMS[accounts[2].address].energy,
+                CLAIMS[accounts[2].address].proof
+            )
+
+            let usdtBalance = await myUSDT.balanceOf(accounts[2].address)
+            expect(usdtBalance.toString()).to.equal(json[accounts[2].address].refund)
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [END_DATE])
 
