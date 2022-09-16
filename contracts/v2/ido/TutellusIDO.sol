@@ -76,10 +76,7 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     modifier isPrefunder(address prefunder) {
-        require(
-            _msgSender() == prefunder,
-            "TutellusIDO: not prefunder"
-        );
+        require(_msgSender() == prefunder, "TutellusIDO: not prefunder");
         _;
     }
 
@@ -92,7 +89,10 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     modifier isClaimTime() {
-        require(block.timestamp >= startDate + cliffTime, "TutellusIDO: not claim time");
+        require(
+            block.timestamp >= startDate + cliffTime,
+            "TutellusIDO: not claim time"
+        );
         _;
     }
 
@@ -195,7 +195,11 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
     }
 
     /// @inheritdoc ITutellusIDO
-    function updateVesting(uint256 startDate_, uint256 endDate_, uint256 cliffTime_) public onlyRole(IDO_ADMIN_ROLE) {
+    function updateVesting(
+        uint256 startDate_,
+        uint256 endDate_,
+        uint256 cliffTime_
+    ) public onlyRole(IDO_ADMIN_ROLE) {
         startDate = startDate_;
         endDate = endDate_;
         cliffTime = cliffTime_;
@@ -276,7 +280,10 @@ contract TutellusIDO is ITutellusIDO, UUPSUpgradeableByRole, CoinCharger {
         uint256 energy_,
         bytes32[] calldata merkleProof_
     ) public isClaimTime acceptedTermsAndConditions(account_) {
-        require((startDate != 0) && (endDate != 0), "TutellusIDO: Wrong vesting dates");
+        require(
+            (startDate != 0) && (endDate != 0),
+            "TutellusIDO: Wrong vesting dates"
+        );
         _verifyMerkle(
             index_,
             account_,

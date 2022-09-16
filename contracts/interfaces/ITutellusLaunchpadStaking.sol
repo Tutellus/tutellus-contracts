@@ -141,7 +141,12 @@ interface ITutellusLaunchpadStaking {
     /// @param minFee Fee after endInterval
     /// @param maxFee Fee in deposit block number
     /// @param feeInterval Amount of blocks to get minFee when withdraw
-    function initialize(address tkn, uint minFee, uint maxFee, uint feeInterval) external;
+    function initialize(
+        address tkn,
+        uint256 minFee,
+        uint256 maxFee,
+        uint256 feeInterval
+    ) external;
 
     /// @notice Block number of last update
     function lastUpdate() external view returns (uint256);

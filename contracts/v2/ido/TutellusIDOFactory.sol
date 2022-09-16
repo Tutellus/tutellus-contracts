@@ -33,8 +33,8 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
         address ido,
         bytes32 merkleRoot,
         string memory uri,
-        uint256 startDate, 
-        uint256 endDate, 
+        uint256 startDate,
+        uint256 endDate,
         uint256 cliffTime,
         address idoToken
     ) external onlyRole(IDO_FACTORY_ADMIN_ROLE) {
@@ -94,13 +94,7 @@ contract TutellusIDOFactory is ITutellusIDOFactory, UUPSUpgradeableByRole {
             uint256 openDate_
         ) = abi.decode(
                 initializeCalldata[4:],
-                (
-                    address,
-                    uint256,
-                    uint256,
-                    address,
-                    uint256
-                )
+                (address, uint256, uint256, address, uint256)
             );
 
         emit NewIDO(

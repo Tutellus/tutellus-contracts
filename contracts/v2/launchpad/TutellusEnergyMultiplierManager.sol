@@ -61,11 +61,11 @@ contract TutellusEnergyMultiplierManager is
         returns (uint256 multiplier)
     {
         if (_multiplierType[_contract] == 1) {
-            multiplier = _getMultiplierStaking() * _factorByType[1] / 1 ether;
+            multiplier = (_getMultiplierStaking() * _factorByType[1]) / 1 ether;
         } else if (_multiplierType[_contract] == 2) {
             multiplier =
-                _getEnergyMultiplierFarming(_contract) *
-                _factorByType[2] / 1 ether;
+                (_getEnergyMultiplierFarming(_contract) * _factorByType[2]) /
+                1 ether;
         }
     }
 

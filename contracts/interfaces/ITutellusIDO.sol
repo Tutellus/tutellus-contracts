@@ -33,17 +33,11 @@ interface ITutellusIDO {
     /// @param startDate Vesting start time date
     /// @param endDate Vesting end time date
     /// @param cliffTime Amount of no claimable time from startDate
-    event UpdateVesting(
-        uint256 startDate,
-        uint256 endDate,
-        uint256 cliffTime
-    );
+    event UpdateVesting(uint256 startDate, uint256 endDate, uint256 cliffTime);
 
     /// @notice Emitted when openDate is updated
     /// @param openDate Open time for IDO
-    event UpdateOpenDate(
-        uint256 openDate
-    );
+    event UpdateOpenDate(uint256 openDate);
 
     /// @notice Emitted when claims of project vested token
     /// @param index Index of leave in merkle tree
@@ -234,7 +228,11 @@ interface ITutellusIDO {
     /// @param startDate Vesting start time date
     /// @param endDate Vesting end time date
     /// @param cliffTime Amount of no claimable time from startDate
-    function updateVesting(uint256 startDate, uint256 endDate, uint256 cliffTime) external;
+    function updateVesting(
+        uint256 startDate,
+        uint256 endDate,
+        uint256 cliffTime
+    ) external;
 
     /// @notice Set openDate
     /// @param openDate Open time for IDO

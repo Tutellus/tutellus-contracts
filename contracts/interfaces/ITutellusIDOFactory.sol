@@ -88,8 +88,8 @@ interface ITutellusIDOFactory {
         address ido,
         bytes32 merkleRoot,
         string memory uri,
-        uint256 startDate, 
-        uint256 endDate, 
+        uint256 startDate,
+        uint256 endDate,
         uint256 cliffTime,
         address idoToken
     ) external;
