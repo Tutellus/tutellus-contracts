@@ -15,7 +15,10 @@ const query = async (method, url, data) => {
       data,
     });
   } catch (error) {
-    // console.error('ERROR - QUERY:', error);
+    console.error('ERROR - QUERY:', error);
+    if (error.response.data) {
+      throw new Error(JSON.stringify(error.response.data));
+    }
     return undefined;
   }
 };
@@ -62,8 +65,9 @@ const getTransactions = async (chainId, safe) => {
 const estimateTx = async (chainId, safe, data) => {
   const baseUrl = getUrl(chainId);
   const url = `${baseUrl}/safes/${safe}/multisig-transactions/estimations/`;
-  const { data: result } = await query('POST', url, data);
-  return result;
+  const response = await query('POST', url, data);
+  console.log(response);
+  return response.data;
 };
 
 const getNextNonce = async (chainId, safe) => {
