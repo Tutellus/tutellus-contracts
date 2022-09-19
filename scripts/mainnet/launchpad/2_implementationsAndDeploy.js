@@ -1,8 +1,11 @@
 const { ethers } = require("hardhat")
+const { createTx, sendTx } = require('../../../utils/gnosis');
 
-const MANAGER_ADDRESS = "0x92204B41803Dd82e638C629c1bCAf17FD2023660"
+const MANAGER_ADDRESS = "0x2d0550620b17D748379273dC9E903E8298410Ccc"
 const TUT_ADDRESS = "0x12a34a6759c871c4c1e8a0a42cfc97e4d7aaf68d"
 const LP_ADDRESS = "0x5d9ac8993b714df01d079d1b5b0b592e579ca099"
+const SAFE = "0x144884904F833cc0D0e62787b6761A46712C28F4"
+const DEPLOYER = "0x2c13c40f1Ba5A4d3f5C998cB9ff49B50460cb8C4"
 
 async function main() {
     const TutellusLaunchpadDeployer = await ethers.getContractFactory("TutellusLaunchpadDeployer");
@@ -32,20 +35,38 @@ async function main() {
     const idoFactoryImplementation = await TutellusIDOFactory.deploy()
     await idoFactoryImplementation.deployed()
 
-    const response = await TutellusLaunchpadDeployer.deploy(
-        MANAGER_ADDRESS,
-        vaultBytecode,
-        energyImplementation.address,
-        whitelistImplementation.address,
-        energyMultiplierImplementation.address,
-        factionManagerImplementation.address,
-        stakingImplementation.address,
-        idoFactoryImplementation.address,
-        emptyInitializeCalldata,
-        initializeCalldataStaking,
-        initializeCalldataFarming
+    const deployer = TutellusLaunchpadDeployer.attach(DEPLOYER)
+
+    const wallet = new ethers.Wallet.fromMnemonic(process.env.MNEMONIC);
+    const chainId = ethers.provider._network.chainId;
+
+    const calldataDeploy = deployer.interface.encodeFunctionData(
+        "deploy",
+        [
+            MANAGER_ADDRESS,
+            vaultBytecode,
+            energyImplementation.address,
+            whitelistImplementation.address,
+            energyMultiplierImplementation.address,
+            factionManagerImplementation.address,
+            stakingImplementation.address,
+            idoFactoryImplementation.address,
+            emptyInitializeCalldata,
+            initializeCalldataStaking,
+            initializeCalldataFarming
+        ]
     )
-    await response.deployed()
+
+    const dataDeploy = {
+        to: deployer.address,
+        data: calldataDeploy,
+        value: 0,
+        operation: 0,
+    };
+
+    const txDeploy = await createTx(ethers.provider, chainId, SAFE, dataDeploy, wallet);
+    await sendTx(chainId, SAFE, txDeploy);
+
     console.log("Deployed")
 }
 
