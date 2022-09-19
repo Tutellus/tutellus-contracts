@@ -1,9 +1,9 @@
 const { ethers } = require("hardhat")
 
-const MANAGER_ADDRESS = "0x6299f2B57f9E4A9Ae246eAf8Aa6DA57B4d2f8f2B"
-const TUT_ADDRESS = "0x12a34a6759c871c4c1e8a0a42cfc97e4d7aaf68d"
-const LP_ADDRESS = "0x5d9ac8993b714df01d079d1b5b0b592e579ca099"
-const USDT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
+const MANAGER_ADDRESS = "0xb217522e976c6360d3e2F68E2440e070eaae86ea"
+const TUT_ADDRESS = "0x930f169A87545a8c6a3e7934d42d1582c03e1b35"
+const LP_ADDRESS = "0xfd5447D667eB6960fA326cfa68b7936f52940cA7"
+const USDT_ADDRESS = "0x790CA413c421f253F9fB89aE8546a594287BB8ee"
 
 async function main() {
     const accounts = await ethers.getSigners()
@@ -34,7 +34,7 @@ async function main() {
     const CLIFF_TIME = 3600
     const idoInitializeCalldata = TutellusIDO.interface.encodeFunctionData(
         "initialize",
-        [manager.address, FUNDING_AMOUNT, MIN_PREFUND, ethers.constants.AddressZero, USDT_ADDRESS, START_DATE, END_DATE, 0, CLIFF_TIME]
+        [manager.address, FUNDING_AMOUNT, MIN_PREFUND, USDT_ADDRESS, 0]
     );
     response = await manager.grantRole(ethers.utils.id("IDO_FACTORY_ADMIN_ROLE"), accounts[0].address)
     await response.wait()
