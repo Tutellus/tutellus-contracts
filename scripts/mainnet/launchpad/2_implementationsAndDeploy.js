@@ -1,11 +1,11 @@
 const { ethers } = require("hardhat")
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
-const MANAGER_ADDRESS = "0x2d0550620b17D748379273dC9E903E8298410Ccc"
-const TUT_ADDRESS = "0x12a34a6759c871c4c1e8a0a42cfc97e4d7aaf68d"
-const LP_ADDRESS = "0x5d9ac8993b714df01d079d1b5b0b592e579ca099"
+const MANAGER_ADDRESS = "0xb217522e976c6360d3e2F68E2440e070eaae86ea"
+const TUT_ADDRESS = "0x930f169A87545a8c6a3e7934d42d1582c03e1b35"
+const LP_ADDRESS = "0xfd5447D667eB6960fA326cfa68b7936f52940cA7"
 const SAFE = "0x144884904F833cc0D0e62787b6761A46712C28F4"
-const DEPLOYER = "0x2c13c40f1Ba5A4d3f5C998cB9ff49B50460cb8C4"
+const DEPLOYER = "0x56a81Eb9d793007D5ee10c24F290b86121A70f59"
 
 async function main() {
     const TutellusLaunchpadDeployer = await ethers.getContractFactory("TutellusLaunchpadDeployer");

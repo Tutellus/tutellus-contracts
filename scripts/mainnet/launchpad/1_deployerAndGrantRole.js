@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat")
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
-const MANAGER_ADDRESS = "0x2d0550620b17D748379273dC9E903E8298410Ccc"
+const MANAGER_ADDRESS = "0xb217522e976c6360d3e2F68E2440e070eaae86ea"
 const SAFE = "0x144884904F833cc0D0e62787b6761A46712C28F4"
 
 async function main() {
