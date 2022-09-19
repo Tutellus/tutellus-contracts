@@ -1,8 +1,8 @@
 const { ethers } = require("hardhat")
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
-const MANAGER_ADDRESS = "0xb217522e976c6360d3e2F68E2440e070eaae86ea"
-const SAFE = "0x144884904F833cc0D0e62787b6761A46712C28F4"
+const MANAGER_ADDRESS = "0x73205567d90A45533879eF39a29920056225eFB2"
+const SAFE = "0x5ACB3043da168b59b775eA28F3942597F45e9543"
 
 async function main() {
     const TutellusManager = await ethers.getContractFactory("TutellusManager");
