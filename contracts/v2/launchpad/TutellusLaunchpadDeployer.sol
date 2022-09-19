@@ -10,7 +10,7 @@ contract TutellusLaunchpadDeployer {
     address public owner;
 
     constructor(address _owner) {
-        owner = owner;
+        owner = _owner;
     }
     
     function deploy(
