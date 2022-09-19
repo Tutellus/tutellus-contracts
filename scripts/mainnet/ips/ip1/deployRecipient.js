@@ -1,7 +1,7 @@
 const bre = require('hardhat');
 const ethers = bre.ethers;
 const { utils, constants, Wallet, provider } = ethers;
-const { createTx, sendTx } = require('../../../utils/gnosis');
+const { createTx, sendTx } = require('../../../../utils/gnosis');
 
 const ID = utils.id('TUT_IP1_RECIPIENT');
 const CONTRACT_NAME = 'TutellusRecipient';

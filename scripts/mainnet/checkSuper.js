@@ -2,7 +2,7 @@ const bre = require('hardhat');
 const ethers = bre.ethers;
 const { Contract, utils } = ethers;
 
-const ADDRESS = '0x801a8705b28fC21570E061945B86c52484b1197b';
+const ADDRESS = '0x0fC43aAc971813D095e83F9BccB1DeB25f93A4fd';
 
 const poolABI = [
     'function totalSupply() external view returns (uint256)',
@@ -32,9 +32,9 @@ async function main () {
 
   const poolRatio = reserves[0].mul(utils.parseEther('1')).div(totalSupply);
 
-  console.log('TUT on wallet:', tutBalance.toString());
-  console.log('TUT on staking:', stakingBalance.toString());
-  console.log('TUT on farming:', farmingBalance.mul(poolRatio).div(utils.parseEther('1')).toString());
+  console.log('TUT on wallet:', utils.formatEther(tutBalance.toString()));
+  console.log('TUT on staking:', utils.formatEther(stakingBalance.toString()));
+  console.log('TUT on farming:', utils.formatEther(farmingBalance.mul(poolRatio).div(utils.parseEther('1')).toString()));
 
   const total = stakingBalance.add(farmingBalance.mul(poolRatio).div(utils.parseEther('1')));
 
