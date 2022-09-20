@@ -131,14 +131,17 @@ module.exports = {
     },
     hardhat: {
       chainId: 31337,
+      // forking: {
+      //   url: 'https://goerli.infura.io/v3/' + process.env.INFURA_API_KEY
+      // },
       forking: {
         url: 'https://polygon-rpc.com'
       },
       accounts: getAccounts()
     },
-    // localhost: {
-    //   chainId: 31337
-    // }
+    localhost: {
+      chainId: 31337
+    }
   },
   // This is a sample solc configuration that specifies which version of solc to use
   solidity: {
