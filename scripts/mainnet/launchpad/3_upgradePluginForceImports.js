@@ -32,11 +32,13 @@ const contracts = [
 ]
 
 async function main() {
-    const manager = await ethers.getContractAt("TutellusManger", "0x73205567d90A45533879eF39a29920056225eFB2")
+    const manager = await ethers.getContractAt("TutellusManager", "0x73205567d90A45533879eF39a29920056225eFB2")
     for(let i = 0; i < contracts.length; i++) {
         const Factory = await ethers.getContractFactory(contracts[i].name);
         const address = await manager.get(contracts[i].id)
         const result = await upgrades.forceImport(address, Factory, { kind: 'uups' })
+        console.log(contracts[i].name)
+        console.log(address)
     }
     
     console.log("Imported")
