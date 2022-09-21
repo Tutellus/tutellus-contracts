@@ -11,10 +11,6 @@ const SAFE = "0x5ACB3043da168b59b775eA28F3942597F45e9543"
 
 async function main() {
     const TutellusManager = await ethers.getContractFactory("TutellusManager");
-    const TutellusLaunchpadDeployer = await ethers.getContractFactory("TutellusLaunchpadDeployer");
-
-    const deployer = await TutellusLaunchpadDeployer.deploy(SAFE)
-    await deployer.deployed()
 
     const wallet = new ethers.Wallet.fromMnemonic(process.env.MNEMONIC);
     const chainId = ethers.provider._network.chainId;
