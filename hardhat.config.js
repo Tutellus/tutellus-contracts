@@ -7,7 +7,7 @@ require('@openzeppelin/hardhat-upgrades')
 require('hardhat-gas-reporter')
 require('solidity-coverage')
 require('hardhat-interface-generator')
-require('hardhat-contract-sizer');
+// require('hardhat-contract-sizer');
 const { random, template } = require('lodash')
 const GAS_PRICE_DEFAULT = 50000000000
 const GAS_MULTIPLIER_DEFAULT = 1
@@ -129,19 +129,19 @@ module.exports = {
       gasMultiplier: GAS_MULTIPLIER_DEFAULT,
       accounts: getAccounts()
     },
-    hardhat: {
-      chainId: 31337,
-      // forking: {
-      //   url: 'https://goerli.infura.io/v3/' + process.env.INFURA_API_KEY
-      // },
-      forking: {
-        url: 'https://polygon-rpc.com'
-      },
-      accounts: getAccounts()
-    },
-    localhost: {
-      chainId: 31337
-    }
+    // hardhat: {
+    //   chainId: 31337,
+    //   // forking: {
+    //   //   url: 'https://goerli.infura.io/v3/' + process.env.INFURA_API_KEY
+    //   // },
+    //   forking: {
+    //     url: 'https://polygon-rpc.com'
+    //   },
+    //   accounts: getAccounts()
+    // },
+    // localhost: {
+    //   chainId: 31337
+    // }
   },
   // This is a sample solc configuration that specifies which version of solc to use
   solidity: {
