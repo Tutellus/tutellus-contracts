@@ -4,8 +4,8 @@ const { utils, constants } = ethers;
 const { id } = utils;
 
 const ADMIN_ROLE = constants.HashZero;
-const ROLE = '0x28f5a99355973cc89255b8c4ac88405f27c78ded7608b040ee77a8bdf44d15e2'
-const ADDRESS = '0x30729b6910757042024304e56beb015821462691'
+const ROLE = '0x5a422ad2976e7798e7b69a1e99e3c9f846792ccccfe43a967d0b86f044b27e9e'
+const ADDRESS = '0x741d2e86b07ae985fca680017d996b59ff6eec83'
 
 async function main () {
   await bre.run('compile');
