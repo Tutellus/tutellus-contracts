@@ -16,7 +16,7 @@ contract TutellusPOAP is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC
     bytes32 public constant _AUTH_NFT_SIGNER = keccak256('AUTH_NFT_SIGNER');
     bytes32 private immutable _ENERGY = keccak256('ENERGY');
 
-    bytes32 private immutable _NEW_NFT_TYPEHASH = keccak256('Mint(bytes32 poapId,bytes32 code,uint256 limit)');
+    bytes32 private immutable _NEW_NFT_TYPEHASH = keccak256('Mint(bytes32 poapId,address account,bytes32 code,uint256 limit)');
 
     struct POAP {
         bytes32 ido;
@@ -80,6 +80,7 @@ contract TutellusPOAP is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC
         bytes32 structHash = keccak256(abi.encode(
             _NEW_NFT_TYPEHASH,
             poapId,
+            account,
             code,
             limit
         ));

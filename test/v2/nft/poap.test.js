@@ -52,7 +52,7 @@ const setInstances = async (addresses) => {
     ])
 }
 
-const signPoap = async (contract, poapId, code, limit) => {
+const signPoap = async (contract, poapId, account, code, limit) => {
     const domain = {
         name: 'TutellusPOAP',
         version: '1',
@@ -63,6 +63,7 @@ const signPoap = async (contract, poapId, code, limit) => {
     const types = {
         Mint: [
             { name: 'poapId', type: 'bytes32' },
+            { name: 'account', type: 'address' },
             { name: 'code', type: 'bytes32' },
             { name: 'limit', type: 'uint256' }
         ]
@@ -70,6 +71,7 @@ const signPoap = async (contract, poapId, code, limit) => {
 
     const value = {
         poapId,
+        account,
         code,
         limit,
     }
@@ -114,7 +116,7 @@ const myPOAP4 = {
     uri: 'uri/non-perpetual-energy'
 }
 
-describe('POAP', function () {
+describe.only('POAP', function () {
     before(async () => {
         [owner, person, person2] = await web3.eth.getAccounts()
     })
@@ -245,7 +247,7 @@ describe('POAP', function () {
         it('Can mint a perpetual token without energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP.id,
@@ -265,7 +267,7 @@ describe('POAP', function () {
         it('Can mint a perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP2.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP2.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP2.id,
@@ -288,7 +290,7 @@ describe('POAP', function () {
         it('Can mint a non-perpetual token without energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP3.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP3.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP3.id,
@@ -309,7 +311,7 @@ describe('POAP', function () {
         it('Can mint a non-perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP4.id,
@@ -332,7 +334,7 @@ describe('POAP', function () {
         it('Cant mint a token with unauthorized signer', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await expectRevert(
                 myNFT.mint(
                     myPOAP.id,
@@ -348,7 +350,7 @@ describe('POAP', function () {
         it('Cant overflow the limit', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP.id,
@@ -373,7 +375,7 @@ describe('POAP', function () {
         it('Cant mint same poap to same wallet', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 2;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP.id,
@@ -398,7 +400,7 @@ describe('POAP', function () {
         it('Cant mint if disabled', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.setValid(myPOAP.id, false);
             await expectRevert(
@@ -416,7 +418,7 @@ describe('POAP', function () {
         it('Cant mint a token with an invalid signature', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 2;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP.id,
@@ -476,7 +478,7 @@ describe('POAP', function () {
         it('Can burn a perpetual token without energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP.id,
@@ -495,7 +497,7 @@ describe('POAP', function () {
         it('Can burn a perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP2.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP2.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP2.id,
@@ -521,7 +523,7 @@ describe('POAP', function () {
         it('Can burn a non-perpetual token without energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP3.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP3.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP3.id,
@@ -541,7 +543,7 @@ describe('POAP', function () {
         it('Can burn a non-perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP4.id,
@@ -564,7 +566,7 @@ describe('POAP', function () {
         it('Cant burn if not admin, approved, owner', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP4.id,
@@ -582,7 +584,7 @@ describe('POAP', function () {
         it('Can burn if admin', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP4.id,
@@ -606,7 +608,7 @@ describe('POAP', function () {
         it('Can burn if approved', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP4.id,
@@ -630,7 +632,7 @@ describe('POAP', function () {
         it('Cant transfer tokens', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
-            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, code, limit)
+            const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.mint(
                 myPOAP4.id,
