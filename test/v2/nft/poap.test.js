@@ -1,25 +1,10 @@
-const { artifacts, ethers } = require('hardhat')
-const { latestBlock } = require('@openzeppelin/test-helpers/src/time')
-const { expectRevert } = require('@openzeppelin/test-helpers')
-const { expect } = require('hardhat')
+const { ethers } = require('hardhat')
+const { utils } = ethers
+const { expect } = require('chai')
 const { parseEther } = require('ethers/lib/utils')
-const { utils, constants } = require('ethers')
 const { expectEqEth } = require('../../utils')
-const Deployer = artifacts.require('TutellusDeployer')
-const Token = artifacts.require('TutellusERC20')
-const Manager = artifacts.require('TutellusManager')
-const RewardsVault = artifacts.require('TutellusRewardsVault')
-const HoldersVault = artifacts.require('TutellusHoldersVault')
-const TreasuryVault = artifacts.require('TutellusTreasuryVault')
-const ACPP = artifacts.require('AccessControlProxyPausable')
-const NFT = artifacts.require('TutellusPOAP')
-const Energy = artifacts.require('TutellusEnergy')
 
 let myDeployer
-let myToken
-let myRewardsVault
-let myHoldersVault
-let myTreasuryVault
 let myManager
 let myEnergy
 let myNFT
@@ -31,28 +16,8 @@ const AUTH_NFT_SIGNER = utils.id('AUTH_NFT_SIGNER')
 const ENERGY_ID = utils.id('ENERGY');
 const NFT_ID = utils.id('721');
 
-const getAddresses = async () => {
-const addresses = await Promise.all([
-    myDeployer.token(),
-    myDeployer.rolemanager(),
-    myDeployer.rewardsVault(),
-    myDeployer.clientsVault(),
-    myDeployer.holdersVault(),
-    myDeployer.treasuryVault()
-])
-return addresses
-}
-
-const setInstances = async (addresses) => {
-    [myToken, myRewardsVault, myHoldersVault, myTreasuryVault] = await Promise.all([
-        Token.at(addresses[0]),
-        RewardsVault.at(addresses[2]),
-        HoldersVault.at(addresses[4]),
-        TreasuryVault.at(addresses[5]),
-    ])
-}
-
-const signPoap = async (contract, poapId, account, code, limit) => {
+const signPoap = async (contract, poapId, signer, code, limit) => {
+    const { address: account } = signer 
     const domain = {
         name: 'TutellusPOAP',
         version: '1',
@@ -116,57 +81,49 @@ const myPOAP4 = {
     uri: 'uri/non-perpetual-energy'
 }
 
-describe.only('POAP', function () {
+describe('POAP', function () {
     before(async () => {
-        [owner, person, person2] = await web3.eth.getAccounts()
+        [owner, person, person2] = await ethers.getSigners()
     })
     beforeEach(async () => {
-        const previous = await latestBlock()
-        myDeployer = await Deployer.new(owner, previous)
-        const addresses = await getAddresses()
-        await setInstances(addresses)
+        const { number } = await ethers.provider.getBlock('latest')
 
-        const ids = {   
-            ERC20: myToken.address,
-            REWARDS_VAULT: myRewardsVault.address,
-            HOLDERS_VAULT: myHoldersVault.address,
-            TREASURY_VAULT: myTreasuryVault.address
-        }
-        myManager = await Manager.new()
+        const Deployer = await ethers.getContractFactory('TutellusDeployer')
+        const Manager = await ethers.getContractFactory('TutellusManager')
+
+        myDeployer = await Deployer.deploy(owner.address, number)
+        await myDeployer.deployed()
+
+        myManager = await Manager.deploy()
+        await myManager.deployed()
         await myManager.initialize()
 
-        const keys = Object.keys(ids)
-
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i]
-            const addr = ids[key]
-            const myContract = await ACPP.at(addr)
-
-            await myManager.setId(utils.id(key), addr)
-            await myContract.updateManager(myManager.address)
-        }
-
         const EnergyFactory = await ethers.getContractFactory('TutellusEnergy')
-        const NFTFactory = await ethers.getContractFactory('TutellusPOAP')
+        const POAPFactory = await ethers.getContractFactory('TutellusPOAP')
+
+        EnergyContract = await EnergyFactory.deploy()
+        await EnergyContract.deployed()
+        POAPContract = await POAPFactory.deploy()
+        await POAPContract.deployed()
 
         let initializeCalldataEnergy = EnergyFactory.interface.encodeFunctionData('initialize', []);
-        let initializeCalldataNFT = NFTFactory.interface.encodeFunctionData('initialize', []);
+        let initializeCalldataNFT = POAPFactory.interface.encodeFunctionData('initialize', []);
 
-        await myManager.deploy(ENERGY_ID, EnergyFactory.bytecode, initializeCalldataEnergy)
-        await myManager.deploy(NFT_ID, NFTFactory.bytecode, initializeCalldataNFT)
+        await myManager.deployProxyWithImplementation(ENERGY_ID, EnergyContract.address, initializeCalldataEnergy)
+        await myManager.deployProxyWithImplementation(NFT_ID, POAPContract.address, initializeCalldataNFT)
 
         const [energy, nft] = await Promise.all([
             myManager.get(ENERGY_ID),
             myManager.get(NFT_ID),
         ])
 
-        myEnergy = await Energy.at(energy)
-        myNFT = await NFT.at(nft)
+        myEnergy = EnergyFactory.attach(energy)
+        myNFT = POAPFactory.attach(nft)
     })
 
     describe('Create poap', () => {
         it('Can create a new poap', async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner)
+            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
@@ -190,7 +147,7 @@ describe.only('POAP', function () {
 
         })
         it('Cant create an poap with the same id', async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner)
+            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
@@ -199,21 +156,20 @@ describe.only('POAP', function () {
                 myPOAP.perpetual,
                 myPOAP.energy
             )
-            await expectRevert(
+            await expect(
                 myNFT.createPOAP(
                     myPOAP.id,
                     myPOAP.eventId,
                     myPOAP2.uri,
                     myPOAP3.perpetual,
                     myPOAP4.energy
-                ),
-                'TutellusPOAP: poap valid'
-            ) 
+                )
+            ).to.be.revertedWith('TutellusPOAP: poap valid')
         })
     })
     describe('Mint', () => {
         beforeEach(async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner)
+            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
@@ -249,11 +205,10 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
@@ -261,7 +216,7 @@ describe.only('POAP', function () {
                 myNFT.ownerOf(0),
                 myNFT.tokenURI(0)
             ]) 
-            expect(ownerOf).eq(person)
+            expect(ownerOf).eq(person.address)
             expect(uri).eq(myPOAP.uri)
         })
         it('Can mint a perpetual token with energy', async () => {
@@ -269,11 +224,10 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP2.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP2.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
@@ -281,9 +235,9 @@ describe.only('POAP', function () {
             const [ownerOf, uri, energyBalance] = await Promise.all([
                 myNFT.ownerOf(0),
                 myNFT.tokenURI(0),
-                myEnergy.balanceOf(person)
+                myEnergy.balanceOf(person.address)
             ])
-            expect(ownerOf).eq(person)
+            expect(ownerOf).eq(person.address)
             expect(uri).eq(myPOAP2.uri)
             expectEqEth(energyBalance, myPOAP2.energy)
         })
@@ -292,11 +246,10 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP3.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP3.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
@@ -305,7 +258,7 @@ describe.only('POAP', function () {
                 myNFT.ownerOf(0),
                 myNFT.tokenURI(0)
             ])
-            expect(ownerOf).eq(person)
+            expect(ownerOf).eq(person.address)
             expect(uri).eq(myPOAP3.uri)
         })
         it('Can mint a non-perpetual token with energy', async () => {
@@ -313,11 +266,10 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
@@ -325,9 +277,9 @@ describe.only('POAP', function () {
             const [ownerOf, uri, eventEnergyBalance] = await Promise.all([
                 myNFT.ownerOf(0),
                 myNFT.tokenURI(0),
-                myEnergy.eventBalanceOf(myPOAP4.eventId, person)
+                myEnergy.eventBalanceOf(myPOAP4.eventId, person.address)
             ])
-            expect(ownerOf).eq(person)
+            expect(ownerOf).eq(person.address)
             expect(uri).eq(myPOAP4.uri)
             expectEqEth(eventEnergyBalance, myPOAP4.energy)
         })
@@ -335,67 +287,59 @@ describe.only('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
-            await expectRevert(
-                myNFT.mint(
+            await expect(
+                myNFT.connect(person).mint(
                     myPOAP.id,
                     code,
                     limit,
-                    person,
                     signature,
                     signer
-                ),
-                'TutellusPOAP: invalid signer'
-            ) 
+                )
+            ).to.be.revertedWith('TutellusPOAP: invalid signer')
         })
         it('Cant overflow the limit', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await expectRevert(
+            await expect(
                 myNFT.mint(
                     myPOAP.id,
                     code,
                     limit,
-                    person2,
                     signature,
                     signer
-                ),
-                'TutellusPOAP: code limit reached'
-            ) 
+                )
+            ).to.be.revertedWith('TutellusPOAP: code limit reached')
         })
         it('Cant mint same poap to same wallet', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 2;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await expectRevert(
-                myNFT.mint(
+            await expect(
+                myNFT.connect(person).mint(
                     myPOAP.id,
                     code,
                     limit,
-                    person,
                     signature,
                     signer
-                ),
-                'TutellusPOAP: poap already emitted for account'
-            ) 
+                )
+            ).to.be.revertedWith('TutellusPOAP: poap already emitted for account')
         })
         it('Cant mint if disabled', async () => {
             const code = ethers.utils.id('42943892042');
@@ -403,48 +347,35 @@ describe.only('POAP', function () {
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
             await myNFT.setValid(myPOAP.id, false);
-            await expectRevert(
-                myNFT.mint(
+            await expect(
+                myNFT.connect(person).mint(
                     myPOAP.id,
                     code,
                     limit,
-                    person,
                     signature,
                     signer
-                ),
-                'TutellusPOAP: poap not valid'
-            ) 
+                )
+            ).to.be.revertedWith('TutellusPOAP: poap not valid')
         })
         it('Cant mint a token with an invalid signature', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 2;
-            const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
+            const { signer } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
-                myPOAP.id,
-                code,
-                limit,
-                person,
-                signature,
-                signer
-            )
-            await myManager.grantRole(AUTH_NFT_SIGNER, owner)
-            await expectRevert(
-                myNFT.mint(
+            await expect(
+                myNFT.connect(person).mint(
                     myPOAP.id,
                     code,
                     limit,
-                    person,
                     ethers.utils.id('invalid'),
-                    owner
-                ),
-                'TutellusPOAP: invalid signature'
-            ) 
+                    signer
+                )
+            ).to.be.revertedWith('TutellusPOAP: invalid signature')
         })
     })
     describe('Burn', () => {
         beforeEach(async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner)
+            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
@@ -480,42 +411,38 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await myNFT.burn(0, { from: person })
-            await expectRevert(
-                myNFT.ownerOf(0),
-                'ERC721: owner query for nonexistent token'
-            ) 
+            await myNFT.connect(person).burn(0)
+            await expect(
+                myNFT.ownerOf(0)
+            ).to.be.revertedWith('ERC721: invalid token ID')
         })
         it('Can burn a perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP2.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP2.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
             
-            await myNFT.burn(0, { from: person })
-            await expectRevert(
-                myNFT.ownerOf(0),
-                'ERC721: owner query for nonexistent token'
-            ) 
+            await myNFT.connect(person).burn(0)
+            await expect(
+                myNFT.ownerOf(0)
+            ).to.be.revertedWith('ERC721: invalid token ID')
 
             const [energyBalance] = await Promise.all([
-                myEnergy.balanceOf(person)
+                myEnergy.balanceOf(person.address)
             ])
             
             expectEqEth(energyBalance, 0)
@@ -525,41 +452,37 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP3.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP3.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
  
-            await myNFT.burn(0, { from: person })
-            await expectRevert(
-                myNFT.ownerOf(0),
-                'ERC721: owner query for nonexistent token'
-            ) 
+            await myNFT.connect(person).burn(0)
+            await expect(
+                myNFT.ownerOf(0)
+            ).to.be.revertedWith('ERC721: invalid token ID')
         })
         it('Can burn a non-perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await myNFT.burn(0, { from: person })
-            await expectRevert(
-                myNFT.ownerOf(0),
-                'ERC721: owner query for nonexistent token'
-            ) 
+            await myNFT.connect(person).burn(0)
+            await expect(
+                myNFT.ownerOf(0)
+            ).to.be.revertedWith('ERC721: invalid token ID')
             const [eventEnergyBalance] = await Promise.all([
-                myEnergy.eventBalanceOf(myPOAP4.eventId, person)
+                myEnergy.eventBalanceOf(myPOAP4.eventId, person.address)
             ])
             expectEqEth(eventEnergyBalance, 0)
         })
@@ -568,40 +491,36 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await expectRevert(
-                myNFT.burn(0, { from: person2 }),
-                'TutellusPOAP: invalid sender'
-            ) 
+            await expect(
+                myNFT.connect(person2).burn(0)
+            ).to.be.revertedWith('TutellusPOAP: invalid sender')
         })
         it('Can burn if admin', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await myManager.grantRole(ADMIN_721_ROLE, person2)
-            await myNFT.burn(0, { from: person2 })
-            await expectRevert(
-                myNFT.ownerOf(0),
-                'ERC721: owner query for nonexistent token'
-            ) 
+            await myManager.grantRole(ADMIN_721_ROLE, person2.address)
+            await myNFT.connect(person2).burn(0)
+            await expect(
+                myNFT.ownerOf(0)
+            ).to.be.revertedWith('ERC721: invalid token ID')
             const [eventEnergyBalance] = await Promise.all([
-                myEnergy.eventBalanceOf(myPOAP4.id, person)
+                myEnergy.eventBalanceOf(myPOAP4.id, person.address)
             ])
             expectEqEth(eventEnergyBalance, 0)
         })
@@ -610,22 +529,20 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await myNFT.setApprovalForAll(person2, true, { from: person })
-            await myNFT.burn(0, { from: person2 })
-            await expectRevert(
-                myNFT.ownerOf(0),
-                'ERC721: owner query for nonexistent token'
-            ) 
+            await myNFT.connect(person).setApprovalForAll(person2.address, true)
+            await myNFT.connect(person2).burn(0)
+            await expect(
+                myNFT.ownerOf(0)
+            ).to.be.revertedWith('ERC721: invalid token ID')
             const [eventEnergyBalance] = await Promise.all([
-                myEnergy.eventBalanceOf(myPOAP4.id, person)
+                myEnergy.eventBalanceOf(myPOAP4.id, person.address)
             ])
             expectEqEth(eventEnergyBalance, 0)
         })
@@ -634,25 +551,22 @@ describe.only('POAP', function () {
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
             await myManager.grantRole(AUTH_NFT_SIGNER, signer)
-            await myNFT.mint(
+            await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
                 limit,
-                person,
                 signature,
                 signer
             )
-            await expectRevert(
-                myNFT.transferFrom(person, owner, 0, { from: person }),
-                'TutellusPOAP: untransferable'
-            )
+            await expect(
+                myNFT.connect(person).transferFrom(person.address, owner.address, 0)
+            ).to.be.revertedWith('TutellusPOAP: untransferable')
         })
     })
 
     describe('Solidity', () => {
-        it('Supports interface', async () => {
-            await myNFT.supportsInterface('0x00');
-        })
+        // it('Supports interface', async () => {
+        //     await myNFT.supportsInterface(0x80ac58cd);
+        // })
     })
 })
-  

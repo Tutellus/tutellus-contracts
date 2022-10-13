@@ -66,11 +66,17 @@ contract TutellusPOAP is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC
         poaps[poapId].valid = value;
     }
 
+    function adminMint (
+        bytes32 poapId,
+        address account
+    ) public onlyRole(_AUTH_NFT_SIGNER) {
+        _mint(poapId, account);
+    }
+
     function mint (
         bytes32 poapId,
         bytes32 code,
         uint256 limit,
-        address account,
         bytes memory signature, 
         address signer
     ) public {
@@ -80,7 +86,7 @@ contract TutellusPOAP is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC
         bytes32 structHash = keccak256(abi.encode(
             _NEW_NFT_TYPEHASH,
             poapId,
-            account,
+            msg.sender,
             code,
             limit
         ));
@@ -90,7 +96,7 @@ contract TutellusPOAP is UUPSUpgradeableByRole, ERC721URIStorageUpgradeable, ERC
 
         codeUses[code] = codeUses[code] + 1;
 
-        _mint(poapId, account);
+        _mint(poapId, msg.sender);
     }
 
     function _mint (
