@@ -100,10 +100,14 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     "to-fast-properties" "^2.0.0"
 
-"@chainlink/contracts@^0.2.1":
-  "integrity" "sha512-hf4b8OEfEqfjC9addvXCrE2SEybNwN1r971vxFYhL/l/yDTTMAk0jmGZYtfUPDOB/qY7FfrOXuxlEVQ+ojZgZw=="
-  "resolved" "https://registry.npmjs.org/@chainlink/contracts/-/contracts-0.2.3.tgz"
-  "version" "0.2.3"
+"@chainlink/contracts@^0.5.1":
+  "integrity" "sha512-3PDBJ38Sd6Ml9h7FNK/tZQti+kTCdXUq1qzE6E59CnlzycsV9ElPvf2hTvs9Mi9C6pEx2Mmw9yhZMfBktYUInQ=="
+  "resolved" "https://registry.npmjs.org/@chainlink/contracts/-/contracts-0.5.1.tgz"
+  "version" "0.5.1"
+  dependencies:
+    "@eth-optimism/contracts" "^0.5.21"
+    "@openzeppelin/contracts" "^4.3.3"
+    "@openzeppelin/contracts-v0.7" "npm:@openzeppelin/contracts@v3.4.2"
 
 "@ensdomains/address-encoder@^0.1.7":
   "integrity" "sha512-E2d2gP4uxJQnDu2Kfg1tHNspefzbLT8Tyjrm5sEuim32UkU2sm5xL4VXtgc2X33fmPEw9+jUMpGs4veMbf+PYg=="
@@ -163,6 +167,37 @@
     "lodash" "^4.17.20"
     "minimatch" "^3.0.4"
     "strip-json-comments" "^3.1.1"
+
+"@eth-optimism/contracts@^0.5.21":
+  "integrity" "sha512-HbNUUDIM1dUAM0hWPfGp3l9/Zte40zi8QhVbUSIwdYRA7jG7cZgbteqavrjW8wwFqxkWX9IrtA0KAR7pNlSAIQ=="
+  "resolved" "https://registry.npmjs.org/@eth-optimism/contracts/-/contracts-0.5.37.tgz"
+  "version" "0.5.37"
+  dependencies:
+    "@eth-optimism/core-utils" "0.10.1"
+    "@ethersproject/abstract-provider" "^5.7.0"
+    "@ethersproject/abstract-signer" "^5.7.0"
+
+"@eth-optimism/core-utils@0.10.1":
+  "integrity" "sha512-IJvG5UtYvyz6An9QdohlCLoeB3NBFxx2lRJKlPzvYYlfugUNNCHsajRIWIwJTcPRRma0WPd46JUsKACLJDdNrA=="
+  "resolved" "https://registry.npmjs.org/@eth-optimism/core-utils/-/core-utils-0.10.1.tgz"
+  "version" "0.10.1"
+  dependencies:
+    "@ethersproject/abi" "^5.7.0"
+    "@ethersproject/abstract-provider" "^5.7.0"
+    "@ethersproject/address" "^5.7.0"
+    "@ethersproject/bignumber" "^5.7.0"
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/constants" "^5.7.0"
+    "@ethersproject/contracts" "^5.7.0"
+    "@ethersproject/hash" "^5.7.0"
+    "@ethersproject/keccak256" "^5.7.0"
+    "@ethersproject/properties" "^5.7.0"
+    "@ethersproject/providers" "^5.7.0"
+    "@ethersproject/rlp" "^5.7.0"
+    "@ethersproject/transactions" "^5.7.0"
+    "@ethersproject/web" "^5.7.0"
+    "bufio" "^1.0.7"
+    "chai" "^4.3.4"
 
 "@ethereum-waffle/chai@^3.4.4":
   "integrity" "sha512-/K8czydBtXXkcM9X6q29EqEkc5dN3oYenyH2a9hF7rGAApAJUpH8QBtojxOY/xQ2up5W332jqgxwp0yPiYug1g=="
@@ -336,7 +371,7 @@
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
 
-"@ethersproject/contracts@5.7.0":
+"@ethersproject/contracts@^5.7.0", "@ethersproject/contracts@5.7.0":
   "integrity" "sha512-5GJbzEU3X+d33CdfPhcyS+z8MzsTrBGk/sc+G+59+tPa9yFkl6HQ9D6L0QMgNTA9q8dT0XKxxkyp883XsQvbbg=="
   "resolved" "https://registry.npmjs.org/@ethersproject/contracts/-/contracts-5.7.0.tgz"
   "version" "5.7.0"
@@ -439,7 +474,7 @@
   dependencies:
     "@ethersproject/logger" "^5.7.0"
 
-"@ethersproject/providers@5.7.1":
+"@ethersproject/providers@^5.7.0", "@ethersproject/providers@5.7.1":
   "integrity" "sha512-vZveG/DLyo+wk4Ga1yx6jSEHrLPgmTt+dFv0dv8URpVCRf0jVhalps1jq/emN/oXnMRsC7cQgAF32DcXLL7BPQ=="
   "resolved" "https://registry.npmjs.org/@ethersproject/providers/-/providers-5.7.1.tgz"
   "version" "5.7.1"
@@ -1167,12 +1202,17 @@
     "find-up" "^4.1.0"
     "fs-extra" "^8.1.0"
 
-"@openzeppelin/contracts-upgradeable@^4.2.0":
+"@openzeppelin/contracts-upgradeable@^4.7.3":
   "integrity" "sha512-+wuegAMaLcZnLCJIvrVUDzA9z/Wp93f0Dla/4jJvIhijRrPabjQbZe6fWiECLaJyfn5ci9fqf9vTw3xpQOad2A=="
   "resolved" "https://registry.npmjs.org/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.7.3.tgz"
   "version" "4.7.3"
 
-"@openzeppelin/contracts@^4.2.0":
+"@openzeppelin/contracts-v0.7@npm:@openzeppelin/contracts@v3.4.2":
+  "integrity" "sha512-z0zMCjyhhp4y7XKAcDAi3Vgms4T2PstwBdahiO0+9NaGICQKjynK3wduSRplTgk4LXmoO1yfDGO5RbjKYxtuxA=="
+  "resolved" "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-3.4.2.tgz"
+  "version" "3.4.2"
+
+"@openzeppelin/contracts@^4.3.3", "@openzeppelin/contracts@^4.7.3":
   "integrity" "sha512-dGRS0agJzu8ybo44pCIf3xBaPQN/65AIXNgK8+4gzKd5kbvlqyxryUYVLJv7fK98Seyd2hDZzVEHSWAh0Bt1Yw=="
   "resolved" "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-4.7.3.tgz"
   "version" "4.7.3"
@@ -2082,12 +2122,7 @@
     "mime-types" "~2.1.34"
     "negotiator" "0.6.3"
 
-"acorn-jsx@^5.0.0":
-  "integrity" "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="
-  "resolved" "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-5.3.2.tgz"
-  "version" "5.3.2"
-
-"acorn-jsx@^5.3.1":
+"acorn-jsx@^5.0.0", "acorn-jsx@^5.3.1":
   "integrity" "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="
   "resolved" "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-5.3.2.tgz"
   "version" "5.3.2"
@@ -3512,6 +3547,11 @@
   dependencies:
     "node-gyp-build" "^4.3.0"
 
+"bufio@^1.0.7":
+  "integrity" "sha512-bd1dDQhiC+bEbEfg56IdBv7faWa6OipMs/AFFFvtFnB3wAYjlwQpQRZ0pm6ZkgtfL0pILRXhKxOiQj6UzoMR7A=="
+  "resolved" "https://registry.npmjs.org/bufio/-/bufio-1.0.7.tgz"
+  "version" "1.0.7"
+
 "busboy@^1.6.0":
   "integrity" "sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA=="
   "resolved" "https://registry.npmjs.org/busboy/-/busboy-1.6.0.tgz"
@@ -3703,7 +3743,7 @@
   "resolved" "https://registry.npmjs.org/chai-bn/-/chai-bn-0.2.2.tgz"
   "version" "0.2.2"
 
-"chai@^4.0.0", "chai@^4.2.0", "chai@^4.3.6":
+"chai@^4.0.0", "chai@^4.2.0", "chai@^4.3.4", "chai@^4.3.6":
   "integrity" "sha512-bbcp3YfHCUzMOvKqsztczerVgBKSsEijCySNlHHbX3VG1nskvqjz5Rfso1gGwD6w6oOV3eI60pKuMOV5MV7p3Q=="
   "resolved" "https://registry.npmjs.org/chai/-/chai-4.3.6.tgz"
   "version" "4.3.6"
@@ -5596,7 +5636,7 @@
     "@ethereum-waffle/provider" "^3.4.4"
     "ethers" "^5.0.1"
 
-"ethereumjs-abi@^0.6.8", "ethereumjs-abi@0.6.8":
+"ethereumjs-abi@^0.6.8", "ethereumjs-abi@0.6.8", "ethereumjs-abi@git+https://github.com/ethereumjs/ethereumjs-abi.git":
   "integrity" "sha512-Tx0r/iXI6r+lRsdvkFDlut0N08jWMnKRZ6Gkq+Nmw75lZe4e6o3EkSnkaBP5NF6+m5PTGAr9JP43N3LyeoglsA=="
   "resolved" "https://registry.npmjs.org/ethereumjs-abi/-/ethereumjs-abi-0.6.8.tgz"
   "version" "0.6.8"
@@ -5611,12 +5651,6 @@
   dependencies:
     "bn.js" "^4.10.0"
     "ethereumjs-util" "^4.3.0"
-
-"ethereumjs-abi@git+https://github.com/ethereumjs/ethereumjs-abi.git":
-  "version" "0.6.8"
-  dependencies:
-    "bn.js" "^4.11.8"
-    "ethereumjs-util" "^6.0.0"
 
 "ethereumjs-account@^2.0.3":
   "integrity" "sha512-bgDojnXGjhMwo6eXQC0bY6UK2liSFUSMwwylOmQvZbSl/D7NXQ3+vrGO46ZeOgjGfxXmgIeVNDIiHw7fNZM4VA=="
@@ -5978,7 +6012,7 @@
     "uuid" "2.0.1"
     "xmlhttprequest" "1.8.0"
 
-"ethers@^5.0.0", "ethers@^5.0.1", "ethers@^5.0.13", "ethers@^5.0.2", "ethers@^5.0.31", "ethers@^5.0.5", "ethers@^5.5.2":
+"ethers@^5", "ethers@^5.0.0", "ethers@^5.0.1", "ethers@^5.0.13", "ethers@^5.0.2", "ethers@^5.0.31", "ethers@^5.0.5", "ethers@^5.5.2":
   "integrity" "sha512-5krze4dRLITX7FpU8J4WscXqADiKmyeNlylmmDLbS95DaZpBhDe2YSwRQwKXWNyXcox7a3gBgm/MkGXV1O1S/Q=="
   "resolved" "https://registry.npmjs.org/ethers/-/ethers-5.7.1.tgz"
   "version" "5.7.1"
@@ -9543,10 +9577,10 @@
     "object.getownpropertydescriptors" "^2.0.3"
     "semver" "^5.7.0"
 
-"node-fetch@*", "node-fetch@https://registry.npmjs.org/@achingbrain/node-fetch/-/node-fetch-2.6.7.tgz":
+"node-fetch@*":
   "version" "2.6.7"
 
-"node-fetch@^2.6.0", "node-fetch@^2.6.1", "node-fetch@^2.6.7", "node-fetch@2.6.7":
+"node-fetch@^2.6.0", "node-fetch@^2.6.1", "node-fetch@^2.6.7", "node-fetch@2.6.7", "node-fetch@https://registry.npmjs.org/@achingbrain/node-fetch/-/node-fetch-2.6.7.tgz":
   "integrity" "sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ=="
   "resolved" "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz"
   "version" "2.6.7"
