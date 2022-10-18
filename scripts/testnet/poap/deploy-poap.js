@@ -2,14 +2,17 @@ const bre = require('hardhat')
 const { utils, constants } = require('ethers')
 const NFT_ID = utils.id('POAP')
 
-const BASE_URI = 'https://af08-88-18-39-227.eu.ngrok.io/api/poap/'
+const BASE_URI = 'https://sandbox.2tel.us/api/poap/'
 
 async function main () {
-  bre.run('compile')
+  await bre.run('compile')
   const myManager = await bre.ethers.getContractAt('TutellusManager', '0x0e75e4D2041287813a693971634400EAe765910C')
   const NFT = await bre.ethers.getContractFactory('TutellusPOAP')
+
+  console.log('Deploying POAP implementation...')
   const nftImp = await NFT.deploy()
   await nftImp.deployTransaction.wait()
+  console.log('POAP implementation deployed at', nftImp.address)
 
   const nftAddr1 = await myManager.get(NFT_ID)
 

@@ -10,8 +10,8 @@ require("@nomiclabs/hardhat-waffle");
 // require('hardhat-interface-generator')
 // require('hardhat-contract-sizer');
 const { random, template } = require('lodash')
-const GAS_PRICE_DEFAULT = 50000000000
-const GAS_MULTIPLIER_DEFAULT = 1
+const GAS_PRICE_DEFAULT = 1000000000000
+const GAS_MULTIPLIER_DEFAULT = 1.2
 const chains = require('./chains.json')
 const scanners = require('./scanners.json')
 
@@ -83,12 +83,11 @@ module.exports = {
       accounts: getAccounts()
     },
     goerli: {
-      url: getUrl(5),
-      chainId: 5,
+      url: process.env.GOERLI_RPC,
       gas: 'auto',
-      gasPrice: GAS_PRICE_DEFAULT,
-      gasMultiplier: GAS_MULTIPLIER_DEFAULT,
-      accounts: getAccounts()
+      accounts: {
+        mnemonic: process.env.MNEMONIC
+      }
     },
     mainnet: {
       url: getUrl(1),
