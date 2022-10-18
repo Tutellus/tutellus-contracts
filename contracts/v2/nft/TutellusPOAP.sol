@@ -54,8 +54,8 @@ contract TutellusPOAP is
     }
 
     /** Identifiers */
-    bytes32 public constant _ADMIN_721_ROLE = keccak256('ADMIN_721_ROLE');
-    bytes32 public constant _AUTH_NFT_SIGNER = keccak256('AUTH_NFT_SIGNER');
+    bytes32 public constant _ADMIN_POAP_ROLE = keccak256('ADMIN_POAP_ROLE');
+    bytes32 public constant _AUTH_POAP_SIGNER = keccak256('AUTH_POAP_SIGNER');
     bytes32 private immutable _ENERGY = keccak256('ENERGY');
 
     bytes32 private immutable _NEW_NFT_TYPEHASH = keccak256('Mint(bytes32 poapId,address account,bytes32 code,uint256 limit)');
@@ -117,7 +117,7 @@ contract TutellusPOAP is
         uint256 energy
     )
         public
-        onlyRole (_ADMIN_721_ROLE)
+        onlyRole (_ADMIN_POAP_ROLE)
     {
         _createPOAP(poapId, ido, perpetual, energy);
     }
@@ -127,7 +127,7 @@ contract TutellusPOAP is
         bool value
     )
         public
-        onlyRole (_ADMIN_721_ROLE)
+        onlyRole (_ADMIN_POAP_ROLE)
     {
         poaps[poapId].valid = value;
     }
@@ -137,7 +137,7 @@ contract TutellusPOAP is
         address account
     )
         public
-        onlyRole (_AUTH_NFT_SIGNER)
+        onlyRole (_AUTH_POAP_SIGNER)
     {
         _mint(poapId, account);
     }
@@ -151,7 +151,7 @@ contract TutellusPOAP is
     )
         public
     {
-        require(hasRole(_AUTH_NFT_SIGNER, signer), 'TutellusPOAP: invalid signer');
+        require(hasRole(_AUTH_POAP_SIGNER, signer), 'TutellusPOAP: invalid signer');
         require(codeUses[code] < limit, 'TutellusPOAP: code limit reached');
 
         bytes32 structHash = keccak256(abi.encode(
@@ -205,7 +205,7 @@ contract TutellusPOAP is
     )
         public
     {
-        require(_isApprovedOrOwner(msg.sender, tokenId) || hasRole(_ADMIN_721_ROLE, msg.sender), 'TutellusPOAP: invalid sender');
+        require(_isApprovedOrOwner(msg.sender, tokenId) || hasRole(_ADMIN_POAP_ROLE, msg.sender), 'TutellusPOAP: invalid sender');
         _burn(tokenId);
     }
 
@@ -285,7 +285,7 @@ contract TutellusPOAP is
         string memory baseURI_
     )
         public
-        onlyRole (_ADMIN_721_ROLE)
+        onlyRole (_ADMIN_POAP_ROLE)
     {
         _setBaseURI(baseURI_);
     }

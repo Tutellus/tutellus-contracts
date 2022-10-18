@@ -27,7 +27,6 @@ const getScanUrl = () => {
 const getKey = () => {
   const chainId = scanners.current
   const result = scanners.apikey[chainId]
-  console.log(result)
   return result
 }
 // This is a sample Buidler task. To learn how to create your own go to

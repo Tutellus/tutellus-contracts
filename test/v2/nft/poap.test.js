@@ -11,10 +11,10 @@ let myNFT
 let owner, person, person2
 
 const ENERGY_MINTER_ROLE = utils.id('ENERGY_MINTER_ROLE')
-const ADMIN_721_ROLE = utils.id('ADMIN_721_ROLE')
-const AUTH_NFT_SIGNER = utils.id('AUTH_NFT_SIGNER')
+const ADMIN_POAP_ROLE = utils.id('ADMIN_POAP_ROLE')
+const AUTH_POAP_SIGNER = utils.id('AUTH_POAP_SIGNER')
 const ENERGY_ID = utils.id('ENERGY');
-const NFT_ID = utils.id('721');
+const NFT_ID = utils.id('POAP');
 
 const signPoap = async (contract, poapId, signer, code, limit) => {
     const { address: account } = signer 
@@ -57,28 +57,24 @@ const myPOAP = {
     eventId: EVENT1,
     energy: parseEther('0'),
     perpetual: true,
-    uri: 'uri/perpetual'
 }
 const myPOAP2 = {
     id: utils.id('perpetual-energy'),
     eventId: EVENT1,
     energy: parseEther('1000'),
     perpetual: true,
-    uri: 'uri/perpetual-energy'
 }
 const myPOAP3 = {
     id: utils.id('non-perpetual'),
     eventId: EVENT1,
     energy: parseEther('0'),
     perpetual: false,
-    uri: 'uri/non-perpetual'
 }
 const myPOAP4 = {
     id: utils.id('non-perpetual-energy'),
     eventId: EVENT2,
     energy: parseEther('1000'),
     perpetual: false,
-    uri: 'uri/non-perpetual-energy'
 }
 
 describe('POAP', function () {
@@ -107,7 +103,7 @@ describe('POAP', function () {
         await POAPContract.deployed()
 
         let initializeCalldataEnergy = EnergyFactory.interface.encodeFunctionData('initialize', []);
-        let initializeCalldataNFT = POAPFactory.interface.encodeFunctionData('initialize', []);
+        let initializeCalldataNFT = POAPFactory.interface.encodeFunctionData('initialize(string)', ['uri/']);
 
         await myManager.deployProxyWithImplementation(ENERGY_ID, EnergyContract.address, initializeCalldataEnergy)
         await myManager.deployProxyWithImplementation(NFT_ID, POAPContract.address, initializeCalldataNFT)
@@ -123,36 +119,32 @@ describe('POAP', function () {
 
     describe('Create poap', () => {
         it('Can create a new poap', async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
+            await myManager.grantRole(ADMIN_POAP_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
-                myPOAP.uri,
                 myPOAP.perpetual,
                 myPOAP.energy
             )
             
             const {
-                uri,
                 valid,
                 perpetual,
                 energy
             } = await myNFT.poaps(myPOAP.id)
 
-            expect(uri).eq(myPOAP.uri)
             expect(perpetual).eq(myPOAP.perpetual)
             expect(valid).eq(true)
             expectEqEth(energy, myPOAP.energy)
 
         })
         it('Cant create an poap with the same id', async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
+            await myManager.grantRole(ADMIN_POAP_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
-                myPOAP.uri,
                 myPOAP.perpetual,
                 myPOAP.energy
             )
@@ -160,7 +152,6 @@ describe('POAP', function () {
                 myNFT.createPOAP(
                     myPOAP.id,
                     myPOAP.eventId,
-                    myPOAP2.uri,
                     myPOAP3.perpetual,
                     myPOAP4.energy
                 )
@@ -169,42 +160,57 @@ describe('POAP', function () {
     })
     describe('Mint', () => {
         beforeEach(async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
+            await myManager.grantRole(ADMIN_POAP_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
-                myPOAP.uri,
                 myPOAP.perpetual,
                 myPOAP.energy
             )
             await myNFT.createPOAP(
                 myPOAP2.id,
                 myPOAP2.eventId,
-                myPOAP2.uri,
                 myPOAP2.perpetual,
                 myPOAP2.energy
             )
             await myNFT.createPOAP(
                 myPOAP3.id,
                 myPOAP3.eventId,
-                myPOAP3.uri,
                 myPOAP3.perpetual,
                 myPOAP3.energy
             )
             await myNFT.createPOAP(
                 myPOAP4.id,
                 myPOAP4.eventId,
-                myPOAP4.uri,
                 myPOAP4.perpetual,
                 myPOAP4.energy
             )
+        })
+        it('Can mint a poap from admin', async () => {
+            await expect(
+                myNFT.connect(person).adminMint(
+                    myPOAP.id,
+                    person2.address,
+                )
+            ).to.be.reverted
+            await myManager.grantRole(AUTH_POAP_SIGNER, person.address)
+            await myNFT.connect(person).adminMint(
+                myPOAP.id,
+                person2.address,
+            )
+            const [ownerOf, uri] = await Promise.all([
+                myNFT.ownerOf(0),
+                myNFT.tokenURI(0)
+            ]) 
+            expect(ownerOf).eq(person2.address)
+            expect(uri.toLowerCase()).eq('uri/'+myPOAP.id)
         })
         it('Can mint a perpetual token without energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
@@ -217,13 +223,13 @@ describe('POAP', function () {
                 myNFT.tokenURI(0)
             ]) 
             expect(ownerOf).eq(person.address)
-            expect(uri).eq(myPOAP.uri)
+            expect(uri.toLowerCase()).eq('uri/'+myPOAP.id)
         })
         it('Can mint a perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP2.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP2.id,
                 code,
@@ -238,14 +244,14 @@ describe('POAP', function () {
                 myEnergy.balanceOf(person.address)
             ])
             expect(ownerOf).eq(person.address)
-            expect(uri).eq(myPOAP2.uri)
+            expect(uri.toLowerCase()).eq('uri/'+myPOAP2.id)
             expectEqEth(energyBalance, myPOAP2.energy)
         })
         it('Can mint a non-perpetual token without energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP3.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP3.id,
                 code,
@@ -259,13 +265,13 @@ describe('POAP', function () {
                 myNFT.tokenURI(0)
             ])
             expect(ownerOf).eq(person.address)
-            expect(uri).eq(myPOAP3.uri)
+            expect(uri.toLowerCase()).eq('uri/'+myPOAP3.id)
         })
         it('Can mint a non-perpetual token with energy', async () => {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
@@ -280,7 +286,7 @@ describe('POAP', function () {
                 myEnergy.eventBalanceOf(myPOAP4.eventId, person.address)
             ])
             expect(ownerOf).eq(person.address)
-            expect(uri).eq(myPOAP4.uri)
+            expect(uri.toLowerCase()).eq('uri/'+myPOAP4.id)
             expectEqEth(eventEnergyBalance, myPOAP4.energy)
         })
         it('Cant mint a token with unauthorized signer', async () => {
@@ -301,7 +307,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
@@ -323,7 +329,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 2;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
@@ -345,7 +351,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.setValid(myPOAP.id, false);
             await expect(
                 myNFT.connect(person).mint(
@@ -361,7 +367,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 2;
             const { signer } = await signPoap(myNFT, myPOAP.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await expect(
                 myNFT.connect(person).mint(
                     myPOAP.id,
@@ -375,33 +381,29 @@ describe('POAP', function () {
     })
     describe('Burn', () => {
         beforeEach(async () => {
-            await myManager.grantRole(ADMIN_721_ROLE, owner.address)
+            await myManager.grantRole(ADMIN_POAP_ROLE, owner.address)
             await myManager.grantRole(ENERGY_MINTER_ROLE, myNFT.address)
             await myNFT.createPOAP(
                 myPOAP.id,
                 myPOAP.eventId,
-                myPOAP.uri,
                 myPOAP.perpetual,
                 myPOAP.energy
             )
             await myNFT.createPOAP(
                 myPOAP2.id,
                 myPOAP2.eventId,
-                myPOAP2.uri,
                 myPOAP2.perpetual,
                 myPOAP2.energy
             )
             await myNFT.createPOAP(
                 myPOAP3.id,
                 myPOAP3.eventId,
-                myPOAP3.uri,
                 myPOAP3.perpetual,
                 myPOAP3.energy
             )
             await myNFT.createPOAP(
                 myPOAP4.id,
                 myPOAP4.eventId,
-                myPOAP4.uri,
                 myPOAP4.perpetual,
                 myPOAP4.energy
             )
@@ -410,7 +412,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP.id,
                 code,
@@ -427,7 +429,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP2.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP2.id,
                 code,
@@ -451,7 +453,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP3.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP3.id,
                 code,
@@ -469,7 +471,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
@@ -490,7 +492,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
@@ -506,7 +508,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
@@ -514,7 +516,7 @@ describe('POAP', function () {
                 signature,
                 signer
             )
-            await myManager.grantRole(ADMIN_721_ROLE, person2.address)
+            await myManager.grantRole(ADMIN_POAP_ROLE, person2.address)
             await myNFT.connect(person2).burn(0)
             await expect(
                 myNFT.ownerOf(0)
@@ -528,7 +530,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
@@ -550,7 +552,7 @@ describe('POAP', function () {
             const code = ethers.utils.id('42943892042');
             const limit = 1;
             const { signer, signature } = await signPoap(myNFT, myPOAP4.id, person, code, limit)
-            await myManager.grantRole(AUTH_NFT_SIGNER, signer)
+            await myManager.grantRole(AUTH_POAP_SIGNER, signer)
             await myNFT.connect(person).mint(
                 myPOAP4.id,
                 code,
