@@ -9,6 +9,9 @@ async function main () {
   const myManager = await bre.ethers.getContractAt('TutellusManager', '0x0e75e4D2041287813a693971634400EAe765910C')
   const NFT = await bre.ethers.getContractFactory('TutellusPOAP')
 
+  const signer = await bre.ethers.getSigner()
+  console.log('Signer', signer.address)
+
   console.log('Deploying POAP implementation...')
   const nftImp = await NFT.deploy()
   await nftImp.deployTransaction.wait()

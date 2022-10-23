@@ -83,11 +83,9 @@ module.exports = {
       accounts: getAccounts()
     },
     goerli: {
-      url: process.env.GOERLI_RPC,
+      url: getUrl(5),
       gas: 'auto',
-      accounts: {
-        mnemonic: process.env.MNEMONIC
-      }
+      accounts: getAccounts(),
     },
     mainnet: {
       url: getUrl(1),
