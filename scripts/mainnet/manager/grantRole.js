@@ -3,8 +3,8 @@ const ethers = bre.ethers;
 const { utils } = ethers;
 const { id } = utils;
 
-const ROLE = id('CLIENTS_REWARDS_ADMIN_ROLE');
-const ADDRESS = '0x5ACB3043da168b59b775eA28F3942597F45e9543'
+const ROLE = id('AUTH_POAP_SIGNER');
+const ADDRESS = '0x44eEdBEE931A5dc22a5f4Ad441679FD5C0e38D38'
 
 async function main () {
   bre.run('compile');

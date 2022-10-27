@@ -3,10 +3,15 @@ const ethers = bre.ethers;
 const { utils, constants, Wallet, provider } = ethers;
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
-const ID = utils.id('TUT_IP1_RECIPIENT');
-const CONTRACT_NAME = 'TutellusRecipient';
+const ID = utils.id('POAP');
+const CONTRACT_NAME = 'TutellusPOAP';
 
 const SAFE = "0x5ACB3043da168b59b775eA28F3942597F45e9543"
+
+const INITIALIZE = {
+  sig: 'initialize(string)',
+  args: ['https://backend.tutellus.io/api/poap/'],
+}
 
 async function main () {
   bre.run('compile');
@@ -23,7 +28,7 @@ async function main () {
 
   if(proxyCheck == constants.AddressZero) {
     console.log('Deploying...')
-    initializeCalldata = Contract.interface.encodeFunctionData('initialize', []);
+    initializeCalldata = Contract.interface.encodeFunctionData(INITIALIZE.sig, INITIALIZE.args);
   } else {
     console.log('Upgrading...')
     initializeCalldata = '0x';
