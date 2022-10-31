@@ -197,9 +197,10 @@ contract TutellusFactionManager is
     {
         bytes32 id = factionOf[account];
         require(id != 0x00, "TutellusFactionManager: cant migrate");
+        require(id != to, "TutellusFactionManager: cant migrate to same faction");
         require(
             faction[to].stakingContract != address(0) &&
-                faction[to].farmingContract != address(0),
+            faction[to].farmingContract != address(0),
             "TutellusFactionManager: faction does not exist"
         );
 
