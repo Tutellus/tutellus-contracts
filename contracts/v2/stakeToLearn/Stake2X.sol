@@ -32,10 +32,11 @@ abstract contract Stake2X is OwnableUpgradeable {
 
     function _depositCall(uint256 amount) internal virtual {}
     function _claimCall() internal virtual {}
-    function _withdrawCall(uint256 amount) internal virtual {}
-    function _canDeposit() internal virtual returns (bool) {}
+    function _withdrawCall() internal virtual {}
+    function _canDeposit(uint256 amount) internal virtual returns (bool) {}
     function _canWithdraw() internal virtual returns (bool) {}
     function _payAmount() internal virtual returns (uint256) {}
+    function _payReceiver() internal virtual returns (address) {}
 
     function token() public view returns (address) {
         return _token;
@@ -59,13 +60,19 @@ abstract contract Stake2X is OwnableUpgradeable {
 
     //we assume funds are transfered by factory before deposit call
     function deposit(uint256 amount) public {
-        require(_canDeposit(), "");
+        require(_canDeposit(amount), "");
         _deposit(amount);
     }
 
-    function withdraw(uint256 amount) public {
+    function claimAndDeposit() public {
+        _claim();
+        uint256 amount = IERC20Upgradeable(_token).balanceOf(address(this));
+        _deposit(amount);
+    }
+
+    function withdraw() public {
         require(_canWithdraw(), "");
-        _withdraw(amount);
+        _withdraw();
     }
 
     function _deposit(uint256 amount) internal {
@@ -77,7 +84,14 @@ abstract contract Stake2X is OwnableUpgradeable {
         _claimCall();
     }
 
-    function _withdraw(uint256 amount) internal {
-        _withdrawCall(amount);
+    function _withdraw() internal {
+        _claim();
+        _withdrawCall();
+        IERC20Upgradeable tokenContract = IERC20Upgradeable(_token);
+        uint256 payment = _payAmount();
+        address to = _payReceiver();
+        tokenContract.transfer(to, payment);
+        uint256 left = tokenContract.balanceOf(address(this));
+        tokenContract.transfer(owner(), left);
     }
 }

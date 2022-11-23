@@ -17,7 +17,7 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
     {
         __AccessControlProxyPausable_init(msg.sender); //TBD: msg.sender?
         __Stake2XFactory_initialize("TUT_S2L", "1", token, stakingContract, feeds, inverts);
-        _upgradeByImplementation(address(new TutellusStake2Learn()));
+        _upgradeByImplementation(address(new TutellusStake2Learn())); //TBD: pass implementation address through param if code size exceeds
     }
 
     function createS2L(
@@ -33,7 +33,13 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
         address account = msg.sender;
         uint256 maxPriceToken = _convertFiat2Token(priceFiat);
         bytes memory initializeCalldata = abi.encodeWithSelector(
-            TutellusStake2Learn.initialize.selector, account, amount, stakingContract(), priceFiat, maxPriceToken
+            TutellusStake2Learn.initialize.selector,
+            config,
+            account,
+            amount,
+            stakingContract(),
+            priceFiat,
+            maxPriceToken
         );
         address proxy = _createProxy(initializeCalldata);
         IERC20Upgradeable(token()).transferFrom(account, proxy, amount);
