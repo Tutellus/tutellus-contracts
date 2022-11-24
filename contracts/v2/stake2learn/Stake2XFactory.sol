@@ -18,8 +18,8 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
         keccak256("Deposit(bytes32 id,uint256 deposit,uint256 price,uint256 deadline)");
 
     address private _token;
-    address private _stakingContract;
     address private _poolAddress;
+    address private _stakingContract;
 
     Feed[] public feeds;
 
@@ -27,6 +27,7 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
         string memory name_,
         string memory version_,
         address token_,
+        address poolAddress_,
         address stakingContract_,
         address[] memory feeds_,
         bool[] memory inverts_
@@ -34,6 +35,7 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
         __EIP712_init(name_, version_);
 
         _token = token_;
+        _poolAddress = poolAddress_;
         _stakingContract = stakingContract_;
 
         for (uint256 i = 0; i < feeds_.length; i++) {
