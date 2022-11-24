@@ -38,6 +38,8 @@ abstract contract Stake2X is OwnableUpgradeable {
     function _payAmount() internal virtual returns (uint256) {}
     function _payReceiver() internal virtual returns (address) {}
 
+    //TBD: function to migrate to another staking contract
+
     function token() public view returns (address) {
         return _token;
     }
