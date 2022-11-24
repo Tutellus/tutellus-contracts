@@ -35,7 +35,7 @@ abstract contract Stake2X is OwnableUpgradeable {
     function _withdrawCall() internal virtual {}
     function _canDeposit(uint256 amount) internal virtual returns (bool) {}
     function _canWithdraw() internal virtual returns (bool) {}
-    function _payAmount() internal virtual returns (uint256) {}
+    function _payAmount() internal view virtual returns (uint256) {}
     function _payReceiver() internal virtual returns (address) {}
 
     //TBD: function to migrate to another staking contract
@@ -58,6 +58,10 @@ abstract contract Stake2X is OwnableUpgradeable {
 
     function maxPriceToken() public view returns (uint256) {
         return _maxPriceToken;
+    }
+
+    function payAmount() public view returns (uint256) {
+        return _payAmount();
     }
 
     //we assume funds are transfered by factory before deposit call

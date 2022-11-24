@@ -47,7 +47,7 @@ contract TutellusStake2Learn is Stake2X, UUPSUpgradeableByRole {
         return (balance + deposit + claimable) >= _payAmount();
     }
 
-    function _payAmount() internal virtual override (Stake2X) returns (uint256) {
+    function _payAmount() internal view virtual override (Stake2X) returns (uint256) {
         uint256 priceNow = TutellusStake2LearnFactory(factory()).convertFiat2Token(priceFiat());
         uint256 maxPrice = maxPriceToken();
         return priceNow < maxPrice ? priceNow : maxPrice;
