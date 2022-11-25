@@ -13,6 +13,10 @@ abstract contract Stake2X is OwnableUpgradeable {
     uint256 private _priceFiat;
     uint256 private _maxPriceToken;
 
+    event Deposit(address indexed owner, uint256 amount);
+    event Claim(address indexed owner, uint256 amount);
+    event Withdraw(address indexed owner, address receiver, uint256 left, uint256 payment);
+
     function __Stake2X_initialize(
         address account_,
         address token_,
@@ -36,6 +40,9 @@ abstract contract Stake2X is OwnableUpgradeable {
     function _canDeposit(uint256 amount) internal view virtual returns (bool) {}
     function _canWithdraw() internal view virtual returns (bool) {}
     function _payAmount() internal view virtual returns (uint256) {}
+    function _deposited() internal view virtual returns (uint256) {}
+    function _claimable() internal view virtual returns (uint256) {}
+    function _fee() internal view virtual returns (uint256) {}
     function _payReceiver() internal virtual returns (address) {}
 
     //TBD: function to migrate to another staking contract
@@ -88,10 +95,13 @@ abstract contract Stake2X is OwnableUpgradeable {
     function _deposit(uint256 amount) internal {
         IERC20Upgradeable(_token).approve(_stakingContract, amount);
         _depositCall(amount);
+        emit Deposit(owner(), amount);
     }
 
     function _claim() internal {
+        uint256 claimable = _claimable();
         _claimCall();
+        emit Claim(owner(), claimable);
     }
 
     function _withdraw() internal {
@@ -101,7 +111,12 @@ abstract contract Stake2X is OwnableUpgradeable {
         uint256 payment = _payAmount();
         address to = _payReceiver();
         tokenContract.transfer(to, payment);
-        uint256 left = tokenContract.balanceOf(address(this));
+        uint256 left = _contractBalance();
         tokenContract.transfer(owner(), left);
+        emit Withdraw(owner(), to, left, payment);
+    }
+
+    function _contractBalance() internal view returns (uint256) {
+        return IERC20Upgradeable(token()).balanceOf(address(this));
     }
 }

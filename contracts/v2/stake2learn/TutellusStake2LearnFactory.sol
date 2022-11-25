@@ -9,7 +9,14 @@ import "./ITutellusStake2Learn.sol";
 contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
     bytes32 internal constant _S2L_SIGNER_ROLE = keccak256("S2L_SIGNER_ROLE");
 
-    event CreateS2L(bytes32 indexed id, address indexed account, address indexed proxy, uint256 deposit, uint256 price);
+    event CreateS2L(
+        bytes32 indexed id,
+        address indexed account,
+        address indexed proxy,
+        uint256 deposit,
+        uint256 price,
+        uint256 maxTokenPrice
+    );
 
     function initialize(
         address implementation,
@@ -48,7 +55,7 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
         address proxy = _createProxy(initializeCalldata);
         IERC20Upgradeable(token()).transferFrom(account, proxy, amount);
         ITutellusStake2Learn(proxy).deposit(amount);
-        emit CreateS2L(id, account, proxy, amount, priceFiat);
+        emit CreateS2L(id, account, proxy, amount, priceFiat, maxPriceToken);
         return proxy;
     }
 }

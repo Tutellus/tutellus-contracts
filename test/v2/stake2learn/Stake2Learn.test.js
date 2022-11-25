@@ -93,6 +93,7 @@ const createS2L = async (id, deposit, price, deadline, userSigner, signer) => {
     await myToken.connect(personSigner).approve(myFactory.address, ethers.constants.MaxUint256)
     const nonce = await ethers.provider.getTransactionCount(myFactory.address)
     const proxy = ethers.utils.getContractAddress({ from: myFactory.address, nonce: nonce })
+    const maxPriceToken = await myFactory.convertFiat2Token(price)
     await expect(
         myFactory.connect(userSigner).createS2L(
             id,
@@ -105,7 +106,7 @@ const createS2L = async (id, deposit, price, deadline, userSigner, signer) => {
     ).to.emit(
         myFactory, "CreateS2L"
     ).withArgs(
-        id, person, proxy, deposit, price
+        id, person, proxy, deposit, price, maxPriceToken
     )
     return proxy
 }
@@ -194,7 +195,7 @@ describe("Stake2Learn", function () {
         await myManager.grantRole(S2L_SIGNER_ROLE, owner)
         await myManager.setId(S2L_RECEIVER, receiver)
     })
-    describe.only("Create", () => {
+    describe("Create", () => {
         it("createS2L", async () => {
             const id = ethers.utils.id("bootcamp01")
             const price = ethers.utils.parseEther("5100")
@@ -212,6 +213,8 @@ describe("Stake2Learn", function () {
             expect((await myS2L.payAmount()).toString()).to.equal(tokenAmount.toString())
             expect((await myStaking.getUserBalance(myS2L.address)).toString()).to.equal(deposit.toString())
         })
+    })
+    describe("ClaimAndDeposit", () => {
         it("claimAndDeposit", async () => {
             const id = ethers.utils.id("bootcamp01")
             const price = ethers.utils.parseEther("5100")
@@ -230,6 +233,8 @@ describe("Stake2Learn", function () {
             expect(parseFloat(ethers.utils.formatEther(deposit2.toString()))).gte(parseFloat(ethers.utils.formatEther(total.toString())))
             expect(claimable2.toString()).to.equal("0")
         })
+    })
+    describe("Withdraw", () => {
         it("withdraw", async () => {
             const id = ethers.utils.id("bootcamp01")
             const price = ethers.utils.parseEther("5100")

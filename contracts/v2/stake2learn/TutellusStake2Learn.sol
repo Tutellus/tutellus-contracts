@@ -31,20 +31,20 @@ contract TutellusStake2Learn is Stake2X, UUPSUpgradeableByRole {
     }
 
     function _withdrawCall() internal virtual override (Stake2X) {
-        uint256 amount = ITutellusStaking(stakingContract()).getUserBalance(address(this));
+        uint256 amount = _deposited();
         ITutellusStaking(stakingContract()).withdraw(amount);
     }
 
     function _canDeposit(uint256 amount) internal view virtual override (Stake2X) returns (bool) {
-        uint256 balance = IERC20Upgradeable(token()).balanceOf(address(this));
+        uint256 balance = _contractBalance();
         return balance >= amount;
     }
 
     function _canWithdraw() internal view virtual override (Stake2X) returns (bool) {
-        uint256 balance = IERC20Upgradeable(token()).balanceOf(address(this));
-        uint256 deposit = ITutellusStaking(stakingContract()).getUserBalance(address(this));
-        uint256 claimable = ITutellusStaking(stakingContract()).pendingRewards(address(this));
-        uint256 fee = ITutellusStaking(stakingContract()).getFee(address(this));
+        uint256 balance = _contractBalance();
+        uint256 deposit = _deposited();
+        uint256 claimable = _claimable();
+        uint256 fee = _fee();
         return (balance + deposit + claimable - fee) >= _payAmount();
     }
 
@@ -56,5 +56,17 @@ contract TutellusStake2Learn is Stake2X, UUPSUpgradeableByRole {
 
     function _payReceiver() internal virtual override (Stake2X) returns (address) {
         return ITutellusManager(config).get(keccak256("S2L_RECEIVER"));
+    }
+
+    function _deposited() internal view virtual override (Stake2X) returns (uint256) {
+        return ITutellusStaking(stakingContract()).getUserBalance(address(this));
+    }
+
+    function _claimable() internal view virtual override (Stake2X) returns (uint256) {
+        return ITutellusStaking(stakingContract()).pendingRewards(address(this));
+    }
+
+    function _fee() internal view virtual override (Stake2X) returns (uint256) {
+        return ITutellusStaking(stakingContract()).getFee(address(this));
     }
 }
