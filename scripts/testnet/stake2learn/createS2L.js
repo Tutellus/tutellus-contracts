@@ -1,6 +1,6 @@
 const { ethers } = require("hardhat");
 
-const S2L_ID = ethers.utils.id("S2L")
+const S2L_ID = ethers.utils.id("S2L_FACTORY")
 const MANAGER_ADDR = "0x0e75e4D2041287813a693971634400EAe765910C"
 const TOKEN = "0x930f169A87545a8c6a3e7934d42d1582c03e1b35"
 
@@ -22,7 +22,6 @@ async function main() {
     const deadline = "5393044017"
     const signature = await getSignature(
         COURSE_ID,
-        deposit,
         PRICE,
         deadline,
         signer,
@@ -55,7 +54,7 @@ main()
         process.exit(1)
     })
 
-const getSignature = async (id, deposit, price, deadline, signer, verifyingContract) => {
+const getSignature = async (id, price, deadline, signer, verifyingContract) => {
     const domain = {
         name: "TUT_S2L",
         version: "1",
@@ -66,7 +65,6 @@ const getSignature = async (id, deposit, price, deadline, signer, verifyingContr
     const types = {
         Deposit: [
             { name: "id", type: "bytes32" },
-            { name: "deposit", type: "uint256" },
             { name: "price", type: "uint256" },
             { name: "deadline", type: "uint256" }
         ]
@@ -74,7 +72,6 @@ const getSignature = async (id, deposit, price, deadline, signer, verifyingContr
 
     const value = {
         id: id,
-        deposit: deposit,
         price: price,
         deadline: deadline,
     }

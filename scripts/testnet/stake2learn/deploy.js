@@ -1,6 +1,6 @@
 const { ethers } = require("hardhat");
 
-const S2L_ID = ethers.utils.id("S2L")
+const S2L_ID = ethers.utils.id("S2L_FACTORY")
 const MANAGER_ADDR = "0x0e75e4D2041287813a693971634400EAe765910C"
 const TOKEN = "0x930f169A87545a8c6a3e7934d42d1582c03e1b35"
 const POOL = "0xfd5447D667eB6960fA326cfa68b7936f52940cA7"

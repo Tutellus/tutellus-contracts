@@ -14,8 +14,7 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
         bool invert;
     }
 
-    bytes32 internal constant _S2X_TYPEHASH =
-        keccak256("Deposit(bytes32 id,uint256 deposit,uint256 price,uint256 deadline)");
+    bytes32 internal constant _S2X_TYPEHASH = keccak256("Deposit(bytes32 id,uint256 price,uint256 deadline)");
 
     address private _token;
     address private _poolAddress;
@@ -43,6 +42,8 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
         }
     }
 
+    function _canUpgradeByImplementation(address implementation, address sender) internal virtual returns (bool) {}
+
     function token() public view returns (address) {
         return _token;
     }
@@ -63,15 +64,17 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
         return _convertFiat2Token(amount);
     }
 
-    function verifySignature(
-        bytes32 id,
-        uint256 amount,
-        uint256 price,
-        uint256 deadline,
-        bytes memory signature,
-        address signer
-    ) public view returns (bool) {
-        return _verifySignature(id, amount, price, deadline, signature, signer);
+    function verifySignature(bytes32 id, uint256 price, uint256 deadline, bytes memory signature, address signer)
+        public
+        view
+        returns (bool)
+    {
+        return _verifySignature(id, price, deadline, signature, signer);
+    }
+
+    function upgradeByImplementation(address implementation) public {
+        require(_canUpgradeByImplementation(implementation, msg.sender), "");
+        _upgradeByImplementation(implementation);
     }
 
     function _convertToken2Fiat(uint256 amount) internal view returns (uint256) {
@@ -116,16 +119,13 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
             : ((amount * uint256(answer)) / (10 ** decimals));
     }
 
-    function _verifySignature(
-        bytes32 id,
-        uint256 amount,
-        uint256 price,
-        uint256 deadline,
-        bytes memory signature,
-        address signer
-    ) internal view returns (bool) {
+    function _verifySignature(bytes32 id, uint256 price, uint256 deadline, bytes memory signature, address signer)
+        internal
+        view
+        returns (bool)
+    {
         if (block.timestamp > deadline) return false;
-        bytes32 structHash = keccak256(abi.encode(_S2X_TYPEHASH, id, amount, price, deadline));
+        bytes32 structHash = keccak256(abi.encode(_S2X_TYPEHASH, id, price, deadline));
         bytes32 hash = _hashTypedDataV4(structHash);
         return SignatureCheckerUpgradeable.isValidSignatureNow(signer, hash, signature);
     }

@@ -62,7 +62,7 @@ const setInstances = async (addresses) => {
     ])
 }
 
-const getSignature = async (id, deposit, price, deadline, signer) => {
+const getSignature = async (id, price, deadline, signer) => {
     const domain = {
         name: "TUT_S2L",
         version: "1",
@@ -73,7 +73,6 @@ const getSignature = async (id, deposit, price, deadline, signer) => {
     const types = {
         Deposit: [
             { name: "id", type: "bytes32" },
-            { name: "deposit", type: "uint256" },
             { name: "price", type: "uint256" },
             { name: "deadline", type: "uint256" }
         ]
@@ -81,7 +80,6 @@ const getSignature = async (id, deposit, price, deadline, signer) => {
 
     const value = {
         id: id,
-        deposit: deposit,
         price: price,
         deadline: deadline,
     }
@@ -89,7 +87,7 @@ const getSignature = async (id, deposit, price, deadline, signer) => {
 }
 
 const createS2L = async (id, deposit, price, deadline, userSigner, signer) => {
-    const signature = await getSignature(id, deposit, price, deadline, signer)
+    const signature = await getSignature(id, price, deadline, signer)
     await myToken.connect(personSigner).approve(myFactory.address, ethers.constants.MaxUint256)
     const nonce = await ethers.provider.getTransactionCount(myFactory.address)
     const proxy = ethers.utils.getContractAddress({ from: myFactory.address, nonce: nonce })

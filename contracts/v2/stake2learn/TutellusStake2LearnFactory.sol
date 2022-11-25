@@ -40,9 +40,10 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
         address signer
     ) external returns (address) {
         require(hasRole(_S2L_SIGNER_ROLE, signer), "");
-        require(_verifySignature(id, amount, priceFiat, deadline, signature, signer), "");
+        require(_verifySignature(id, priceFiat, deadline, signature, signer), "");
         address account = msg.sender;
         uint256 maxPriceToken = _convertFiat2Token(priceFiat);
+        require(amount >= maxPriceToken, "");
         bytes memory initializeCalldata = abi.encodeWithSelector(
             ITutellusStake2Learn.initialize.selector,
             config,
@@ -57,5 +58,16 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
         ITutellusStake2Learn(proxy).deposit(amount);
         emit CreateS2L(id, account, proxy, amount, priceFiat, maxPriceToken);
         return proxy;
+    }
+
+    //override required by Stake2XFactory
+    function _canUpgradeByImplementation(address implementation, address sender)
+        internal
+        virtual
+        override (Stake2XFactory)
+        returns (bool)
+    {
+        (implementation);
+        return hasRole(UPGRADER_ROLE, implementation);
     }
 }
