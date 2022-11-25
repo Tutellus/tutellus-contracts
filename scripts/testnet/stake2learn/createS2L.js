@@ -6,7 +6,7 @@ const TOKEN = "0x930f169A87545a8c6a3e7934d42d1582c03e1b35"
 
 const COURSE_ID = ethers.utils.id("bootcamp01")
 const PRICE = ethers.utils.parseEther("5100")
-const MULTIPLIER = ethers.BigNumber.from("3")
+const MULTIPLIER = ethers.BigNumber.from("1")
 
 async function main() {
     const signers = await ethers.getSigners()
@@ -29,7 +29,7 @@ async function main() {
     )
 
     console.log("Approving...")
-    const approval = await myToken.approve(factoryAddress, ethers.constants.MaxUint256)
+    const approval = await myToken.connect(user).approve(factoryAddress, ethers.constants.MaxUint256)
     await approval.wait()
 
     console.log("Creating S2L...")
