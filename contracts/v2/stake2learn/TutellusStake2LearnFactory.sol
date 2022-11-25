@@ -9,7 +9,7 @@ import "./ITutellusStake2Learn.sol";
 contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
     bytes32 internal constant _S2L_SIGNER_ROLE = keccak256("S2L_SIGNER_ROLE");
 
-    event CreateS2L(
+    event CreateS2L( //TBD: Rename to maxPriceToken
         bytes32 indexed id,
         address indexed account,
         address indexed proxy,
