@@ -42,8 +42,7 @@ async function main() {
         signer.address
     )
     const receipt = await response.wait()
-    console.log(receipt)
-    console.log("Created: ", factory)
+    console.log("Created: ", receipt.events[receipt.events.length - 1].args.proxy)
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
