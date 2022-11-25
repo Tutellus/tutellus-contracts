@@ -35,16 +35,17 @@ contract TutellusStake2Learn is Stake2X, UUPSUpgradeableByRole {
         ITutellusStaking(stakingContract()).withdraw(amount);
     }
 
-    function _canDeposit(uint256 amount) internal virtual override (Stake2X) returns (bool) {
+    function _canDeposit(uint256 amount) internal view virtual override (Stake2X) returns (bool) {
         uint256 balance = IERC20Upgradeable(token()).balanceOf(address(this));
         return balance >= amount;
     }
 
-    function _canWithdraw() internal virtual override (Stake2X) returns (bool) {
+    function _canWithdraw() internal view virtual override (Stake2X) returns (bool) {
         uint256 balance = IERC20Upgradeable(token()).balanceOf(address(this));
         uint256 deposit = ITutellusStaking(stakingContract()).getUserBalance(address(this));
         uint256 claimable = ITutellusStaking(stakingContract()).pendingRewards(address(this));
-        return (balance + deposit + claimable) >= _payAmount();
+        uint256 fee = ITutellusStaking(stakingContract()).getFee(address(this));
+        return (balance + deposit + claimable - fee) >= _payAmount();
     }
 
     function _payAmount() internal view virtual override (Stake2X) returns (uint256) {

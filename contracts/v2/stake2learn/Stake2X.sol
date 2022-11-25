@@ -33,8 +33,8 @@ abstract contract Stake2X is OwnableUpgradeable {
     function _depositCall(uint256 amount) internal virtual {}
     function _claimCall() internal virtual {}
     function _withdrawCall() internal virtual {}
-    function _canDeposit(uint256 amount) internal virtual returns (bool) {}
-    function _canWithdraw() internal virtual returns (bool) {}
+    function _canDeposit(uint256 amount) internal view virtual returns (bool) {}
+    function _canWithdraw() internal view virtual returns (bool) {}
     function _payAmount() internal view virtual returns (uint256) {}
     function _payReceiver() internal virtual returns (address) {}
 
@@ -64,6 +64,10 @@ abstract contract Stake2X is OwnableUpgradeable {
         return _payAmount();
     }
 
+    function canWithdraw() public view returns (bool) {
+        return _canWithdraw();
+    }
+
     //we assume funds are transfered by factory before deposit call
     function deposit(uint256 amount) public {
         require(_canDeposit(amount), "");
@@ -76,7 +80,7 @@ abstract contract Stake2X is OwnableUpgradeable {
         _deposit(amount);
     }
 
-    function withdraw() public {
+    function withdraw() public onlyOwner {
         require(_canWithdraw(), "");
         _withdraw();
     }

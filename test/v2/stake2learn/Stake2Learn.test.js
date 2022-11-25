@@ -16,6 +16,7 @@ const HoldersVault = artifacts.require("TutellusHoldersVault")
 
 const S2L_FACTORY = ethers.utils.id("S2L_FACTORY")
 const S2L_SIGNER_ROLE = ethers.utils.id("S2L_SIGNER_ROLE")
+const S2L_RECEIVER = ethers.utils.id("S2L_RECEIVER")
 
 const FEED_BTC_USD = ethers.utils.id("FEED_BTC_USD")
 const FEED_EUR_USD = ethers.utils.id("FEED_EUR_USD")
@@ -35,7 +36,7 @@ let myRewardsVault
 let myHoldersVault
 let myStaking
 let myFarming
-let owner, person, ownerSigner, personSigner
+let owner, person, receiver, ownerSigner, personSigner, receiverSigner
 let myFactory
 let myUniswapFactory, myWBTC, myWETH
 
@@ -111,9 +112,10 @@ const createS2L = async (id, deposit, price, deadline, userSigner, signer) => {
 
 describe("Stake2Learn", function () {
     before(async () => {
-        [ownerSigner, personSigner] = await ethers.getSigners()
+        [ownerSigner, personSigner, receiverSigner] = await ethers.getSigners()
         owner = ownerSigner.address
         person = personSigner.address
+        receiver = receiverSigner.address
     })
     beforeEach(async () => {
         const previous = await latestBlock()
@@ -190,6 +192,7 @@ describe("Stake2Learn", function () {
         myFactory = TutellusStake2LearnFactory.attach(factoryAddress)
 
         await myManager.grantRole(S2L_SIGNER_ROLE, owner)
+        await myManager.setId(S2L_RECEIVER, receiver)
     })
     describe.only("Create", () => {
         it("createS2L", async () => {
@@ -207,6 +210,45 @@ describe("Stake2Learn", function () {
             expect((await myS2L.priceFiat()).toString()).to.equal(price.toString())
             expect((await myS2L.maxPriceToken()).toString()).to.equal(tokenAmount.toString())
             expect((await myS2L.payAmount()).toString()).to.equal(tokenAmount.toString())
+            expect((await myStaking.getUserBalance(myS2L.address)).toString()).to.equal(deposit.toString())
+        })
+        it("claimAndDeposit", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const s2lAddress = await createS2L(id, deposit, price, deadline, personSigner, ownerSigner)
+            const myS2L = await ethers.getContractAt("TutellusStake2Learn", s2lAddress)
+            await hre.network.provider.send("hardhat_mine", ["0x100"]);
+            const claimable1 = await myStaking.pendingRewards(myS2L.address)
+            const deposit1 = await myStaking.getUserBalance(myS2L.address)
+            await myS2L.claimAndDeposit()
+            const claimable2 = await myStaking.pendingRewards(myS2L.address)
+            const deposit2 = await myStaking.getUserBalance(myS2L.address)
+            const total = ethers.BigNumber.from(deposit1.toString()).add(ethers.BigNumber.from(claimable1.toString()))
+            expect(parseFloat(ethers.utils.formatEther(deposit2.toString()))).gte(parseFloat(ethers.utils.formatEther(total.toString())))
+            expect(claimable2.toString()).to.equal("0")
+        })
+        it("withdraw", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const s2lAddress = await createS2L(id, deposit, price, deadline, personSigner, ownerSigner)
+            const myS2L = await ethers.getContractAt("TutellusStake2Learn", s2lAddress)
+            await hre.network.provider.send("hardhat_mine", ["0x100"]);
+            expect(await myS2L.canWithdraw()).to.equal(true)
+            const payAmount = await myS2L.payAmount()
+            await expect(
+                myS2L.withdraw()
+            ).to.be.revertedWith(
+                "Ownable: caller is not the owner"
+            )
+            await myS2L.connect(personSigner).withdraw()
+            const payed = await myToken.balanceOf(receiver)
+            expect(payAmount.toString()).to.equal(payed.toString())
         })
     })
     describe("Getters", () => {
