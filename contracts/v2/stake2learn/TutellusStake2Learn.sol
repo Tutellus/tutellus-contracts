@@ -17,7 +17,7 @@ contract TutellusStake2Learn is Stake2X, UUPSUpgradeableByRole {
         uint256 priceFiat_,
         uint256 maxPriceToken_
     ) public initializer {
-        __AccessControlProxyPausable_init(manager_); //TBD: msg.sender?
+        __AccessControlProxyPausable_init(manager_);
         __Stake2X_initialize(account_, token_, stakingContract_, priceFiat_, maxPriceToken_);
     }
 

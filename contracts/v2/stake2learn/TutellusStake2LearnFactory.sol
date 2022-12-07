@@ -68,6 +68,6 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
         returns (bool)
     {
         (implementation);
-        return hasRole(UPGRADER_ROLE, implementation);
+        return hasRole(UPGRADER_ROLE, sender);
     }
 }
