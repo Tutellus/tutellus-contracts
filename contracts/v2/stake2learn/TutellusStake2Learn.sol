@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "contracts/interfaces/ITutellusStaking.sol";
 import "contracts/interfaces/ITutellusManager.sol";
-import "contracts/utils/UUPSUpgradeableByRole.sol";
+import "contracts/utils/AccessControlProxyPausable.sol";
 import "./TutellusStake2LearnFactory.sol";
 import "./Stake2X.sol";
 
-contract TutellusStake2Learn is Stake2X, UUPSUpgradeableByRole {
+contract TutellusStake2Learn is Stake2X, AccessControlProxyPausable {
     function initialize(
         address manager_,
         address account_,

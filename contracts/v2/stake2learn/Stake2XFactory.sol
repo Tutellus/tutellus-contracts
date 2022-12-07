@@ -73,7 +73,7 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
     }
 
     function upgradeByImplementation(address implementation) public {
-        require(_canUpgradeByImplementation(implementation, msg.sender), "");
+        require(_canUpgradeByImplementation(implementation, msg.sender), "S2X003");
         _upgradeByImplementation(implementation);
     }
 

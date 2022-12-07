@@ -78,7 +78,7 @@ abstract contract Stake2X is OwnableUpgradeable {
 
     //we assume funds are transfered by factory before deposit call
     function deposit(uint256 amount) public {
-        require(_canDeposit(amount), "");
+        require(_canDeposit(amount), "S2X001");
         _deposit(amount);
     }
 
@@ -89,7 +89,7 @@ abstract contract Stake2X is OwnableUpgradeable {
     }
 
     function withdraw() public onlyOwner {
-        require(_canWithdraw(), "");
+        require(_canWithdraw(), "S2X002");
         _withdraw();
     }
 

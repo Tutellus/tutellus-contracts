@@ -17,6 +17,7 @@ const HoldersVault = artifacts.require("TutellusHoldersVault")
 const S2L_FACTORY = ethers.utils.id("S2L_FACTORY")
 const S2L_SIGNER_ROLE = ethers.utils.id("S2L_SIGNER_ROLE")
 const S2L_RECEIVER = ethers.utils.id("S2L_RECEIVER")
+const UPGRADER_ROLE = ethers.utils.id('UPGRADER_ROLE')
 
 const FEED_BTC_USD = ethers.utils.id("FEED_BTC_USD")
 const FEED_EUR_USD = ethers.utils.id("FEED_EUR_USD")
@@ -109,7 +110,7 @@ const createS2L = async (id, deposit, price, deadline, userSigner, signer) => {
     return proxy
 }
 
-describe("Stake2Learn", function () {
+describe.only("Stake2Learn", function () {
     before(async () => {
         [ownerSigner, personSigner, receiverSigner] = await ethers.getSigners()
         owner = ownerSigner.address
@@ -191,7 +192,52 @@ describe("Stake2Learn", function () {
         myFactory = TutellusStake2LearnFactory.attach(factoryAddress)
 
         await myManager.grantRole(S2L_SIGNER_ROLE, owner)
+        await myManager.grantRole(UPGRADER_ROLE, owner)
         await myManager.setId(S2L_RECEIVER, receiver)
+    })
+    describe("Factory", () => {
+        it("verifySignature", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const signature = await getSignature(id, price, deadline, ownerSigner)
+            const wrongSignature = await getSignature(id, price, deadline, personSigner)
+            expect(await myFactory.verifySignature(ethers.utils.id("newId"), price, deadline, signature, owner)).to.equal(false)
+            expect(await myFactory.verifySignature(id, "0", deadline, signature, owner)).to.equal(false)
+            expect(await myFactory.verifySignature(id, price, "0", signature, owner)).to.equal(false)
+            expect(await myFactory.verifySignature(id, price, deadline, signature, person)).to.equal(false)
+            expect(await myFactory.verifySignature(id, price, deadline, wrongSignature, owner)).to.equal(false)
+            expect(await myFactory.verifySignature(id, price, deadline, signature, owner)).to.equal(true)
+            await createS2L(id, deposit, price, deadline, personSigner, ownerSigner)
+        })
+        it("upgradeByImplementation", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const s2lAddress = await createS2L(id, deposit, price, deadline, personSigner, ownerSigner)
+
+            const S2LV2Mock = await ethers.getContractFactory("S2LV2Mock")
+            const implementation = await S2LV2Mock.deploy()
+            const beaconAddress = await myFactory.beacon()
+            const beacon = await ethers.getContractAt("UpgradeableBeacon", beaconAddress)
+            const oldImplementation = await beacon.implementation()
+            await expect(
+                myFactory.connect(personSigner).upgradeByImplementation(implementation.address)
+            ).to.be.revertedWith(
+                "S2X003"
+            )
+            await myFactory.connect(ownerSigner).upgradeByImplementation(implementation.address)
+            const newImplementation = await beacon.implementation()
+
+            expect(newImplementation).to.equal(implementation.address)
+            expect(newImplementation).to.not.equal(oldImplementation)
+            const myS2L = await ethers.getContractAt("S2LV2Mock", s2lAddress)
+            expect(await myS2L.s2lVersion()).to.equal("S2L-V2")
+        })
     })
     describe("Create", () => {
         it("createS2L", async () => {
@@ -210,6 +256,89 @@ describe("Stake2Learn", function () {
             expect((await myS2L.maxPriceToken()).toString()).to.equal(tokenAmount.toString())
             expect((await myS2L.payAmount()).toString()).to.equal(tokenAmount.toString())
             expect((await myStaking.getUserBalance(myS2L.address)).toString()).to.equal(deposit.toString())
+        })
+        it("cant createS2L without role", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const signature = await getSignature(id, price, deadline, personSigner)
+
+            await expect(
+                myFactory.connect(personSigner).createS2L(
+                    id,
+                    deposit,
+                    price,
+                    deadline,
+                    signature,
+                    personSigner.address
+                )
+            ).to.be.revertedWith(
+                "TUTS2L002"
+            )
+        })
+        it("cant createS2L with wrong signature", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const signature = await getSignature(id, price, deadline, ownerSigner)
+
+            await expect(
+                myFactory.connect(personSigner).createS2L(
+                    id,
+                    deposit,
+                    "0",
+                    deadline,
+                    signature,
+                    ownerSigner.address
+                )
+            ).to.be.revertedWith(
+                "TUTS2L003"
+            )
+        })
+        it("cant createS2L with deposit amount under price converted to token", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const signature = await getSignature(id, price, deadline, ownerSigner)
+
+            await expect(
+                myFactory.connect(personSigner).createS2L(
+                    id,
+                    "0",
+                    price,
+                    deadline,
+                    signature,
+                    ownerSigner.address
+                )
+            ).to.be.revertedWith(
+                "TUTS2L004"
+            )
+        })
+    })
+    describe("Deposit", () => {
+        it("cant deposit if not funds in S2L", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount.mul(MULTIPLIER)
+            const deadline = "5393044017"
+            const s2lAddress = await createS2L(id, deposit, price, deadline, personSigner, ownerSigner)
+            const myS2L = await ethers.getContractAt("TutellusStake2Learn", s2lAddress)
+
+            await expect(
+                myS2L.deposit(tokenAmount)
+            ).to.be.revertedWith(
+                "S2X001"
+            )
+
+            await myToken.transfer(s2lAddress, tokenAmount)
+            await myS2L.deposit(tokenAmount)
         })
     })
     describe("ClaimAndDeposit", () => {
@@ -253,6 +382,26 @@ describe("Stake2Learn", function () {
             const payed = await myToken.balanceOf(receiver)
             expect(payAmount.toString()).to.equal(payed.toString())
         })
+        it("cant withdraw if not enough funds to liquidate", async () => {
+            const id = ethers.utils.id("bootcamp01")
+            const price = ethers.utils.parseEther("5100")
+            const tokenAmount = await myFactory.convertFiat2Token(price)
+            const deposit = tokenAmount
+            const deadline = "5393044017"
+            const s2lAddress = await createS2L(id, deposit, price, deadline, personSigner, ownerSigner)
+            const myS2L = await ethers.getContractAt("TutellusStake2Learn", s2lAddress)
+
+            const fee = await myStaking.getFee(s2lAddress)
+            const claimable = await myStaking.pendingRewards(s2lAddress)
+            expect(parseFloat(ethers.utils.formatEther(fee.toString()))).gt(parseFloat(ethers.utils.formatEther(claimable.toString())))
+            expect(await myS2L.canWithdraw()).to.equal(false)
+
+            await expect(
+                myS2L.connect(personSigner).withdraw()
+            ).to.be.revertedWith(
+                "S2X002"
+            )
+        })
     })
     describe("Getters", () => {
         it("token", async () => {
@@ -263,6 +412,14 @@ describe("Stake2Learn", function () {
         })
         it("stakingContract", async () => {
             expect(await myFactory.stakingContract()).to.equal(myStaking.address)
+        })
+        it("unit converters", async () => {
+            const priceInt = 5100
+            const priceBN = ethers.utils.parseEther(priceInt.toString())
+            const tokenAmount = await myFactory.convertFiat2Token(priceBN)
+            const fiatAmount = await myFactory.convertToken2Fiat(tokenAmount)
+            const fiatFormatted = ethers.utils.formatEther(fiatAmount.toString())
+            expect(priceInt).to.equal(parseInt(fiatFormatted.toString()))
         })
     })
 })
