@@ -34,16 +34,16 @@ abstract contract Stake2X is OwnableUpgradeable {
         _maxPriceToken = maxPriceToken_;
     }
 
-    function _depositCall(uint256 amount) internal virtual {}
-    function _claimCall() internal virtual {}
-    function _withdrawCall() internal virtual {}
-    function _canDeposit(uint256 amount) internal view virtual returns (bool) {}
-    function _canWithdraw() internal view virtual returns (bool) {}
-    function _payAmount() internal view virtual returns (uint256) {}
-    function _deposited() internal view virtual returns (uint256) {}
-    function _claimable() internal view virtual returns (uint256) {}
-    function _fee() internal view virtual returns (uint256) {}
-    function _payReceiver() internal virtual returns (address) {}
+    function _depositCall(uint256 amount) internal virtual;
+    function _claimCall() internal virtual;
+    function _withdrawCall() internal virtual;
+    function _canDeposit(uint256 amount) internal view virtual returns (bool);
+    function _canWithdraw() internal view virtual returns (bool);
+    function _payAmount() internal view virtual returns (uint256);
+    function _deposited() internal view virtual returns (uint256);
+    function _claimable() internal view virtual returns (uint256);
+    function _fee() internal view virtual returns (uint256);
+    function _payReceiver() internal virtual returns (address);
 
     //TBD: function to migrate to another staking contract
     //TBD: transferFromAndDeposit?

@@ -42,7 +42,7 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
         }
     }
 
-    function _canUpgradeByImplementation(address implementation, address sender) internal virtual returns (bool) {}
+    function _canUpgradeByImplementation(address implementation, address sender) internal virtual returns (bool);
 
     function token() public view returns (address) {
         return _token;
