@@ -41,3 +41,7 @@ yalc.lock
 
 holders_testnet.json
 .openzeppelin/unknown-31337.json
+
+# hardhat
+/typechain-types
+/cache_hardhat
