@@ -11,7 +11,10 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage --solcoverjs ./config.solcover.js",
-    "interface": "hardhat gen-interface"
+    "interface": "hardhat gen-interface",
+    "concatAbi:v2": "node concatAbi.js --root=artifacts/contracts/v2",
+    "concatAbi:v2:minimal": "node concatAbi.js --root=abi/contracts/v2 --minimal=true",
+    "concatABI:v2:launchpad": "node concatABI.js --root=contracts/v2:launchpad"
   },
   "keywords": [],
   "author": "",
