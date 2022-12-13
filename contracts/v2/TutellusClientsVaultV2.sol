@@ -11,6 +11,12 @@ import "contracts/interfaces/ITutellusClientsVaultV2.sol";
 /// @notice Manages clients rewards with a efficient distribution using merkle trees verification
 contract TutellusClientsVaultV2 is ITutellusClientsVaultV2, UUPSUpgradeableByRole {
   
+  /** EVENTS */
+
+  event Claim(uint256 index, address indexed account, uint256 amount);
+
+  event NewRewards(bytes32 indexed merkleRoot, string uri);
+
   /** STORAGE */
 
   bytes32 private immutable CLIENTS_REWARDS_ADMIN_ROLE = keccak256("CLIENTS_REWARDS_ADMIN_ROLE");
@@ -58,7 +64,7 @@ contract TutellusClientsVaultV2 is ITutellusClientsVaultV2, UUPSUpgradeableByRol
   function updateMerkleRoot(bytes32 merkleRoot_, string memory uri_) public onlyRole(CLIENTS_REWARDS_ADMIN_ROLE){
     merkleRoot = merkleRoot_;
     uri = uri_;
-    emit UpdateMerkleRoot(merkleRoot, uri);
+    emit NewRewards(merkleRoot, uri);
   }
 
 }

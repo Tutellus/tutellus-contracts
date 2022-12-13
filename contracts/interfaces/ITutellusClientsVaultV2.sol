@@ -6,19 +6,6 @@ pragma solidity ^0.8.0;
 /// @notice Manages clients rewards with a efficient distribution using merkle trees verification
 interface ITutellusClientsVaultV2 {
 
-    /** EVENTS */
-
-    /// @notice Emitted when a claim is executed
-    /// @param index Position of the account in the original json 
-    /// @param account Account who owns the reward
-    /// @param amount Amount claimed
-    event Claim(uint256 indexed index, address indexed account, uint256 indexed amount);
-
-    /// @notice Emitted when merkleRoot and uri are updated
-    /// @param merkleRoot Root of the merkle tree generated from a json of address => amount
-    /// @param uri Uri, usually ipfs, where the json is located
-    event UpdateMerkleRoot(bytes32 indexed merkleRoot, string indexed uri);
-
     /** METHODS */
 
     /// @notice Returns the amount already claimed by an account
