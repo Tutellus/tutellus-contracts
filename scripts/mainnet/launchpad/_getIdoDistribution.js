@@ -205,12 +205,12 @@ function buildMatrixs(availableToDistributeBN) {
         for (let j = 0; j < ALLOCATION[i].length; j++) {
             TOTAL_PREFUNDS_LEFT = TOTAL_PREFUNDS_LEFT.add(PREFUNDS[i][j])
             // Calculate available allocation amounts (in USDT) by slot
-            ALLOCATION[i][j] = availableToDistributeBN
+            ALLOCATION[i][j] = convertToUsdtPrecision(availableToDistributeBN
                 .mul(ALLOCATION_PERCENTAGES[i][j])
-                .div(HUNDRED_BN);
-            const initialAllocation = ALLOCATION[i][j];
+                .div(HUNDRED_BN));
 
             // Derivate amount available to lottery by slot
+            // Note: forcing ratios to have usdt precision could derive in having a smaller ratio than right one but not a problem
 
             // Superboosters: 0% lottery, 100% fixed. If slot is overprefunded ratio < 1
             if (i == 0 && !PREFUNDS[i][j].isZero()) {
@@ -221,8 +221,12 @@ function buildMatrixs(availableToDistributeBN) {
 
             // Boosters: 50% fixed, 50% lottery. If slot is overprefunded ratio < 1, considering 50% of prefunds
             if (i == 1) {
-                LOTTERY[i][j] = ALLOCATION[i][j].div(TWO_WEI_BN);
+                const half = ALLOCATION[i][j].div(TWO_WEI_BN);
+                const halfUsdtPrecision = convertToUsdtPrecision(half)
+                // Note: maybe 1 decimal position is lost...in that case it goes to allocation and not lottery
+                LOTTERY[i][j] = halfUsdtPrecision;
                 ALLOCATION[i][j] = ALLOCATION[i][j].sub(LOTTERY[i][j]);
+
                 if (!PREFUNDS[i][j].isZero()) {
                     RATIOS[i][j] = ALLOCATION[i][j].gte(
                         PREFUNDS[i][j].div(TWO_WEI_BN)
@@ -259,7 +263,8 @@ function distributeAllocationFixed() {
 
 function distributeAllocationLottery() {
     for (let i = 0; i < 3; i++) {
-        let availableSupertutellianSlot = PREFUNDS[1][i].div(TWO_WEI_BN);
+        // Note: this could be losing some amount...will be distributed in left amounts
+        let availableSupertutellianSlot = convertToUsdtPrecision(PREFUNDS[1][i].div(TWO_WEI_BN));
         while (
             !LOTTERY[1][i].isZero() &&
             !availableSupertutellianSlot.isZero()
@@ -270,6 +275,7 @@ function distributeAllocationLottery() {
             );
             const key = SUPERTUTELLIAN_LOTTERY[i][prefunderIndex];
             const prefunder = PREFUNDERS[key];
+            // Note: LOTTERY[1][i] and availableSupertutellianSlot have usdt precision...so does maxAvailable
             const maxAvailable = availableSupertutellianSlot.gt(LOTTERY[1][i])
                 ? LOTTERY[1][i]
                 : availableSupertutellianSlot;
@@ -366,11 +372,10 @@ function stringifyBNInJson() {
     for (let key in PREFUNDERS) {
         PREFUNDERS[key].energy = PREFUNDERS[key].energy.toString();
         PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.toString();
-        // PREFUNDERS[key].prefund = ethers.utils.parseUnits(ethers.utils.formatEther(PREFUNDERS[key].prefund), USDT_DECIMALS).toString()
-        PREFUNDERS[key].prefund = PREFUNDERS[key].prefund.toString()
-        PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.toString()
-        PREFUNDERS[key].refund = PREFUNDERS[key].refund.toString()
-        PREFUNDERS[key].left = PREFUNDERS[key].left.toString()
+        PREFUNDERS[key].prefund = convertDecimals18To6(PREFUNDERS[key].prefund).toString()
+        PREFUNDERS[key].lottery = convertDecimals18To6(PREFUNDERS[key].lottery).toString()
+        PREFUNDERS[key].refund = convertDecimals18To6(PREFUNDERS[key].refund).toString()
+        PREFUNDERS[key].left = convertDecimals18To6(PREFUNDERS[key].left).toString()
         PREFUNDERS[key].staked = PREFUNDERS[key].staked.toString();
 
         delete PREFUNDERS[key].row;
@@ -382,16 +387,12 @@ function stringifyBNInJson() {
 
 function increasePrefunderLeft(key, amountBN) {
     increasePrefunderAllocation(key, amountBN);
-    PREFUNDERS[key].left = PREFUNDERS[key].left.add(
-        transformUsdtToIdoToken(amountBN)
-    );
+    PREFUNDERS[key].left = PREFUNDERS[key].left.add(amountBN);
 }
 
 function increasePrefunderLottery(key, amountBN) {
     increasePrefunderAllocation(key, amountBN);
-    PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.add(
-        transformUsdtToIdoToken(amountBN)
-    );
+    PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.add(amountBN);
     return PREFUNDERS[key].refund.isZero();
 }
 
@@ -454,6 +455,10 @@ function getNormalization() {
 
 function convertToUsdtPrecision(weiAmountBN) {
     return weiAmountBN.div(ONE_WEI_MINUS_USDT_DECIMALS).mul(ONE_WEI_MINUS_USDT_DECIMALS)
+}
+
+function convertDecimals18To6(amountBN) {
+    return ethers.utils.parseUnits(ethers.utils.formatEther(amountBN.toString()).toString(), 6)
 }
 
 function rayMul(a, b) {
