@@ -31,8 +31,6 @@ const ONE_USDT_BN = ethers.utils.parseUnits("1", USDT_DECIMALS);
 const PARSE_UNITS = 18 - USDT_DECIMALS
 const ONE_WEI_MINUS_USDT_DECIMALS = ethers.utils.parseUnits("1", PARSE_UNITS)
 const N_SUPERBOOSTERS = 1;
-let N_SUPERBOOSTERS_LEFT = N_SUPERBOOSTERS;
-let ONLY_RESULTS = false;
 let FORCE_CLOSE_UNDER_OBJETIVE = true;
 
 async function main() {
@@ -55,33 +53,33 @@ async function main() {
     const stakers = await getStakers(prefunders);
 
     // Initialize JSON object with know props
-    buildObject(prefunders, stakers);
+    const investors = buildObject(prefunders, stakers, FACTIONS)
 
     // Sort by energy and set ranking and type in JSON object
-    const invalidPrefundBN = sortPrefundersByEnergy();
+    const sorted = sortInverstors({ investors, N_SUPERBOOSTERS })
 
-    if (!ONLY_RESULTS) {
-        //only if we want to calculate allocations to close IDO
+    // Prefunders without faction
+    const invalidPrefundBN = getInvalidPrefund(sorted)
+    const validPrefundBN = availableToDistributeBN.sub(invalidPrefundBN)
 
-        // Build 3x3 matrix(s) with general amounts
-        buildMatrixs(availableToDistributeBN.sub(invalidPrefundBN));
+    // Ponderation per slot
+    const ratios = getRatios(sorted, ALLOCATION_PERCENTAGES, validPrefundBN)
 
-        // Distribute fixed allocation of superboosters and boosters
-        distributeAllocationFixed();
+    // Distribute fixed allocation of superboosters and boosters
+    const [investorsFixed, allocationLeftBN1] = distributeAllocationFixed(sorted, validPrefundBN, ratios)
 
-        // Distribute lottery allocation of boosters and standards
-        distributeAllocationLottery();
+    // Distribute lottery allocation of boosters and standards
+    const [investorsLottery, allocationLeftBN2] = distributeAllocationLottery(investorsFixed, validPrefundBN, allocationLeftBN1, ALLOCATION_PERCENTAGES)
 
-        // Distribute left allocation (if any) based in ranking order
-        distributeAllocationLeft();
-    }
+    // Distribute left allocation (if any) based in ranking order
+    const investorsFinal = distributeAllocationLeft(investorsLottery, allocationLeftBN2)
 
     // Convert BigNumbers to strings and remove unused props
-    stringifyBNInJson();
+    const investorsString = stringifyBNInJson(investorsFinal);
 
     fs.writeFileSync(
         path.join(__dirname, jsonPath + IDO.toLowerCase() + ".json"),
-        JSON.stringify(PREFUNDERS, null, 4)
+        JSON.stringify(investorsString, null, 4)
     );
 }
 // We recommend this pattern to be able to use async/await everywhere
@@ -118,310 +116,217 @@ async function setWinnerFaction() {
     }
 }
 
-function buildObject(prefundersArray, stakersArray) {
-    prefundersArray.forEach(function (prefunder) {
+function buildObject(prefundersArray, stakersArray, factionsRanking) {
+    const getRanking = (faction) => factionsRanking[faction].ranking;
+
+    return prefundersArray.reduce((acu, prefunder) => {
         const key = prefunder.account.toLowerCase();
-        PREFUNDERS[key] = getEmptyValuesObject();
+        const stakingInfo = stakersArray.filter((o) => o.account === key);
 
-        // Set initial values
-        PREFUNDERS[key].account = key;
-        PREFUNDERS[key].faction = prefunder.faction;
-        PREFUNDERS[key].prefund = ethers.BigNumber.from(prefunder.prefunded);
-        PREFUNDERS[key].refund = ethers.BigNumber.from(prefunder.prefunded);
-        PREFUNDERS[key].account = key;
+        const investor = {
+            ...getEmptyValuesObject(),
+            account: key,
+            faction: prefunder.faction,
+            prefund: ethers.BigNumber.from(prefunder.prefunded),
+            refund: ethers.BigNumber.from(prefunder.prefunded),
+            energy: calculateEnergy(prefunder),
+            staked: calculateStacked(stakingInfo),
+            column: getRanking(prefunder.faction)
+        }
 
-        // Calculate total energy
-        const energyStatic = ethers.BigNumber.from(
-            prefunder.energyHolder.balanceStatic
-        );
-        const energyVariable = unscaleEnergyVariable(
-            ethers.BigNumber.from(prefunder.energyHolder.balanceVariable)
-        );
-        const energyPOAP =
-            prefunder.energyHolder.poaps.length > 0
-                ? ethers.BigNumber.from(prefunder.energyHolder.poaps[0].balanceEnergy)
-                : ethers.BigNumber.from("0");
-        PREFUNDERS[key].energy = energyStatic
-            .add(energyVariable)
-            .add(energyPOAP);
+        acu[key] = investor;
 
-        // Calculate total staked TUT (staking + farming)
-        const objs = stakersArray.filter((o) => o.account === key);
-        objs.forEach(function (obj) {
-            const amountBN = new ethers.BigNumber.from(obj.amount);
-            const tutAmount =
-                obj.type == 1 ? amountBN : transformLpToTut(amountBN);
-            PREFUNDERS[key].staked = PREFUNDERS[key].staked.add(tutAmount);
-        });
-
-        const column = FACTIONS[PREFUNDERS[key].faction].ranking;
-        PREFUNDERS[key].column = column;
-    });
+        return acu;
+    }, {})
 }
 
-function sortPrefundersByEnergy() {
-    const sortable = [];
-    let invalidPrefund = ZERO_BN
-
-    for (let key in PREFUNDERS) {
-        sortable.push(PREFUNDERS[key]);
-    }
-
+function rankByEnergy(investors) {
+    const sortable = Object.keys(investors).map((key) => investors[key]);
     sortable.sort(
-        (a, b) =>
-            parseFloat(b.energy.toString()) - parseFloat(a.energy.toString())
+        (a, b) => parseFloat(b.energy.toString()) - parseFloat(a.energy.toString()),
+    );
+    return sortable.map(((item, index) => ({
+        ...item,
+        ranking: index,
+    })));
+}
+
+function sortInverstors({ investors, numBoosters }) {
+    const sorted = rankByEnergy(investors);
+
+    let topLeft = numBoosters;
+    const ranked = sorted.map((item) => {
+        let type = 3;
+        let isBooster = false;
+        if (isSuperVenture(item.staked)) {
+            if (topLeft > 0) {
+                topLeft--;
+                isBooster = true;
+                type = 0
+            } else {
+                type = 1
+            }
+        } else if (isVenture(item.staked)) {
+            type = 2;
+        }
+
+        return {
+            ...item,
+            isBooster,
+            type,
+            row: type
+        };
+    });
+
+    return ranked.reduce((acu, item) => {
+        acu[item.account] = item;
+        return acu;
+    }, {});
+}
+
+function getInvalidPrefund(investors) {
+    return Object.values(investors).reduce((acu, investor) => {
+        const prefund = (investor.type === 3) ? investor.prefund : ZERO_BN
+        return acu.add(prefund)
+    }, ZERO_BN)
+}
+
+function getSlotPrefunds(investors, row, column) {
+    return Object.values(investors).reduce((acu, investor) => {
+        const prefund = (investor.row === row && investor.column === column) ? investor.prefund : ZERO_BN
+        return acu.add(prefund)
+    }, ZERO_BN)
+}
+
+function getRatios(investors, percentagesMatrix, totalAllocationBN) {
+    const ratiosMatrix = []
+    for (let i = 0; i < percentagesMatrix.length; i++) {
+        ratiosMatrix.push([])
+        for (let j = 0; j < percentagesMatrix[i].length; j++) {
+            const slotPrefund = getSlotPrefunds(investors, i, j)
+            const slotAllocation = totalAllocationBN.mul(percentagesMatrix[i][j]).div(HUNDRED_BN)
+            const ratio = slotAllocation.gte(slotPrefund) ? ONE_USDT_BN : slotAllocation.mul(ONE_USDT_BN).div(slotPrefund)
+            ratiosMatrix[i].push(ratio)
+        }
+    }
+    return ratiosMatrix
+}
+
+function distributeAllocationFixed(investors, totalAllocationBN, ratiosMatrix) {
+    let allocationLeftBN = totalAllocationBN
+    return [Object.values(investors).map((item) => {
+        let allocation = ZERO_BN
+        let allocatedUsdt = ZERO_BN
+        if (item.row < 2) {
+            allocatedUsdt = item.prefund.mul(ratiosMatrix[item.row][item.column]).div(ONE_USDT_BN)
+            if (item.row == 1) {
+                allocatedUsdt = allocatedUsdt.div(TWO_WEI_BN)
+            }
+            allocation = transformUsdtToIdoToken(allocatedUsdt)
+            allocationLeftBN = allocationLeftBN.sub(allocatedUsdt)
+        }
+
+        return {
+            ...item,
+            allocation: item.allocation.add(allocation),
+            refund: item.refund.sub(allocatedUsdt)
+        }
+    }).reduce((acu, item) => {
+        acu[item.account] = item;
+        return acu;
+    }, {}), allocationLeftBN]
+}
+
+function distributeAllocationLottery(investors, totalAllocationBN, allocationLeftBN, percentagesMatrix) {
+    for (let i = 1; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            const array = Object.values(investors).filter((investor) => (investor.row === i && investor.column === j))
+            let lotteryLeftBN = totalAllocationBN.mul(percentagesMatrix[i][j]).div(HUNDRED_BN)
+            if (i == 1) lotteryLeftBN = lotteryLeftBN.div(TWO_WEI_BN)
+
+            while (!lotteryLeftBN.isZero() && array.length > 0) {
+                const index = randomIntFromInterval(0, array.length - 1)
+                const investor = investors[array[index].account]
+                const minLotteryInvestor = investor.refund.gt(lotteryLeftBN) ? lotteryLeftBN : investor.refund
+                const lotteryAmount = minLotteryInvestor.lt(ONE_USDT_BN)
+                    ? parseFloat(ethers.utils.formatUnits(minLotteryInvestor, USDT_DECIMALS))
+                    : randomIntFromInterval(
+                        1,
+                        parseFloat(ethers.utils.formatUnits(minLotteryInvestor, USDT_DECIMALS))
+                    );
+                const lotteryAmountBN = ethers.utils.parseUnits(lotteryAmount.toString(), USDT_DECIMALS);
+                investor.refund = investor.refund.sub(lotteryAmountBN)
+                investor.lottery = investor.lottery.add(lotteryAmountBN)
+                investor.allocation = investor.allocation.add(transformUsdtToIdoToken(lotteryAmountBN))
+
+                if (investor.refund.isZero()) array.splice(index, 1)
+                lotteryLeftBN = lotteryLeftBN.sub(lotteryAmountBN)
+                allocationLeftBN = allocationLeftBN.sub(lotteryAmountBN)
+            }
+        }
+    }
+    return [investors, allocationLeftBN]
+}
+
+function distributeAllocationLeft(investors, allocationLeftBN) {
+    const array = Object.keys(investors).map((key) => investors[key]);
+    array.sort(
+        (a, b) => parseFloat(a.ranking) - parseFloat(b.ranking),
     );
 
-    for (let i = 0; i < sortable.length; i++) {
-        const key = sortable[i].account;
-
-        const staked = PREFUNDERS[key].staked;
-        PREFUNDERS[key].type = !isStandard(staked)
-            ? 3
-            : !isBooster(staked)
-                ? 2
-                : isSuperBooster()
-                    ? 0
-                    : 1;
-
-        const row = PREFUNDERS[key].type;
-        const column = FACTIONS[PREFUNDERS[key].faction].ranking;
-        PREFUNDERS[key].row = row;
-        PREFUNDERS[key].ranking = i;
-        if (row < 3)
-            PREFUNDS[row][column] = PREFUNDS[row][column].add(
-                PREFUNDERS[key].prefund
-            );
-        if (row == 1) SUPERTUTELLIAN_LOTTERY[column].push(key);
-        if (row == 2) TUTELLIAN_LOTTERY[column].push(key);
-        if (PREFUNDERS[key].type == 3) invalidPrefund = invalidPrefund.add(PREFUNDERS[key].prefund)
+    let index = 0;
+    while (!allocationLeftBN.isZero() && index < array.length) {
+        const investor = investors[array[index].account]
+        index++
+        if (investor.row < 3) {
+            const leftAmountUsdtBN = investor.refund.gt(allocationLeftBN) ? allocationLeftBN : investor.refund;
+            allocationLeftBN = allocationLeftBN.sub(leftAmountUsdtBN)
+            investor.refund = investor.refund.sub(leftAmountUsdtBN)
+            investor.left = investor.left.add(leftAmountUsdtBN)
+            investor.allocation = investor.allocation.add(transformUsdtToIdoToken(leftAmountUsdtBN))
+        }
     }
-    return invalidPrefund
+    return investors;
 }
 
-function buildMatrixs(availableToDistributeBN) {
-    TOTAL_ALLOCATION_LEFT = availableToDistributeBN
-    for (let i = 0; i < ALLOCATION.length; i++) {
-        for (let j = 0; j < ALLOCATION[i].length; j++) {
-            TOTAL_PREFUNDS_LEFT = TOTAL_PREFUNDS_LEFT.add(PREFUNDS[i][j])
-            // Calculate available allocation amounts (in USDT) by slot
-            ALLOCATION[i][j] = availableToDistributeBN
-                .mul(ALLOCATION_PERCENTAGES[i][j])
-                .div(HUNDRED_BN);
+function stringifyBNInJson(investors) {
+    return Object.entries(investors).reduce((acu, [key, investor]) => {
 
-            // Derivate amount available to lottery by slot
-            // Note: forcing ratios to have usdt precision could derive in having a smaller ratio than right one but not a problem
+        acu[key] = {
+            ...investor,
+            energy: investor.energy.toString(),
+            allocation: investor.allocation.toString(),
+            prefund: investor.prefund.toString(),
+            lottery: investor.lottery.toString(),
+            refund: investor.refund.toString(),
+            left: investor.left.toString(),
+            staked: investor.staked.toString(),
 
-            // Superboosters: 0% lottery, 100% fixed. If slot is overprefunded ratio < 1
-            if (i == 0 && !PREFUNDS[i][j].isZero()) {
-                RATIOS[i][j] = ALLOCATION[i][j].gte(PREFUNDS[i][j])
-                    ? ONE_USDT_BN
-                    : ALLOCATION[i][j].mul(ONE_USDT_BN).div(PREFUNDS[i][j]);
-            }
-
-            // Boosters: 50% fixed, 50% lottery. If slot is overprefunded ratio < 1, considering 50% of prefunds
-            if (i == 1) {
-                const half = ALLOCATION[i][j].div(TWO_WEI_BN);
-                // Note: maybe 1 decimal position is lost...in that case it goes to allocation and not lottery
-                LOTTERY[i][j] = half;
-                ALLOCATION[i][j] = ALLOCATION[i][j].sub(LOTTERY[i][j]);
-
-                if (!PREFUNDS[i][j].isZero()) {
-                    RATIOS[i][j] = ALLOCATION[i][j].gte(
-                        PREFUNDS[i][j].div(TWO_WEI_BN)
-                    )
-                        ? ONE_USDT_BN
-                        : ALLOCATION[i][j].mul(ONE_USDT_BN).div(PREFUNDS[i][j].div(TWO_WEI_BN));
-                }
-            }
-
-            // Standards: 100% lottery, 0% fixed. Ratio no needed
-            if (i == 2) {
-                LOTTERY[i][j] = ALLOCATION[i][j];
-                ALLOCATION[i][j] = ZERO_BN;
-            }
+            row: undefined,
+            column: undefined,
         }
-    }
-}
-
-function distributeAllocationFixed() {
-    for (let key in PREFUNDERS) {
-        const prefunder = PREFUNDERS[key];
-        const row = prefunder.row;
-        const column = prefunder.column;
-        if (row < 2) {
-            const prefund =
-                row == 0
-                    ? prefunder.prefund
-                    : prefunder.prefund.div(TWO_WEI_BN);
-            const allocationUsdt = prefund.mul(RATIOS[row][column]).div(ONE_USDT_BN);
-            increasePrefunderAllocation(key, allocationUsdt);
-        }
-    }
-}
-
-function distributeAllocationLottery() {
-    for (let i = 0; i < 3; i++) {
-        // Note: this could be losing some amount...will be distributed in left amounts
-        let availableSupertutellianSlot = PREFUNDS[1][i].div(TWO_WEI_BN);
-        while (
-            !LOTTERY[1][i].isZero() &&
-            !availableSupertutellianSlot.isZero()
-        ) {
-            const prefunderIndex = randomIntFromInterval(
-                0,
-                SUPERTUTELLIAN_LOTTERY[i].length - 1
-            );
-            const key = SUPERTUTELLIAN_LOTTERY[i][prefunderIndex];
-            const prefunder = PREFUNDERS[key];
-            // Note: LOTTERY[1][i] and availableSupertutellianSlot have usdt precision...so does maxAvailable
-            const maxAvailable = availableSupertutellianSlot.gt(LOTTERY[1][i])
-                ? LOTTERY[1][i]
-                : availableSupertutellianSlot;
-            const prefunderAvailable = prefunder.refund;
-            const maxAmount = prefunderAvailable.gt(maxAvailable)
-                ? maxAvailable
-                : prefunderAvailable;
-            const amount = maxAmount.lt(ONE_USDT_BN)
-                ? parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
-                : randomIntFromInterval(
-                    1,
-                    parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
-                );
-            const amountBN = ethers.utils.parseUnits(amount.toString(), USDT_DECIMALS);
-            const removeKeyFromLottery = increasePrefunderLottery(
-                key,
-                amountBN
-            );
-            if (removeKeyFromLottery)
-                SUPERTUTELLIAN_LOTTERY[i].splice(prefunderIndex, 1);
-            LOTTERY[1][i] = LOTTERY[1][i].sub(amountBN);
-            availableSupertutellianSlot =
-                availableSupertutellianSlot.sub(amountBN);
-        }
-
-        let availableTutellianSlot = PREFUNDS[2][i];
-        while (!LOTTERY[2][i].isZero() && !availableTutellianSlot.isZero()) {
-            const prefunderIndex = randomIntFromInterval(
-                0,
-                TUTELLIAN_LOTTERY[i].length - 1
-            );
-            const key = TUTELLIAN_LOTTERY[i][prefunderIndex];
-            const prefunder = PREFUNDERS[key];
-            const maxAvailable = availableTutellianSlot.gt(LOTTERY[2][i])
-                ? LOTTERY[2][i]
-                : availableTutellianSlot;
-            const prefunderAvailable = prefunder.refund;
-            const maxAmount = prefunderAvailable.gt(maxAvailable)
-                ? maxAvailable
-                : prefunderAvailable;
-            const amount = maxAmount.lt(ONE_USDT_BN)
-                ? parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
-                : randomIntFromInterval(
-                    1,
-                    parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
-                );
-            const amountBN = ethers.utils.parseUnits(amount.toString(), USDT_DECIMALS);
-            const removeKeyFromLottery = increasePrefunderLottery(
-                key,
-                amountBN
-            );
-            if (removeKeyFromLottery)
-                TUTELLIAN_LOTTERY[i].splice(prefunderIndex, 1);
-            LOTTERY[2][i] = LOTTERY[2][i].sub(amountBN);
-            availableTutellianSlot = availableTutellianSlot.sub(amountBN);
-        }
-    }
-}
-
-function distributeAllocationLeft() {
-    if (TOTAL_PREFUNDS_LEFT.gte(TOTAL_ALLOCATION_LEFT)) {
-        // Enough to distribute
-
-        const sortable = [];
-        for (let key in PREFUNDERS) {
-            sortable.push(PREFUNDERS[key]);
-        }
-        sortable.sort((a, b) => a.ranking - b.ranking);
-
-        for (let i in sortable) {
-            const key = sortable[i].account;
-            const prefunder = PREFUNDERS[key];
-
-            if (
-                prefunder.refund.gt(ZERO_BN) &&
-                TOTAL_ALLOCATION_LEFT.gt(ZERO_BN) &&
-                prefunder.row < 3
-            ) {
-                const extraAmountBN = prefunder.refund.gt(TOTAL_ALLOCATION_LEFT)
-                    ? TOTAL_ALLOCATION_LEFT
-                    : prefunder.refund;
-                increasePrefunderLeft(key, extraAmountBN);
-            }
-        }
-    } else {
-        // Not enough to distribute
-        throw new Error(
-            "Not enough prefund available to distribute allocation left"
-        );
-    }
-}
-
-function stringifyBNInJson() {
-    for (let key in PREFUNDERS) {
-        PREFUNDERS[key].energy = PREFUNDERS[key].energy.toString();
-        PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.toString();
-        PREFUNDERS[key].prefund = PREFUNDERS[key].prefund.toString()
-        PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.toString()
-        PREFUNDERS[key].refund = PREFUNDERS[key].refund.toString()
-        PREFUNDERS[key].left = PREFUNDERS[key].left.toString()
-        PREFUNDERS[key].staked = PREFUNDERS[key].staked.toString();
-
-        delete PREFUNDERS[key].row;
-        delete PREFUNDERS[key].column;
-    }
+        return acu;
+    }, {})
 }
 
 /******** UTILS */
 
-function increasePrefunderLeft(key, amountBN) {
-    increasePrefunderAllocation(key, amountBN);
-    PREFUNDERS[key].left = PREFUNDERS[key].left.add(amountBN);
-}
-
-function increasePrefunderLottery(key, amountBN) {
-    increasePrefunderAllocation(key, amountBN);
-    PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.add(amountBN);
-    return PREFUNDERS[key].refund.isZero();
-}
-
-function increasePrefunderAllocation(key, amountBN) {
-    PREFUNDERS[key].refund = PREFUNDERS[key].refund.sub(amountBN);
-    PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.add(
-        transformUsdtToIdoToken(amountBN)
-    );
-    TOTAL_ALLOCATION = TOTAL_ALLOCATION.add(amountBN);
-    TOTAL_ALLOCATION_LEFT = TOTAL_ALLOCATION_LEFT.sub(amountBN);
-    TOTAL_PREFUNDS_LEFT = TOTAL_PREFUNDS_LEFT.sub(amountBN)
-}
-
-function getEmptyValuesObject() {
-    const object = new Object();
-    object.account = ethers.constants.AddressZero;
-    object.ranking = -1;
-    object.type = -1;
-    object.faction = ethers.constants.HashZero;
-    object.energy = ZERO_BN;
-    object.allocation = ZERO_BN;
-    object.prefund = ZERO_BN;
-    object.lottery = ZERO_BN;
-    object.refund = ZERO_BN;
-    object.left = ZERO_BN;
-    object.staked = ZERO_BN;
-    object.row = -1;
-    object.column = -1;
-    return object;
-}
+const getEmptyValuesObject = () => ({
+    account: ethers.constants.AddressZero,
+    isBooster: false,
+    ranking: -1,
+    type: -1,
+    faction: ethers.constants.HashZero,
+    energy: ZERO_BN,
+    allocation: ZERO_BN,
+    prefund: ZERO_BN,
+    lottery: ZERO_BN,
+    refund: ZERO_BN,
+    left: ZERO_BN,
+    staked: ZERO_BN,
+    row: -1,
+    column: -1,
+});
 
 /******** MATH UTILS */
 
@@ -441,6 +346,28 @@ async function getReserves() {
     LP_TOTAL_SUPPLY = await contract.totalSupply();
 }
 
+function calculateEnergy(prefunder) {
+    const energyStatic = ethers.BigNumber.from(
+        prefunder.energyHolder.balanceStatic
+    );
+    const energyVariable = unscaleEnergyVariable(
+        ethers.BigNumber.from(prefunder.energyHolder.balanceVariable)
+    );
+    const energyPOAP =
+        prefunder.energyHolder.poaps.length > 0
+            ? ethers.BigNumber.from(prefunder.energyHolder.poaps[0].balanceEnergy)
+            : ethers.BigNumber.from("0");
+    return energyStatic.add(energyVariable).add(energyPOAP)
+}
+
+function calculateStacked(stakingInfo) {
+    return stakingInfo.reduce((acu, info) => {
+        const amountBN = new ethers.BigNumber.from(info.amount);
+        const tutAmount = info.type === 1 ? amountBN : transformLpToTut(amountBN);
+        return acu.add(tutAmount);
+    }, ZERO_BN);
+}
+
 function unscaleEnergyVariable(amount) {
     return rayMul(amount, getNormalization());
 }
@@ -450,14 +377,6 @@ function getNormalization() {
     if (timestamp.eq(mathObj.blockTimestamp)) return mathObj.normalization;
     let result = calculateLinearInterest(timestamp);
     return rayMul(result, mathObj.normalization);
-}
-
-function convertToUsdtPrecision(weiAmountBN) {
-    return weiAmountBN.div(ONE_WEI_MINUS_USDT_DECIMALS).mul(ONE_WEI_MINUS_USDT_DECIMALS)
-}
-
-function convertDecimals18To6(amountBN) {
-    return ethers.utils.parseUnits(ethers.utils.formatEther(amountBN.toString()).toString(), 6)
 }
 
 function rayMul(a, b) {
@@ -473,18 +392,12 @@ function calculateLinearInterest(lastUpdateTimestamp) {
         .add(mathObj.ray);
 }
 
-function isBooster(tutAmount) {
+function isSuperVenture(tutAmount) {
     return BOOSTER_LIMIT_BN.lte(tutAmount);
 }
 
-function isStandard(tutAmount) {
+function isVenture(tutAmount) {
     return STANDARD_LIMIT_BN.lte(tutAmount);
-}
-
-function isSuperBooster() {
-    if (!(N_SUPERBOOSTERS_LEFT > 0)) return false;
-    N_SUPERBOOSTERS_LEFT--;
-    return true;
 }
 
 function randomIntFromInterval(min, max) {
@@ -624,7 +537,6 @@ const mathObj = {
     halfRAY: ethers.BigNumber.from("500000000000000000000000000"),
 };
 
-const PREFUNDERS = new Object();
 const FACTIONS = new Object();
 FACTIONS[NAKAMOTOS_FACTION] = { energy: ZERO_BN, ranking: -1 };
 FACTIONS[VUTERINS_FACTION] = { energy: ZERO_BN, ranking: -1 };
@@ -647,34 +559,3 @@ const ALLOCATION_PERCENTAGES = [
         ethers.utils.parseEther("7"),
     ],
 ];
-
-const PREFUNDS = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-];
-
-const ALLOCATION = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-];
-
-const LOTTERY = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-];
-
-const RATIOS = [
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-    [ZERO_BN, ZERO_BN, ZERO_BN],
-];
-
-let TOTAL_ALLOCATION_LEFT = ZERO_BN;
-let TOTAL_ALLOCATION = ZERO_BN;
-let TOTAL_PREFUNDS_LEFT = ZERO_BN;
-
-const SUPERTUTELLIAN_LOTTERY = [[], [], []];
-const TUTELLIAN_LOTTERY = [[], [], []];
