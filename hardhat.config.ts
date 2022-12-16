@@ -30,13 +30,13 @@ const config: HardhatUserConfig = {
         mnemonic: process.env.MNEMONIC,
       },
       forking: {
-        url: process.env.ETH_GOERLI_TESTNET_URL || '',
+        url: process.env.POLYGON_MAINNET_URL || '',
         // The Hardhat network will by default fork from the latest mainnet block
         // To pin the block number, specify it below
         // You will need access to a node with archival data for this to work!
         // blockNumber: 14743877,
         // If you want to do some forking, set `enabled` to true
-        enabled: false,
+        enabled: true,
       },
     },
     localhost: {
@@ -45,10 +45,10 @@ const config: HardhatUserConfig = {
     goerli: {
       url: process.env.GOERLI_RPC || "",
       accounts:
-        {
-          mnemonic: process.env.MNEMONIC,
-        }
-        // process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      {
+        mnemonic: process.env.MNEMONIC,
+      }
+      // process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     rinkeby: {
       url: process.env.ETH_RINKEBY_TESTNET_URL || "",

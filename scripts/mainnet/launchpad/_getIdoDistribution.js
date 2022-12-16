@@ -38,8 +38,8 @@ let FORCE_CLOSE_UNDER_OBJETIVE = true;
 async function main() {
     await getReserves();
     const ido = await getIDO();
-    const fundingAmountBN = ethers.utils.parseUnits(ido.fundingAmount, PARSE_UNITS);
-    const prefundedBN = ethers.utils.parseUnits(ido.prefunded, PARSE_UNITS);
+    const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount);
+    const prefundedBN = ethers.BigNumber.from(ido.prefunded);
     const availableToDistributeBN = (fundingAmountBN.gt(prefundedBN) && FORCE_CLOSE_UNDER_OBJETIVE) ? prefundedBN : fundingAmountBN
 
     // Initialize object used to unscale energy
@@ -126,8 +126,8 @@ function buildObject(prefundersArray, stakersArray) {
         // Set initial values
         PREFUNDERS[key].account = key;
         PREFUNDERS[key].faction = prefunder.faction;
-        PREFUNDERS[key].prefund = ethers.utils.parseUnits(prefunder.prefunded, PARSE_UNITS);
-        PREFUNDERS[key].refund = ethers.utils.parseUnits(prefunder.prefunded, PARSE_UNITS);
+        PREFUNDERS[key].prefund = ethers.BigNumber.from(prefunder.prefunded);
+        PREFUNDERS[key].refund = ethers.BigNumber.from(prefunder.prefunded);
         PREFUNDERS[key].account = key;
 
         // Calculate total energy
@@ -205,9 +205,9 @@ function buildMatrixs(availableToDistributeBN) {
         for (let j = 0; j < ALLOCATION[i].length; j++) {
             TOTAL_PREFUNDS_LEFT = TOTAL_PREFUNDS_LEFT.add(PREFUNDS[i][j])
             // Calculate available allocation amounts (in USDT) by slot
-            ALLOCATION[i][j] = convertToUsdtPrecision(availableToDistributeBN
+            ALLOCATION[i][j] = availableToDistributeBN
                 .mul(ALLOCATION_PERCENTAGES[i][j])
-                .div(HUNDRED_BN));
+                .div(HUNDRED_BN);
 
             // Derivate amount available to lottery by slot
             // Note: forcing ratios to have usdt precision could derive in having a smaller ratio than right one but not a problem
@@ -215,24 +215,23 @@ function buildMatrixs(availableToDistributeBN) {
             // Superboosters: 0% lottery, 100% fixed. If slot is overprefunded ratio < 1
             if (i == 0 && !PREFUNDS[i][j].isZero()) {
                 RATIOS[i][j] = ALLOCATION[i][j].gte(PREFUNDS[i][j])
-                    ? ONE_BN
-                    : convertToUsdtPrecision(ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j]));
+                    ? ONE_USDT_BN
+                    : ALLOCATION[i][j].mul(ONE_USDT_BN).div(PREFUNDS[i][j]);
             }
 
             // Boosters: 50% fixed, 50% lottery. If slot is overprefunded ratio < 1, considering 50% of prefunds
             if (i == 1) {
                 const half = ALLOCATION[i][j].div(TWO_WEI_BN);
-                const halfUsdtPrecision = convertToUsdtPrecision(half)
                 // Note: maybe 1 decimal position is lost...in that case it goes to allocation and not lottery
-                LOTTERY[i][j] = halfUsdtPrecision;
+                LOTTERY[i][j] = half;
                 ALLOCATION[i][j] = ALLOCATION[i][j].sub(LOTTERY[i][j]);
 
                 if (!PREFUNDS[i][j].isZero()) {
                     RATIOS[i][j] = ALLOCATION[i][j].gte(
                         PREFUNDS[i][j].div(TWO_WEI_BN)
                     )
-                        ? ONE_BN
-                        : convertToUsdtPrecision(ALLOCATION[i][j].mul(ONE_BN).div(PREFUNDS[i][j].div(TWO_WEI_BN)));
+                        ? ONE_USDT_BN
+                        : ALLOCATION[i][j].mul(ONE_USDT_BN).div(PREFUNDS[i][j].div(TWO_WEI_BN));
                 }
             }
 
@@ -255,7 +254,7 @@ function distributeAllocationFixed() {
                 row == 0
                     ? prefunder.prefund
                     : prefunder.prefund.div(TWO_WEI_BN);
-            const allocationUsdt = convertToUsdtPrecision(prefund.mul(RATIOS[row][column]).div(ONE_BN));
+            const allocationUsdt = prefund.mul(RATIOS[row][column]).div(ONE_USDT_BN);
             increasePrefunderAllocation(key, allocationUsdt);
         }
     }
@@ -264,7 +263,7 @@ function distributeAllocationFixed() {
 function distributeAllocationLottery() {
     for (let i = 0; i < 3; i++) {
         // Note: this could be losing some amount...will be distributed in left amounts
-        let availableSupertutellianSlot = convertToUsdtPrecision(PREFUNDS[1][i].div(TWO_WEI_BN));
+        let availableSupertutellianSlot = PREFUNDS[1][i].div(TWO_WEI_BN);
         while (
             !LOTTERY[1][i].isZero() &&
             !availableSupertutellianSlot.isZero()
@@ -283,13 +282,13 @@ function distributeAllocationLottery() {
             const maxAmount = prefunderAvailable.gt(maxAvailable)
                 ? maxAvailable
                 : prefunderAvailable;
-            const amount = maxAmount.lt(ONE_BN)
-                ? parseFloat(ethers.utils.formatEther(maxAmount))
+            const amount = maxAmount.lt(ONE_USDT_BN)
+                ? parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
                 : randomIntFromInterval(
                     1,
-                    parseFloat(ethers.utils.formatEther(maxAmount))
+                    parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
                 );
-            const amountBN = ethers.utils.parseEther(amount.toString());
+            const amountBN = ethers.utils.parseUnits(amount.toString(), USDT_DECIMALS);
             const removeKeyFromLottery = increasePrefunderLottery(
                 key,
                 amountBN
@@ -316,13 +315,13 @@ function distributeAllocationLottery() {
             const maxAmount = prefunderAvailable.gt(maxAvailable)
                 ? maxAvailable
                 : prefunderAvailable;
-            const amount = maxAmount.lt(ONE_BN)
-                ? parseFloat(ethers.utils.formatEther(maxAmount))
+            const amount = maxAmount.lt(ONE_USDT_BN)
+                ? parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
                 : randomIntFromInterval(
                     1,
-                    parseFloat(ethers.utils.formatEther(maxAmount))
+                    parseFloat(ethers.utils.formatUnits(maxAmount, USDT_DECIMALS))
                 );
-            const amountBN = ethers.utils.parseEther(amount.toString());
+            const amountBN = ethers.utils.parseUnits(amount.toString(), USDT_DECIMALS);
             const removeKeyFromLottery = increasePrefunderLottery(
                 key,
                 amountBN
@@ -372,10 +371,10 @@ function stringifyBNInJson() {
     for (let key in PREFUNDERS) {
         PREFUNDERS[key].energy = PREFUNDERS[key].energy.toString();
         PREFUNDERS[key].allocation = PREFUNDERS[key].allocation.toString();
-        PREFUNDERS[key].prefund = convertDecimals18To6(PREFUNDERS[key].prefund).toString()
-        PREFUNDERS[key].lottery = convertDecimals18To6(PREFUNDERS[key].lottery).toString()
-        PREFUNDERS[key].refund = convertDecimals18To6(PREFUNDERS[key].refund).toString()
-        PREFUNDERS[key].left = convertDecimals18To6(PREFUNDERS[key].left).toString()
+        PREFUNDERS[key].prefund = PREFUNDERS[key].prefund.toString()
+        PREFUNDERS[key].lottery = PREFUNDERS[key].lottery.toString()
+        PREFUNDERS[key].refund = PREFUNDERS[key].refund.toString()
+        PREFUNDERS[key].left = PREFUNDERS[key].left.toString()
         PREFUNDERS[key].staked = PREFUNDERS[key].staked.toString();
 
         delete PREFUNDERS[key].row;
@@ -427,7 +426,7 @@ function getEmptyValuesObject() {
 /******** MATH UTILS */
 
 function transformUsdtToIdoToken(amountUsdtBN) {
-    return amountUsdtBN.mul(ONE_BN).div(IDO_TOKEN_USDT_PRICE);
+    return amountUsdtBN.mul(ONE_BN).mul(ONE_BN).div(IDO_TOKEN_USDT_PRICE).div(ONE_USDT_BN);
 }
 
 function transformLpToTut(lpAmount) {
