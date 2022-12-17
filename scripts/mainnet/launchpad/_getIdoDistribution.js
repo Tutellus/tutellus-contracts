@@ -56,7 +56,7 @@ async function main() {
     const investors = buildObject(prefunders, stakers, FACTIONS)
 
     // Sort by energy and set ranking and type in JSON object
-    const sorted = sortInverstors({ investors, N_SUPERBOOSTERS })
+    const sorted = sortInverstors(investors, N_SUPERBOOSTERS)
 
     // Prefunders without faction
     const invalidPrefundBN = getInvalidPrefund(sorted)
@@ -151,7 +151,7 @@ function rankByEnergy(investors) {
     })));
 }
 
-function sortInverstors({ investors, numBoosters }) {
+function sortInverstors(investors, numBoosters) {
     const sorted = rankByEnergy(investors);
 
     let topLeft = numBoosters;
