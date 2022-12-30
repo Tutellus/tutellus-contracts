@@ -7,6 +7,8 @@ const path = require("path");
 
 const GRAPH_URL =
     "https://api.thegraph.com/subgraphs/name/tutellus/tutellus-launchpad";
+const GRAPH_URL_TUTELLUS =
+    "https://api.thegraph.com/subgraphs/name/tutellus/tutellus";
 const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
 const TWO_WEI_BN = ethers.BigNumber.from("2");
@@ -30,11 +32,12 @@ const USDT_DECIMALS = 6
 const ONE_USDT_BN = ethers.utils.parseUnits("1", USDT_DECIMALS);
 const PARSE_UNITS = 18 - USDT_DECIMALS
 const ONE_WEI_MINUS_USDT_DECIMALS = ethers.utils.parseUnits("1", PARSE_UNITS)
-const N_SUPERBOOSTERS = 1;
+const N_SUPERBOOSTERS = 10;
 let FORCE_CLOSE_UNDER_OBJETIVE = true;
+const BLOCK_NUMBER = 37463968
 
 async function main() {
-    await getReserves();
+    await getReservesSubgraph(BLOCK_NUMBER);
     const ido = await getIDO();
     const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount);
     const prefundedBN = ethers.BigNumber.from(ido.prefunded);
@@ -346,6 +349,13 @@ async function getReserves() {
     LP_TOTAL_SUPPLY = await contract.totalSupply();
 }
 
+async function getReservesSubgraph(blockNumber) {
+    const query = '{ liquidity (id:"0x0000000000000000000000000000000000000000", block:{number:' + blockNumber.toString() + ') { liquidityTUT } lptoken (id:"0x5d9ac8993b714df01d079d1b5b0b592e579ca099", block:{number:' + blockNumber.toString() + '}) { totalSupplyLP } }'
+    const data = await querySubgraphTutellus(query);
+    RESERVES_TUT = ethers.BigNumber.from(data.liquidity.liquidityTUT)
+    LP_TOTAL_SUPPLY = ethers.BigNumber.from(data.lptoken.totalSupplyLP)
+}
+
 function calculateEnergy(prefunder) {
     const energyStatic = ethers.BigNumber.from(
         prefunder.energyHolder.balanceStatic
@@ -494,14 +504,29 @@ async function setMathObj() {
     mathObj.lastUpdateTimestamp = ethers.BigNumber.from(
         obj.lastUpdateTimestamp
     );
+    const blockTimestamp = await getBlockTimestamp(BLOCK_NUMBER)
+    mathObj.blockTimestamp = ethers.BigNumber.from(blockTimestamp.toString())
+}
+
+async function getBlockTimestamp(blockNumber) {
+    const block = await ethers.provider.getBlock(blockNumber)
+    return block.timestamp;
 }
 
 async function querySubgraph(query) {
+    return await querySubgraphUrl(query, GRAPH_URL)
+}
+
+async function querySubgraphTutellus(query) {
+    return await querySubgraphUrl(query, GRAPH_URL_TUTELLUS)
+}
+
+async function querySubgraphUrl(query, url) {
     let response;
     let responseData;
 
     try {
-        response = await fetch(GRAPH_URL, {
+        response = await fetch(url, {
             method: "POST",
             headers: {
                 Accept: "application/json",
