@@ -34,7 +34,7 @@ const PARSE_UNITS = 18 - USDT_DECIMALS
 const ONE_WEI_MINUS_USDT_DECIMALS = ethers.utils.parseUnits("1", PARSE_UNITS)
 const N_SUPERBOOSTERS = 10;
 let FORCE_CLOSE_UNDER_OBJETIVE = true;
-const BLOCK_NUMBER = 37463968
+const BLOCK_NUMBER = 37468043
 
 async function main() {
     await getReservesSubgraph(BLOCK_NUMBER);
@@ -350,7 +350,7 @@ async function getReserves() {
 }
 
 async function getReservesSubgraph(blockNumber) {
-    const query = '{ liquidity (id:"0x0000000000000000000000000000000000000000", block:{number:' + blockNumber.toString() + ') { liquidityTUT } lptoken (id:"0x5d9ac8993b714df01d079d1b5b0b592e579ca099", block:{number:' + blockNumber.toString() + '}) { totalSupplyLP } }'
+    const query = '{ liquidity (id:"0x0000000000000000000000000000000000000000", block:{number:' + blockNumber.toString() + '}) { liquidityTUT } lptoken (id:"0x5d9ac8993b714df01d079d1b5b0b592e579ca099", block:{number:' + blockNumber.toString() + '}) { totalSupplyLP } }'
     const data = await querySubgraphTutellus(query);
     RESERVES_TUT = ethers.BigNumber.from(data.liquidity.liquidityTUT)
     LP_TOTAL_SUPPLY = ethers.BigNumber.from(data.lptoken.totalSupplyLP)
