@@ -9,18 +9,19 @@ const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
 const IDO = "0x620a27a4c628d46cfb398b3169948baa90089dc5";
 const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.1");
+const { downloadJSON, uploadJSON } = require('../../../utils/ipfs');
 const jsonPath =
     "../../../examples/mainnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
     "https://api.thegraph.com/subgraphs/name/tutellus/tutellus-launchpad";
+const URI = "https://ipfs.io/ipfs/QmWtRm4ujAn45KGErXi7QQJbgLaaGJhQhi3CzgyBJMUpQV"
 
 async function main() {
     const ido = await getIDO();
     const prefundersArray = await getPrefunders();
     const fundingAmountUsdtBN = ethers.BigNumber.from(ido.fundingAmount);
     const prefundedUsdtBN = ethers.BigNumber.from(ido.prefunded);
-    const file = await readFile(path.join(__dirname, jsonPath), "utf8");
-    const json = JSON.parse(file);
+    const json = await downloadJSON(URI);
     const validJson = await verifyJson(
         json,
         prefundersArray,
@@ -139,10 +140,10 @@ async function querySubgraph(query) {
 async function getTokenBalances() {
     const ido = await ethers.getContractAt("TutellusIDO", IDO)
     const prefundTokenAddress = await ido.prefundToken()
-    const prefundToken = await ethers.getContractAt("ERC20", prefundTokenAddress)
-    const idoTokenAddress = await ido.idoToken()
+    // const prefundToken = await ethers.getContractAt("ERC20", prefundTokenAddress)
+    // const idoTokenAddress = await ido.idoToken()
     // const idoToken = await ethers.getContractAt("ERC20", idoTokenAddress)
-    const prefundTokenBalance = await prefundToken.balanceOf(IDO)
+    const prefundTokenBalance = await ido.prefunded()
     const idoTokenBalance = ZERO_BN//await idoToken.balanceOf(IDO)
     return [
         ethers.BigNumber.from(prefundTokenBalance.toString()),
