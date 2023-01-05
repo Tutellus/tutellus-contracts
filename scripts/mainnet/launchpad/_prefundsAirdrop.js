@@ -3,7 +3,6 @@ const ethers = bre.ethers;
 const fetch = (...args) =>
     import("node-fetch").then(({ default: fetch }) => fetch(...args));
 const fs = require("fs");
-const { readFile } = require("fs/promises");
 const path = require("path");
 const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
@@ -120,18 +119,6 @@ async function querySubgraph(query) {
 
 /******** MATH UTILS */
 
-function transformUsdtToIdoToken(amountUsdtBN) {
-    return amountUsdtBN.mul(ONE_BN).div(IDO_TOKEN_USDT_PRICE);
-}
-
-function transformIdoTokenToUsdt(amountIdoBN) {
-    return amountIdoBN.mul(IDO_TOKEN_USDT_PRICE).div(ONE_BN);
-}
-
 function convertDecimals6To18(amountBN) {
     return ethers.utils.parseUnits(amountBN.toString(), 12)
-}
-
-function createBN(amountString) {
-    return ethers.BigNumber.from(amountString)
 }
