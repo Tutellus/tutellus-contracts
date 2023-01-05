@@ -29,7 +29,7 @@ const getTotal = (jsonOld, jsonNew) => {
     return counter
 }
 
-const URI = "https://ipfs.io/ipfs/QmX2kMbBQZrGKgbi1s7CQck94Eqpq5gbpuXhpbRGs3xXSj"
+const URI = "https://ipfs.io/ipfs/QmVEKV6SKiXeqQeLSB3kUiRSoEMGtm15NAy9rHEUrs9hFZ"
 
 const main = async () => {
     const myClientsVault = await ethers.getContractAt('TutellusClientsVaultV2', '0x9E7b780Ebc944260081A443d5703D86DcAef002c');
