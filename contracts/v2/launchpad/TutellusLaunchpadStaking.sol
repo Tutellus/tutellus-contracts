@@ -152,6 +152,13 @@ contract TutellusLaunchpadStaking is
         return _getEnergyMultiplier();
     }
 
+    function syncBalance(address recipient) external onlyRole(LAUNCHPAD_ADMIN_ROLE) {
+        ITutellusERC20 tokenInterface = ITutellusERC20(token);
+        uint256 tokenBalance = tokenInterface.balanceOf(address(this));
+        uint256 dif = tokenBalance - balance;
+        if (dif != 0) tokenInterface.transfer(recipient, dif);
+    }
+
     /// @inheritdoc ITutellusLaunchpadStaking
     function setFees(
         uint256 minFee_,
