@@ -52,15 +52,15 @@ const SECONDS = 1
 const SECONDS_PER_YEAR = 365 * 24 * 60 * 60
 
 const getAddresses = async () => {
-const addresses = await Promise.all([
-    myDeployer.token(),
-    myDeployer.rolemanager(),
-    myDeployer.rewardsVault(),
-    myDeployer.clientsVault(),
-    myDeployer.holdersVault(),
-    myDeployer.treasuryVault()
-])
-return addresses
+    const addresses = await Promise.all([
+        myDeployer.token(),
+        myDeployer.rolemanager(),
+        myDeployer.rewardsVault(),
+        myDeployer.clientsVault(),
+        myDeployer.holdersVault(),
+        myDeployer.treasuryVault()
+    ])
+    return addresses
 }
 
 const setInstances = async (addresses) => {
@@ -82,7 +82,7 @@ describe('Launchpad Staking', function () {
         const addresses = await getAddresses()
         await setInstances(addresses)
 
-        const ids = {   
+        const ids = {
             ERC20: myToken.address,
             REWARDS_VAULT: myRewardsVault.address,
             HOLDERS_VAULT: myHoldersVault.address,
@@ -109,7 +109,7 @@ describe('Launchpad Staking', function () {
 
         const FactionManager = await ethers.getContractFactory('TutellusFactionManager');
         let initializeFactionManager = FactionManager.interface.encodeFunctionData('initialize', []);
-        
+
         await myManager.deploy(ENERGY_ID, Energy.bytecode, initializeCalldata)
         await myManager.deploy(REWARDS_ID, RewardsVaultV2.bytecode, initializeCalldata)
         await myManager.deploy(FACTION_MANAGER, FactionManager.bytecode, initializeFactionManager)
@@ -136,7 +136,7 @@ describe('Launchpad Staking', function () {
         await myManager.grantRole(LAUNCHPAD_ADMIN_ROLE, owner)
         await myManager.grantRole(ENERGY_MINTER_ROLE, owner)
         await myManager.grantRole(ENERGY_MULTIPLIER_MANAGER_ADMIN_ROLE, owner)
-        
+
         await myToken.mint(owner, parseEther('100000'))
     })
 
@@ -144,10 +144,10 @@ describe('Launchpad Staking', function () {
         it('Deploying Launchpad Staking', async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
-    
+
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
+
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
             const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
 
@@ -177,10 +177,10 @@ describe('Launchpad Staking', function () {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
-    
+
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
+
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
             const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
 
@@ -212,7 +212,17 @@ describe('Launchpad Staking', function () {
             const energyBalance = await myEnergy.balanceOf(owner)
             expect(etherToNumber(energyBalance)).eq(etherToNumber(ONE_ETHER))
         })
-        it('Cant deposit 0 tokens', async() => {
+        it('Can deposit and syncBalance extra balance', async () => {
+            await myToken.approve(myFactionManager.address, ONE_ETHER)
+            await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
+            await myToken.transfer(myLaunchpadStaking.address, SIX_ETHER)
+            expect((await myToken.balanceOf(myLaunchpadStaking.address)).toString()).to.equal((ONE_ETHER.add(SIX_ETHER)).toString())
+            await myLaunchpadStaking.syncBalance(person)
+            const balancePost = await myToken.balanceOf(person)
+            expect((await myToken.balanceOf(myLaunchpadStaking.address)).toString()).to.equal(ONE_ETHER.toString())
+            expect(balancePost.toString()).to.equal(SIX_ETHER.toString())
+        })
+        it('Cant deposit 0 tokens', async () => {
             await expectRevert(
                 myFactionManager.stake(NAKAMOTOS_FACTION, owner, 0),
                 'TutellusLaunchpadStaking: amount must be over zero'
@@ -223,10 +233,10 @@ describe('Launchpad Staking', function () {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
-    
+
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
+
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
             const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
 
@@ -307,7 +317,7 @@ describe('Launchpad Staking', function () {
             expect(etherToNumber(postBalance)).eq(0)
             expect(etherToNumber(energyBalance)).eq(0)
         })
-        it('Cant withdraw 0 tokens', async() => {
+        it('Cant withdraw 0 tokens', async () => {
             await myToken.approve(myFactionManager.address, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
@@ -316,7 +326,7 @@ describe('Launchpad Staking', function () {
                 'TutellusLaunchpadStaking: amount must be over zero'
             )
         })
-        it('Cant withdraw more than balance', async() => {
+        it('Cant withdraw more than balance', async () => {
             await myToken.approve(myFactionManager.address, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await expectRevert(
@@ -324,7 +334,7 @@ describe('Launchpad Staking', function () {
                 'TutellusLaunchpadStaking: user has not enough staking balance'
             )
         })
-        it('Cant withdraw if not enought energy', async() => {
+        it('Cant withdraw if not enought energy', async () => {
             await myToken.approve(myFactionManager.address, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
@@ -335,7 +345,7 @@ describe('Launchpad Staking', function () {
                 'TutellusLaunchpadStaking: need more energy to unstake'
             )
         })
-        it('Cant withdraw if not from faction manager', async() => {
+        it('Cant withdraw if not from faction manager', async () => {
             await myToken.approve(myFactionManager.address, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
 
@@ -349,10 +359,10 @@ describe('Launchpad Staking', function () {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
-    
+
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
+
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
             const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
 
@@ -387,7 +397,7 @@ describe('Launchpad Staking', function () {
                 myToken.balanceOf(owner),
                 myRewardsVaultV2.rewardPerBlock(),
                 myLaunchpadStaking.pendingRewards(owner)
-            ]) 
+            ])
 
             await myLaunchpadStaking.claim(owner)
 
@@ -408,10 +418,10 @@ describe('Launchpad Staking', function () {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
-    
+
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
+
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
             const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
 
@@ -489,10 +499,10 @@ describe('Launchpad Staking', function () {
         beforeEach(async () => {
             const LaunchpadStaking = await ethers.getContractFactory('TutellusLaunchpadStaking')
             let initializeCalldata = LaunchpadStaking.interface.encodeFunctionData('initialize', [myToken.address, "0", "0", "0"]);
-    
+
             await myManager.deploy(NAKAMOTOS_STAKING_ID, LaunchpadStaking.bytecode, initializeCalldata)
             await myManager.deploy(NAKAMOTOS_FARMING_ID, LaunchpadStaking.bytecode, initializeCalldata)
-    
+
             const launchpadStaking = await myManager.get(NAKAMOTOS_STAKING_ID)
             const launchpadFarming = await myManager.get(NAKAMOTOS_FARMING_ID)
 
@@ -522,7 +532,7 @@ describe('Launchpad Staking', function () {
             await myToken.approve(myFactionManager.address, ONE_ETHER)
             await myFactionManager.stake(NAKAMOTOS_FACTION, owner, ONE_ETHER)
             await myFactionManager.unstake(owner, ONE_ETHER)
-            
+
             const pendingRewards = await myLaunchpadStaking.pendingRewards(owner)
 
             expect(etherToNumber(pendingRewards)).gt(0)
@@ -530,4 +540,3 @@ describe('Launchpad Staking', function () {
         })
     })
 })
-  
