@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.9;
+
 interface ITutellusStake2Learn {
     function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
     function PAUSER_ROLE() external view returns (bytes32);
@@ -8,14 +11,7 @@ interface ITutellusStake2Learn {
     function factory() external view returns (address);
     function hasRole(bytes32 role, address account) external view returns (bool);
     function implementation() external view returns (address);
-    function initialize(
-        address manager_,
-        address account_,
-        address token_,
-        address stakingContract_,
-        uint256 priceFiat_,
-        uint256 maxPriceToken_
-    ) external;
+    function initialize(address account_, address token_, uint256 priceFiat_, uint256 maxPriceToken_) external;
     function maxPriceToken() external view returns (uint256);
     function owner() external view returns (address);
     function pause() external;

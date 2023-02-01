@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.9;
+
 interface ITutellusStake2LearnFactory {
     function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
     function PAUSER_ROLE() external view returns (bytes32);
