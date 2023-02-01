@@ -18,24 +18,29 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
 
     address private _token;
     address private _poolAddress;
-    address private _stakingContract;
 
     Feed[] public feeds;
 
-    function __Stake2XFactory_initialize(
+    function __Stake2XFactory_init(
         string memory name_,
         string memory version_,
         address token_,
         address poolAddress_,
-        address stakingContract_,
         address[] memory feeds_,
         bool[] memory inverts_
     ) internal onlyInitializing {
         __EIP712_init(name_, version_);
+        __Stake2XFactory_init_unchained(token_, poolAddress_, feeds_, inverts_);
+    }
 
+    function __Stake2XFactory_init_unchained(
+        address token_,
+        address poolAddress_,
+        address[] memory feeds_,
+        bool[] memory inverts_
+    ) internal onlyInitializing {
         _token = token_;
         _poolAddress = poolAddress_;
-        _stakingContract = stakingContract_;
 
         for (uint256 i = 0; i < feeds_.length; i++) {
             feeds.push(Feed({feedAddress: feeds_[i], invert: inverts_[i]}));
@@ -50,10 +55,6 @@ abstract contract Stake2XFactory is EIP712Upgradeable, BeaconFactory {
 
     function poolAddress() public view returns (address) {
         return _poolAddress;
-    }
-
-    function stakingContract() public view returns (address) {
-        return _stakingContract;
     }
 
     function convertToken2Fiat(uint256 amount) public view returns (uint256) {

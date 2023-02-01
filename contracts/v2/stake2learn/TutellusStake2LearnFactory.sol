@@ -2,11 +2,15 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
+import "contracts/interfaces/ITutellusManager.sol";
 import "./Stake2XFactory.sol";
 import "./ITutellusStake2Learn.sol";
 
 contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
+    using SafeERC20Upgradeable for IERC20Upgradeable;
+
     bytes32 internal constant _S2L_SIGNER_ROLE = keccak256("S2L_SIGNER_ROLE");
 
     event CreateS2L( //TBD: Rename to maxPriceToken
@@ -22,13 +26,16 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
         address implementation,
         address token,
         address poolAddress,
-        address stakingContract,
         address[] memory feeds,
         bool[] memory inverts
     ) public initializer {
         __AccessControlProxyPausable_init(msg.sender);
-        __Stake2XFactory_initialize("TUT_S2L", "1", token, poolAddress, stakingContract, feeds, inverts);
+        __Stake2XFactory_init("TUT_S2L", "1", token, poolAddress, feeds, inverts);
         _upgradeByImplementation(implementation);
+    }
+
+    function payReceiver() public view returns (address) {
+        return ITutellusManager(config).get(keccak256("S2L_RECEIVER"));
     }
 
     function createS2L(
@@ -45,16 +52,10 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
         uint256 maxPriceToken = _convertFiat2Token(priceFiat);
         require(amount >= maxPriceToken, "TUTS2L004");
         bytes memory initializeCalldata = abi.encodeWithSelector(
-            ITutellusStake2Learn.initialize.selector,
-            config,
-            account,
-            token(),
-            stakingContract(),
-            priceFiat,
-            maxPriceToken
+            ITutellusStake2Learn.initialize.selector, config, account, token(), priceFiat, maxPriceToken
         );
         address proxy = _createProxy(initializeCalldata);
-        IERC20Upgradeable(token()).transferFrom(account, proxy, amount);
+        IERC20Upgradeable(token()).safeTransferFrom(account, proxy, amount);
         ITutellusStake2Learn(proxy).deposit(amount);
         emit CreateS2L(id, account, proxy, amount, priceFiat, maxPriceToken);
         return proxy;
@@ -64,7 +65,7 @@ contract TutellusStake2LearnFactory is Stake2XFactory, UUPSUpgradeableByRole {
     function _canUpgradeByImplementation(address implementation, address sender)
         internal
         virtual
-        override (Stake2XFactory)
+        override(Stake2XFactory)
         returns (bool)
     {
         (implementation);
