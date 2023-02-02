@@ -12,10 +12,11 @@ import "contracts/utils/UUPSUpgradeableByRole.sol";
 import "contracts/interfaces/ITutellusManager.sol";
 import "./ITutellusStake2Learn.sol";
 
-abstract contract TutellusStake2LearnFactory is EIP712Upgradeable, BeaconFactory, UUPSUpgradeableByRole {
+contract TutellusStake2LearnFactory is EIP712Upgradeable, BeaconFactory, UUPSUpgradeableByRole {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    bytes32 internal constant _S2X_TYPEHASH = keccak256("Deposit(bytes32 id,uint256 price,uint256 deadline)");
+    bytes32 internal constant _S2X_TYPEHASH =
+        keccak256("Deposit(bytes32 id,uint256 price,uint256 apr,uint256 deadline)");
     bytes32 internal constant _S2L_SIGNER_ROLE = keccak256("S2L_SIGNER_ROLE");
 
     struct Feed {
@@ -34,7 +35,8 @@ abstract contract TutellusStake2LearnFactory is EIP712Upgradeable, BeaconFactory
         address indexed proxy,
         uint256 deposit,
         uint256 price,
-        uint256 maxTokenPrice
+        uint256 maxTokenPrice,
+        uint256 apr
     );
 
     function initialize(
@@ -64,21 +66,23 @@ abstract contract TutellusStake2LearnFactory is EIP712Upgradeable, BeaconFactory
         bytes32 id,
         uint256 amount,
         uint256 priceFiat,
+        uint256 apr,
         uint256 deadline,
         bytes memory signature,
         address signer
     ) external returns (address) {
         require(hasRole(_S2L_SIGNER_ROLE, signer), "TUTS2L002");
-        require(_verifySignature(id, priceFiat, deadline, signature, signer), "TUTS2L003");
+        require(_verifySignature(id, priceFiat, apr, deadline, signature, signer), "TUTS2L003");
         address account = msg.sender;
         uint256 maxPriceToken = _convertFiat2Token(priceFiat);
         require(amount >= maxPriceToken, "TUTS2L004");
-        bytes memory initializeCalldata =
-            abi.encodeWithSelector(ITutellusStake2Learn.initialize.selector, account, _token, priceFiat, maxPriceToken);
+        bytes memory initializeCalldata = abi.encodeWithSelector(
+            ITutellusStake2Learn.initialize.selector, account, _token, priceFiat, maxPriceToken, apr
+        );
         address proxy = _createProxy(initializeCalldata);
         IERC20Upgradeable(_token).safeTransferFrom(account, proxy, amount);
         ITutellusStake2Learn(proxy).deposit(amount);
-        emit CreateS2L(id, account, proxy, amount, priceFiat, maxPriceToken);
+        emit CreateS2L(id, account, proxy, amount, priceFiat, maxPriceToken, apr);
         return proxy;
     }
 
@@ -104,16 +108,19 @@ abstract contract TutellusStake2LearnFactory is EIP712Upgradeable, BeaconFactory
         return _convertFiat2Token(amount);
     }
 
-    function verifySignature(bytes32 id, uint256 price, uint256 deadline, bytes memory signature, address signer)
-        public
-        view
-        returns (bool)
-    {
-        return _verifySignature(id, price, deadline, signature, signer);
+    function verifySignature(
+        bytes32 id,
+        uint256 price,
+        uint256 apr,
+        uint256 deadline,
+        bytes memory signature,
+        address signer
+    ) public view returns (bool) {
+        return _verifySignature(id, price, apr, deadline, signature, signer);
     }
 
     function upgradeByImplementation(address implementation) public {
-        require(_canUpgradeByImplementation(implementation, msg.sender), "S2X003");
+        require(_canUpgradeByImplementation(implementation, msg.sender), "TUTS2L001");
         _upgradeByImplementation(implementation);
     }
 
@@ -159,13 +166,16 @@ abstract contract TutellusStake2LearnFactory is EIP712Upgradeable, BeaconFactory
             : ((amount * uint256(answer)) / (10 ** decimals));
     }
 
-    function _verifySignature(bytes32 id, uint256 price, uint256 deadline, bytes memory signature, address signer)
-        internal
-        view
-        returns (bool)
-    {
+    function _verifySignature(
+        bytes32 id,
+        uint256 price,
+        uint256 apr,
+        uint256 deadline,
+        bytes memory signature,
+        address signer
+    ) internal view returns (bool) {
         if (block.timestamp > deadline) return false;
-        bytes32 structHash = keccak256(abi.encode(_S2X_TYPEHASH, id, price, deadline));
+        bytes32 structHash = keccak256(abi.encode(_S2X_TYPEHASH, id, price, apr, deadline));
         bytes32 hash = _hashTypedDataV4(structHash);
         return SignatureCheckerUpgradeable.isValidSignatureNow(signer, hash, signature);
     }

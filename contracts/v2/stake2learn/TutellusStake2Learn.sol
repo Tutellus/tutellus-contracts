@@ -8,7 +8,7 @@ import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./TutellusStake2LearnFactory.sol";
 
-abstract contract TutellusStake2Learn is OwnableUpgradeable {
+contract TutellusStake2Learn is OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     TutellusStake2LearnFactory private _factory;
@@ -22,7 +22,7 @@ abstract contract TutellusStake2Learn is OwnableUpgradeable {
     event Claim(address indexed owner, uint256 amount);
     event Withdraw(address indexed owner, address receiver, uint256 left, uint256 payment);
 
-    function initialize(address account_, address token_, uint256 priceFiat_, uint256 maxPriceToken_)
+    function initialize(address account_, address token_, uint256 priceFiat_, uint256 maxPriceToken_, uint256 apr_)
         public
         initializer
     {
@@ -33,6 +33,7 @@ abstract contract TutellusStake2Learn is OwnableUpgradeable {
         _factory = TutellusStake2LearnFactory(msg.sender);
         _priceFiat = priceFiat_;
         _maxPriceToken = maxPriceToken_;
+        _apr = apr_;
     }
 
     function token() public view returns (address) {
@@ -59,11 +60,24 @@ abstract contract TutellusStake2Learn is OwnableUpgradeable {
         return _contractBalance();
     }
 
+    function depositTime() public view returns (uint256) {
+        return _depositTime;
+    }
+
+    function claimable() public view returns (uint256) {
+        return _claimable();
+    }
+
+    function getTotal() public view returns (uint256) {
+        return _payAmount() - _claimable();
+    }
+
     //we assume funds are transfered by factory before deposit call
     function deposit(uint256 amount) public virtual {
-        require(msg.sender == address(_factory), ""); //TODO: check
-        require(amount == _token.balanceOf(address(this)), "");
-        require(_depositTime == 0, "");
+        require(msg.sender == address(_factory), "TUTS2L005"); //TODO: check
+        require(amount == _token.balanceOf(address(this)), "TUTS2L006");
+        require(_depositTime == 0, "TUTS2L007");
+        require(amount >= _maxPriceToken, "TUTS2L008");
         _depositTime = block.timestamp;
     }
 

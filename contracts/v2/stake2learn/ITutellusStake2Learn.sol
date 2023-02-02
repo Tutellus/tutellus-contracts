@@ -11,7 +11,8 @@ interface ITutellusStake2Learn {
     function factory() external view returns (address);
     function hasRole(bytes32 role, address account) external view returns (bool);
     function implementation() external view returns (address);
-    function initialize(address account_, address token_, uint256 priceFiat_, uint256 maxPriceToken_) external;
+    function initialize(address account_, address token_, uint256 priceFiat_, uint256 maxPriceToken_, uint256 apr_)
+        external;
     function maxPriceToken() external view returns (uint256);
     function owner() external view returns (address);
     function pause() external;
