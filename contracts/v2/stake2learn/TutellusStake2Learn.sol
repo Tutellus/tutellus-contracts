@@ -19,7 +19,6 @@ contract TutellusStake2Learn is OwnableUpgradeable {
     uint256 private _apr;
 
     event Deposit(address indexed owner, uint256 amount);
-    event Claim(address indexed owner, uint256 amount);
     event Withdraw(address indexed owner, address receiver, uint256 left, uint256 payment);
 
     function initialize(address account_, address token_, uint256 priceFiat_, uint256 maxPriceToken_, uint256 apr_)
@@ -68,7 +67,11 @@ contract TutellusStake2Learn is OwnableUpgradeable {
         return _claimable();
     }
 
-    function getTotal() public view returns (uint256) {
+    function apr() public view returns (uint256) {
+        return _apr;
+    }
+
+    function withdrawLoss() public view returns (uint256) {
         return _payAmount() - _claimable();
     }
 
@@ -79,6 +82,7 @@ contract TutellusStake2Learn is OwnableUpgradeable {
         require(_depositTime == 0, "TUTS2L007");
         require(amount >= _maxPriceToken, "TUTS2L008");
         _depositTime = block.timestamp;
+        emit Deposit(owner(), amount);
     }
 
     function withdraw() public onlyOwner {
