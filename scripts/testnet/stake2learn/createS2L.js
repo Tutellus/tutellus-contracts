@@ -7,6 +7,7 @@ const TOKEN = "0x930f169A87545a8c6a3e7934d42d1582c03e1b35"
 const COURSE_ID = ethers.utils.id("bootcamp01")
 const PRICE = ethers.utils.parseEther("5100")
 const MULTIPLIER = ethers.BigNumber.from("1")
+const APR = ethers.BigNumber.from("4000")
 
 async function main() {
     const signers = await ethers.getSigners()
@@ -23,6 +24,7 @@ async function main() {
     const signature = await getSignature(
         COURSE_ID,
         PRICE,
+        APR,
         deadline,
         signer,
         factoryAddress
@@ -37,6 +39,7 @@ async function main() {
         COURSE_ID,
         deposit,
         PRICE,
+        APR,
         deadline,
         signature,
         signer.address
@@ -53,7 +56,7 @@ main()
         process.exit(1)
     })
 
-const getSignature = async (id, price, deadline, signer, verifyingContract) => {
+const getSignature = async (id, price, apr, deadline, signer, verifyingContract) => {
     const domain = {
         name: "TUT_S2L",
         version: "1",
@@ -65,6 +68,7 @@ const getSignature = async (id, price, deadline, signer, verifyingContract) => {
         Deposit: [
             { name: "id", type: "bytes32" },
             { name: "price", type: "uint256" },
+            { name: "apr", type: "uint256" },
             { name: "deadline", type: "uint256" }
         ]
     }
@@ -72,6 +76,7 @@ const getSignature = async (id, price, deadline, signer, verifyingContract) => {
     const value = {
         id: id,
         price: price,
+        apr: apr,
         deadline: deadline,
     }
     return await signer._signTypedData(domain, types, value)
