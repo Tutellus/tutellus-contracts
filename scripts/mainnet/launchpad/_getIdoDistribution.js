@@ -35,11 +35,12 @@ const ONE_WEI_MINUS_USDT_DECIMALS = ethers.utils.parseUnits("1", PARSE_UNITS)
 const N_SUPERBOOSTERS = 10;
 let FORCE_CLOSE_UNDER_OBJETIVE = true;
 const BLOCK_NUMBER = 39627347
+const OBJETIVE_USDT = ethers.utils.parseUnits("100000", USDT_DECIMALS);
 
 async function main() {
     await getReservesSubgraph(BLOCK_NUMBER);
     const ido = await getIDO();
-    const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount);
+    const fundingAmountBN = OBJETIVE_USDT;
     const prefundedBN = ethers.BigNumber.from(ido.prefunded);
     const availableToDistributeBN = (fundingAmountBN.gt(prefundedBN) && FORCE_CLOSE_UNDER_OBJETIVE) ? prefundedBN : fundingAmountBN
 
@@ -77,8 +78,11 @@ async function main() {
     // Distribute left allocation (if any) based in ranking order
     const investorsFinal = distributeAllocationLeft(investorsLottery, allocationLeftBN2)
 
+    // Set final allocation based in prefund - refund
+    const investorsPrecise = setAllocation(investorsFinal);
+
     // Convert BigNumbers to strings and remove unused props
-    const investorsString = stringifyBNInJson(investorsFinal);
+    const investorsString = stringifyBNInJson(investorsPrecise);
 
     fs.writeFileSync(
         path.join(__dirname, jsonPath + IDO.toLowerCase() + ".json"),
@@ -225,13 +229,11 @@ function distributeAllocationFixed(investors, totalAllocationBN, ratiosMatrix) {
             if (item.row == 1) {
                 allocatedUsdt = allocatedUsdt.div(TWO_WEI_BN)
             }
-            allocation = transformUsdtToIdoToken(allocatedUsdt)
             allocationLeftBN = allocationLeftBN.sub(allocatedUsdt)
         }
 
         return {
             ...item,
-            allocation: item.allocation.add(allocation),
             refund: item.refund.sub(allocatedUsdt)
         }
     }).reduce((acu, item) => {
@@ -260,7 +262,6 @@ function distributeAllocationLottery(investors, totalAllocationBN, allocationLef
                 const lotteryAmountBN = ethers.utils.parseUnits(lotteryAmount.toString(), USDT_DECIMALS);
                 investor.refund = investor.refund.sub(lotteryAmountBN)
                 investor.lottery = investor.lottery.add(lotteryAmountBN)
-                investor.allocation = investor.allocation.add(transformUsdtToIdoToken(lotteryAmountBN))
 
                 if (investor.refund.isZero()) array.splice(index, 1)
                 lotteryLeftBN = lotteryLeftBN.sub(lotteryAmountBN)
@@ -286,10 +287,20 @@ function distributeAllocationLeft(investors, allocationLeftBN) {
             allocationLeftBN = allocationLeftBN.sub(leftAmountUsdtBN)
             investor.refund = investor.refund.sub(leftAmountUsdtBN)
             investor.left = investor.left.add(leftAmountUsdtBN)
-            investor.allocation = investor.allocation.add(transformUsdtToIdoToken(leftAmountUsdtBN))
         }
     }
     return investors;
+}
+
+function setAllocation(investors) {
+    return Object.entries(investors).reduce((acu, [key, investor]) => {
+
+        acu[key] = {
+            ...investor,
+            allocation: transformUsdtToIdoToken(investor.prefund.sub(investor.refund)),
+        }
+        return acu;
+    }, {})
 }
 
 function stringifyBNInJson(investors) {
