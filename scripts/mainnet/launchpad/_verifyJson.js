@@ -7,8 +7,9 @@ const { readFile } = require("fs/promises");
 const path = require("path");
 const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
-const IDO = "0x620a27a4c628d46cfb398b3169948baa90089dc5";
-const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.1");
+const IDO = "0xb2d987f2a5fe094ef1c7377287481db4ecdaa05b";
+const BLOCK_NUMBER = 39627347
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.12");
 const jsonPath =
     "../../../examples/mainnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
@@ -80,7 +81,7 @@ async function verifyJson(json, prefundersArray, fundingAmount) {
 
 async function getIDO() {
     let query =
-        '{ ido (id:"' + IDO.toLowerCase() + '") { fundingAmount prefunded } }';
+        '{ ido (id:"' + IDO.toLowerCase() + '", block:{number:' + BLOCK_NUMBER.toString() + '}) { fundingAmount prefunded } }';
     return (await querySubgraph(query)).ido;
 }
 
@@ -91,7 +92,7 @@ async function getPrefunders() {
         IDO.toLowerCase() +
         '", active:true} first:1000, skip:' +
         skip +
-        ', orderBy:prefunded, orderDirection:desc) { account prefunded } }';
+        ', orderBy:prefunded, orderDirection:desc, block:{number:' + BLOCK_NUMBER.toString() + '}) { account prefunded } }';
     let response = (await querySubgraph(query)).prefunders;
     let loopresponse = response;
 
@@ -102,7 +103,7 @@ async function getPrefunders() {
             IDO.toLowerCase() +
             '", active:true} first:1000, skip:' +
             skip +
-            ', orderBy:prefunded, orderDirection:desc) { account prefunded } }';
+            ', orderBy:prefunded, orderDirection:desc, block:{number:' + BLOCK_NUMBER.toString() + '}) { account prefunded } }';
         loopresponse = (await querySubgraph(query)).prefunders;
         response = response.concat(loopresponse);
     }
