@@ -77,6 +77,38 @@ exports.concatJson = (
   }, {});
 };
 
+exports.extractJson = ({
+  base,
+  newJson,
+}) => {
+  const cJsonA = checksumJson(base);
+  const cJsonB = checksumJson(newJson);
+  const sortedKeys = getSortedUniqueKeys(cJsonA, cJsonB);
+  return sortedKeys.reduce((acu, key) => {
+    const baseAmount = BigNumber.from(cJsonA[key] || 0);
+    const newAmount = BigNumber.from(cJsonB[key] || 0);
+    if (newAmount.gt(baseAmount)) {
+      acu[key] = newAmount.sub(baseAmount).toString(); // eslint-disable-line no-param-reassign
+    }
+    return acu;
+  }, {});
+};
+
+exports.compareJson = ({
+  jsonA,
+  jsonB,
+}) => {
+  const cJsonA = checksumJson(jsonA);
+  const cJsonB = checksumJson(jsonB);
+  const sortedKeys = getSortedUniqueKeys(cJsonA, cJsonB);
+  sortedKeys.forEach(key => {
+    const amountA = BigNumber.from(cJsonA[key] || 0);
+    const amountB = BigNumber.from(cJsonB[key] || 0);
+    assert(amountA.eq(amountB), 'JSON not equal');
+  })
+  return true;
+};
+
 exports.checkValidJSON = (balanceJSON) => {
   checkValidJSON(balanceJSON)
 }

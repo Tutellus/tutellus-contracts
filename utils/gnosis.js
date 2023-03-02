@@ -66,7 +66,6 @@ const estimateTx = async (chainId, safe, data) => {
   const baseUrl = getUrl(chainId);
   const url = `${baseUrl}/safes/${safe}/multisig-transactions/estimations/`;
   const response = await query('POST', url, data);
-  console.log(response);
   return response.data;
 };
 

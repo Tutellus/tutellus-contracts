@@ -30,7 +30,7 @@ const config: HardhatUserConfig = {
         mnemonic: process.env.MNEMONIC,
       },
       forking: {
-        url: process.env.POLYGON_MAINNET_URL || '',
+        url: process.env.POLYGON_RPC || '',
         // The Hardhat network will by default fork from the latest mainnet block
         // To pin the block number, specify it below
         // You will need access to a node with archival data for this to work!
