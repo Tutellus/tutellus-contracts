@@ -7,14 +7,14 @@ const { readFile } = require("fs/promises");
 const path = require("path");
 const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
-const IDO = "0x620a27a4c628d46cfb398b3169948baa90089dc5";
-const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.1");
+const IDO = "0xb2d987f2a5fe094ef1c7377287481db4ecdaa05b";
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.12");
 const { downloadJSON, uploadJSON } = require('../../../utils/ipfs');
 const jsonPath =
     "../../../examples/mainnet/launchpad/" + IDO.toLowerCase() + ".json";
 const GRAPH_URL =
     "https://api.thegraph.com/subgraphs/name/tutellus/tutellus-launchpad";
-const URI = "https://ipfs.io/ipfs/QmWtRm4ujAn45KGErXi7QQJbgLaaGJhQhi3CzgyBJMUpQV"
+const URI = "https://ipfs.io/ipfs/QmZJXT9ByQDNqrfUoFXwtjuRhbrEHgDV7AmGRqAs4REPTo"
 
 async function main() {
     const ido = await getIDO();
@@ -69,6 +69,8 @@ async function verifyJson(json, prefundersArray, fundingAmount) {
         prefundCounter = prefundCounter.add(prefund)
     }
 
+    console.log(prefundCounter.toString())
+    console.log(fundingAmount.toString())
     if (!prefundCounter.eq(fundingAmount)) return false
 
     const [prefundTokenBalance, idoTokenBalance] = await getTokenBalances()

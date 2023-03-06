@@ -26,20 +26,21 @@ let RESERVES_TUT, LP_TOTAL_SUPPLY;
 // VARIABLE INPUTS
 const POAP_ID =
     "0x4b9a1717123cccffca21391e077dbc337a0ab212ec8bbaaa2ab1b0c242eba4ea";
-const IDO = "0x620a27a4c628d46cfb398b3169948baa90089dc5";
-const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.1");
+const IDO = "0xb2d987f2a5fe094ef1c7377287481db4ecdaa05b";
+const IDO_TOKEN_USDT_PRICE = ethers.utils.parseEther("0.12");
 const USDT_DECIMALS = 6
 const ONE_USDT_BN = ethers.utils.parseUnits("1", USDT_DECIMALS);
 const PARSE_UNITS = 18 - USDT_DECIMALS
 const ONE_WEI_MINUS_USDT_DECIMALS = ethers.utils.parseUnits("1", PARSE_UNITS)
 const N_SUPERBOOSTERS = 10;
 let FORCE_CLOSE_UNDER_OBJETIVE = true;
-const BLOCK_NUMBER = 37468043
+const BLOCK_NUMBER = 39627347
+const OBJETIVE_USDT = ethers.utils.parseUnits("100000", USDT_DECIMALS);
 
 async function main() {
     await getReservesSubgraph(BLOCK_NUMBER);
     const ido = await getIDO();
-    const fundingAmountBN = ethers.BigNumber.from(ido.fundingAmount);
+    const fundingAmountBN = OBJETIVE_USDT;
     const prefundedBN = ethers.BigNumber.from(ido.prefunded);
     const availableToDistributeBN = (fundingAmountBN.gt(prefundedBN) && FORCE_CLOSE_UNDER_OBJETIVE) ? prefundedBN : fundingAmountBN
 
@@ -77,8 +78,11 @@ async function main() {
     // Distribute left allocation (if any) based in ranking order
     const investorsFinal = distributeAllocationLeft(investorsLottery, allocationLeftBN2)
 
+    // Set final allocation based in prefund - refund
+    const investorsPrecise = setAllocation(investorsFinal);
+
     // Convert BigNumbers to strings and remove unused props
-    const investorsString = stringifyBNInJson(investorsFinal);
+    const investorsString = stringifyBNInJson(investorsPrecise);
 
     fs.writeFileSync(
         path.join(__dirname, jsonPath + IDO.toLowerCase() + ".json"),
@@ -225,13 +229,11 @@ function distributeAllocationFixed(investors, totalAllocationBN, ratiosMatrix) {
             if (item.row == 1) {
                 allocatedUsdt = allocatedUsdt.div(TWO_WEI_BN)
             }
-            allocation = transformUsdtToIdoToken(allocatedUsdt)
             allocationLeftBN = allocationLeftBN.sub(allocatedUsdt)
         }
 
         return {
             ...item,
-            allocation: item.allocation.add(allocation),
             refund: item.refund.sub(allocatedUsdt)
         }
     }).reduce((acu, item) => {
@@ -260,7 +262,6 @@ function distributeAllocationLottery(investors, totalAllocationBN, allocationLef
                 const lotteryAmountBN = ethers.utils.parseUnits(lotteryAmount.toString(), USDT_DECIMALS);
                 investor.refund = investor.refund.sub(lotteryAmountBN)
                 investor.lottery = investor.lottery.add(lotteryAmountBN)
-                investor.allocation = investor.allocation.add(transformUsdtToIdoToken(lotteryAmountBN))
 
                 if (investor.refund.isZero()) array.splice(index, 1)
                 lotteryLeftBN = lotteryLeftBN.sub(lotteryAmountBN)
@@ -286,10 +287,20 @@ function distributeAllocationLeft(investors, allocationLeftBN) {
             allocationLeftBN = allocationLeftBN.sub(leftAmountUsdtBN)
             investor.refund = investor.refund.sub(leftAmountUsdtBN)
             investor.left = investor.left.add(leftAmountUsdtBN)
-            investor.allocation = investor.allocation.add(transformUsdtToIdoToken(leftAmountUsdtBN))
         }
     }
     return investors;
+}
+
+function setAllocation(investors) {
+    return Object.entries(investors).reduce((acu, [key, investor]) => {
+
+        acu[key] = {
+            ...investor,
+            allocation: transformUsdtToIdoToken(investor.prefund.sub(investor.refund)),
+        }
+        return acu;
+    }, {})
 }
 
 function stringifyBNInJson(investors) {
@@ -432,7 +443,7 @@ async function getStakers(prefunders) {
         array +
         "], amount_gt:0}, first:1000, skip:" +
         skip +
-        ") { account type contract amount } }";
+        ", block:{number:" + BLOCK_NUMBER.toString() + "}) { account type contract amount } }";
     let response = (await querySubgraph(query)).stakers;
     let loopresponse = response;
 
@@ -443,7 +454,7 @@ async function getStakers(prefunders) {
             array +
             "], amount_gt:0}, first:1000, skip:" +
             skip +
-            ") { account type contract amount } }";
+            ", block:{number:" + BLOCK_NUMBER.toString() + "}) { account type contract amount } }";
         loopresponse = (await querySubgraph(query)).stakers;
         response = response.concat(loopresponse);
     }
@@ -457,7 +468,7 @@ async function getPrefunders() {
         IDO.toLowerCase() +
         '", active:true} first:1000, skip:' +
         skip +
-        ', orderBy:prefunded, orderDirection:desc) { account faction prefunded energyHolder { balanceVariable balanceStatic poaps(where:{poap:"' +
+        ', orderBy:prefunded, orderDirection:desc, block:{number:' + BLOCK_NUMBER.toString() + '}) { account faction prefunded energyHolder { balanceVariable balanceStatic poaps(where:{poap:"' +
         POAP_ID.toLowerCase() +
         '"}) { balanceEnergy } } } }';
     let response = (await querySubgraph(query)).prefunders;
@@ -470,7 +481,7 @@ async function getPrefunders() {
             IDO.toLowerCase() +
             '", active:true} first:1000, skip:' +
             skip +
-            ', orderBy:prefunded, orderDirection:desc) { account faction prefunded energyHolder { balanceVariable balanceStatic poaps(where:{poap:"' +
+            ', orderBy:prefunded, orderDirection:desc, block:{number:' + BLOCK_NUMBER.toString() + '}) { account faction prefunded energyHolder { balanceVariable balanceStatic poaps(where:{poap:"' +
             POAP_ID.toLowerCase() +
             '"}) { balanceEnergy } } } }';
         loopresponse = (await querySubgraph(query)).prefunders;
@@ -483,13 +494,13 @@ async function getSubgraphDataByIdo() {
     let query =
         '{ factionByIDOs (where:{ido:"' +
         IDO.toLowerCase() +
-        '"}, orderBy:"energy", orderDirection:desc) { energy faction { id } } }';
+        '"}, orderBy:"energy", orderDirection:desc, block:{number:' + BLOCK_NUMBER.toString() + '}) { energy faction { id } } }';
     return await querySubgraph(query);
 }
 
 async function getIDO() {
     let query =
-        '{ ido (id:"' + IDO.toLowerCase() + '") { fundingAmount prefunded } }';
+        '{ ido (id:"' + IDO.toLowerCase() + '", block:{number:' + BLOCK_NUMBER.toString() + '}) { fundingAmount prefunded } }';
     return (await querySubgraph(query)).ido;
 }
 
@@ -497,7 +508,7 @@ async function setMathObj() {
     let query =
         '{ energy (id:"' +
         ENERGY_ADDR.toLowerCase() +
-        '") { lastUpdateTimestamp rate normalization } }';
+        '", block:{number:' + BLOCK_NUMBER.toString() + '}) { lastUpdateTimestamp rate normalization } }';
     let obj = (await querySubgraph(query)).energy;
     mathObj.rate = ethers.BigNumber.from(obj.rate);
     mathObj.normalization = ethers.BigNumber.from(obj.normalization);

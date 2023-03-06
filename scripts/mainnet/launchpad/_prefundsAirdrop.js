@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
-const IDO = "0x620a27a4c628d46cfb398b3169948baa90089dc5";
+const IDO = "0xb2d987f2a5fe094ef1c7377287481db4ecdaa05b";
 const jsonPath =
     "../../../examples/mainnet/airdrops/";
 const GRAPH_URL =
@@ -14,15 +14,19 @@ const GRAPH_URL =
 
 const PERCENTAGES = [
     ethers.BigNumber.from(1200),
-    ethers.BigNumber.from(900)
+    ethers.BigNumber.from(900),
+    ethers.BigNumber.from(600),
+    ethers.BigNumber.from(0)
 ]
 
 const RANGES = [
-    ethers.utils.parseEther("100000"),
-    ethers.utils.parseEther("325000")
+    ethers.utils.parseEther("25000"),
+    ethers.utils.parseEther("25000"),
+    ethers.utils.parseEther("25000"),
+    ethers.utils.parseEther("25000")
 ]
 
-const TUT_PRICE_USD = ethers.utils.parseEther("0.11")
+const TUT_PRICE_USD = ethers.utils.parseEther("0.092")
 
 async function main() {
     const prefundsArray = await getPrefunds();
@@ -46,6 +50,7 @@ function processPrefunds(prefundsArray) {
     let slot = 0
     let percentage = PERCENTAGES[slot]
     let left = RANGES[slot]
+    let total = ZERO_BN
     return prefundsArray.reduce((acu, prefund) => {
         const key = prefund.account.account.toLowerCase()
         const prefundBN = convertDecimals6To18(ethers.BigNumber.from(prefund.amount))
@@ -54,7 +59,7 @@ function processPrefunds(prefundsArray) {
         let amount = prefundAmount.mul(percentage).div(ethers.BigNumber.from(10000))
         left = left.sub(prefundAmount)
 
-        if (!leftPrefundAmount.isZero()) {
+        if (!leftPrefundAmount.isZero() && !percentage.isZero()) {
             slot++
             percentage = PERCENTAGES[slot]
             left = RANGES[slot].sub(leftPrefundAmount)
@@ -62,7 +67,9 @@ function processPrefunds(prefundsArray) {
         }
 
         const amountTut = amount.mul(ONE_BN).div(TUT_PRICE_USD)
-        acu[key] = acu[key] != undefined ? acu[key].add(amountTut) : amountTut
+        total = total.add(amountTut)
+        console.log(total.toString())
+        if (!amount.isZero()) acu[key] = acu[key] != undefined ? acu[key].add(amountTut) : amountTut
         return acu;
     }, {})
 }
