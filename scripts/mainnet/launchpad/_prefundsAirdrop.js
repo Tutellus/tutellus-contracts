@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const ZERO_BN = ethers.utils.parseEther("0");
 const ONE_BN = ethers.utils.parseEther("1");
-const IDO = "0x620a27a4c628d46cfb398b3169948baa90089dc5";
+const IDO = "0xb2d987f2a5fe094ef1c7377287481db4ecdaa05b";
 const jsonPath =
     "../../../examples/mainnet/airdrops/";
 const GRAPH_URL =
@@ -14,15 +14,17 @@ const GRAPH_URL =
 
 const PERCENTAGES = [
     ethers.BigNumber.from(1200),
-    ethers.BigNumber.from(900)
+    ethers.BigNumber.from(900),
+    ethers.BigNumber.from(600),
 ]
 
 const RANGES = [
-    ethers.utils.parseEther("100000"),
-    ethers.utils.parseEther("325000")
+    ethers.utils.parseEther("25000"),
+    ethers.utils.parseEther("50000"),
+    ethers.utils.parseEther("75000")
 ]
 
-const TUT_PRICE_USD = ethers.utils.parseEther("0.11")
+const TUT_PRICE_USD = ethers.utils.parseEther("0.091")
 
 async function main() {
     const prefundsArray = await getPrefunds();
