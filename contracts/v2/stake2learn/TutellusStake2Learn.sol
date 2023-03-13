@@ -71,10 +71,6 @@ contract TutellusStake2Learn is OwnableUpgradeable {
         return _apr;
     }
 
-    function withdrawLoss() public view returns (uint256) {
-        return _payAmount() - _claimable();
-    }
-
     //we assume funds are transfered by factory before deposit call
     function deposit(uint256 amount) public virtual {
         require(msg.sender == address(_factory), "TUTS2L005"); //TODO: check
@@ -87,7 +83,7 @@ contract TutellusStake2Learn is OwnableUpgradeable {
 
     function withdraw() public onlyOwner {
         address to = _payReceiver();
-        uint256 payment = _payAmount() - _claimable();
+        uint256 payment = _payAmount();
         _token.safeTransfer(to, payment);
         uint256 left = _contractBalance();
         _token.safeTransfer(owner(), left);
@@ -95,7 +91,9 @@ contract TutellusStake2Learn is OwnableUpgradeable {
     }
 
     function _payAmount() internal view returns (uint256) {
+        uint256 claimable_ = _claimable();
         uint256 priceNow = _factory.convertFiat2Token(_priceFiat);
+        if (claimable_ <= priceNow) priceNow = priceNow - claimable_;
         uint256 maxPrice = _maxPriceToken;
         return priceNow < maxPrice ? priceNow : maxPrice;
     }
