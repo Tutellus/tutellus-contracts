@@ -401,16 +401,11 @@ describe.only("Stake2Learn", function () {
             ).to.be.revertedWith(
                 "Ownable: caller is not the owner"
             )
+            await ethers.provider.send("evm_setNextBlockTimestamp", [openDate + 1])
             const payAmount = await myS2L.payAmount()
-            const claimable = await myS2L.claimable()
-            const getTotal = await myS2L.getTotal()
-            console.log(payAmount.toString())
-            console.log(claimable.toString())
-            console.log(getTotal.toString())
             await myS2L.connect(personSigner).withdraw()
             const payed = await myToken.balanceOf(receiver)
-            const payment = payAmount.sub(claimable)
-            expect(payment.toString()).to.equal(payed.toString())
+            expect(payAmount.toString()).to.equal(payed.toString())
         })
     })
     describe("Getters", () => {
