@@ -93,7 +93,7 @@ contract TutellusStake2Learn is OwnableUpgradeable {
     function _payAmount() internal view returns (uint256) {
         uint256 claimable_ = _claimable();
         uint256 priceNow = _factory.convertFiat2Token(_priceFiat);
-        if (claimable_ <= priceNow) priceNow = priceNow - claimable_;
+        priceNow = (claimable_ <= priceNow) ? (priceNow - claimable_) : 0;
         uint256 maxPrice = _maxPriceToken;
         return priceNow < maxPrice ? priceNow : maxPrice;
     }
