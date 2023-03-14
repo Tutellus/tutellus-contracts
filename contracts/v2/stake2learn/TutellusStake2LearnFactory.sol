@@ -29,7 +29,7 @@ contract TutellusStake2LearnFactory is EIP712Upgradeable, BeaconFactory, UUPSUpg
 
     Feed[] public feeds;
 
-    event CreateS2L( //TBD: Rename to maxPriceToken
+    event CreateS2L(
         bytes32 indexed id,
         address indexed account,
         address indexed proxy,
