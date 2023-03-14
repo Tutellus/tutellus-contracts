@@ -1,4 +1,5 @@
 const { ethers } = require("hardhat");
+const { createTx, sendTx } = require('../../../utils/gnosis');
 
 const S2L_ID = ethers.utils.id("S2L_FACTORY")
 const MANAGER_ADDR = "0x73205567d90A45533879eF39a29920056225eFB2"
@@ -18,10 +19,10 @@ async function main() {
     const TutellusStake2Learn = await ethers.getContractFactory("TutellusStake2Learn")
 
     console.log("Deploying implementation...")
-    const implementation = await TutellusStake2Learn.deploy()
-    await implementation.deployed()
-    console.log("Deployed: ", implementation.address)
-    // const implementation = await ethers.getContractAt(TutellusStake2Learn, "0x0EfcDA5794bC3Ecb1A434473ca3c3291414DA388")
+    // const implementation = await TutellusStake2Learn.deploy()
+    // await implementation.deployed()
+    // console.log("Deployed: ", implementation.address)
+    const implementation = await ethers.getContractAt("TutellusStake2Learn", "0xeA9c1F482ca1343c8192B1EF458666105976636E")
 
     console.log("Deploying factory...")
     const factoryCalldata = TutellusStake2LearnFactory.interface.encodeFunctionData(
@@ -34,8 +35,9 @@ async function main() {
             INVERTS
         ]
     );
-    const factoryImplementation = await TutellusStake2LearnFactory.deploy()
-    await factoryImplementation.deployed()
+    // const factoryImplementation = await TutellusStake2LearnFactory.deploy()
+    // await factoryImplementation.deployed()
+    const factoryImplementation = await ethers.getContractAt("TutellusStake2LearnFactory", "0x8093C1d3e6Faab67d35C0B1494Eb5a6E031d1E68")
     const TutellusManager = await ethers.getContractFactory("TutellusManager");
     const calldata = TutellusManager.interface.encodeFunctionData("deployProxyWithImplementation", [S2L_ID, factoryImplementation.address, factoryCalldata])
     const data = {
@@ -46,6 +48,7 @@ async function main() {
     };
 
     const wallet = new ethers.Wallet.fromMnemonic(process.env.MNEMONIC);
+    const chainId = ethers.provider._network.chainId;
     const tx = await createTx(ethers.provider, chainId, SAFE, data, wallet);
     await sendTx(chainId, SAFE, tx);
 }
