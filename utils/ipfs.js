@@ -12,7 +12,7 @@ async function downloadJSON(uri) {
       method: 'GET',
     }).then((response) => response.data);
   } catch (error) {
-    return {};
+    throw error;
   }
 }
 
@@ -34,8 +34,9 @@ async function uploadJSON(json, merkleRoot) {
     const cid = file.cid.toString();
     const result = `https://ipfs.io/ipfs/${cid}`;
     return result;
-  } finally {
+  } catch (error) {
     fs.unlinkSync(tmpFile);
+    throw error;
   }
 }
 

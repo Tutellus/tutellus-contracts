@@ -15,7 +15,8 @@
     "concatAbi:v2": "node concatAbi.js --root=artifacts/contracts/v2",
     "concatAbi:v2:minimal": "node concatAbi.js --root=abi/contracts/v2 --minimal=true",
     "concatABI:v2:launchpad": "node concatABI.js --root=contracts/v2:launchpad",
-    "updateClients": "npx hardhat run scripts/mainnet/clients/update.js --network polygon"
+    "updateClients": "npx hardhat run scripts/mainnet/clients/update.js --network polygon",
+    "resetClients": "npx hardhat run scripts/mainnet/clients/reset.js --network polygon"
   },
   "keywords": [],
   "author": "",

@@ -7,17 +7,7 @@ const { getBalanceTree, concatJson, extractJson, compareJson } = require('../../
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
 const json1 = {
-    "0x5F6D71CD8404E661Cb4736e368564C01A7Ff9852": parseEther("4228.860333").toString(),
-    "0xef6A5A06407c5e7aF0B0B66107C119830a4e8FD0": parseEther("100").toString(),
-    "0x9e7685Da4EFfbe6a35266989f4F3040dc39C36eD": parseEther("400").toString(),
-    "0xc6f53efd2c6806B78FCe59A4D55507B1E3624128": parseEther("546").toString(),
-    "0x1820408BF7100b5808687C05BA60F71223129b76": parseEther("200").toString(),
-    "0xbc9CB4C9eB7aD827a982A2f5E4C884fbca33F17A": parseEther("200").toString(),
-    "0x6f173eFbFF72c7b30c64fC38fDaB81C34Ad32b43": parseEther("5050").toString(),
-    "0x8c04702673f8453d9Bb08142557C8E937498c350": parseEther("5050").toString(),
-    "0x2b2aBa926A94221c5602dC82065610440102D613": parseEther("3212").toString(),
-    "0x86484061e228d7578Ad898DEE2CacCAbc3A4ABa5": parseEther("100").toString(),
-    "0x9ae21712497825Ddea48c9BD8C8218E6315da7CF": parseEther("100").toString(),
+    "0x6d2aeA076B1E1deb491df73E20546c21F8a3d458": parseEther("300000").toString(),
 }
 
 const checkWallets = (json) => {
@@ -48,12 +38,16 @@ const main = async () => {
     const json = concatJson(json0, json1);
     const tree = getBalanceTree(json).toJSON();
     const uri = await uploadJSON(json, tree.merkleRoot);
+    console.log('Uri:', uri)
     console.log('Verifying JSONs...')
     const newJson = await downloadJSON(uri);
     const extraction = extractJson({
         base: json0,
         newJson,
     });
+    console.log('Comparing JSONs...')
+    console.log('json1:', json1)
+    console.log('extraction:', extraction)
     compareJson({
         jsonA: json1,
         jsonB: extraction,
