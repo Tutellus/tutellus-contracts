@@ -1,0 +1,1568 @@
+{
+    "0x9e7b780ebc944260081a443d5703d86dcaef002c": {
+        "token": "67491620.386038181818181895",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "67491620.386038181818181895"
+    },
+    "0xc7963fb87c365f67247f97d329d50b9ec5a374b8": {
+        "token": "55764482.042228440749028605",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "55764482.042228440749028605"
+    },
+    "0x2851e29189b115aabab7678b34f13124ec242da8": {
+        "token": "27179915.41911677428243283",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "27179915.41911677428243283"
+    },
+    "0xd1306d5a2a074c3f33e94346d8d3db05c624eb24": {
+        "token": "18868130.372047385377285735",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "18868130.372047385377285735"
+    },
+    "0x28caa843cb577d892a8b6ec3f24aa682ed22be68": {
+        "token": "8968273.896063604253052808",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "8968273.896063604253052808"
+    },
+    "0x5d9ac8993b714df01d079d1b5b0b592e579ca099": {
+        "token": "8336392.007236429261385243",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "8336392.007236429261385243"
+    },
+    "0x27937ce5804eb054e467b7f2c1386fb4433358af": {
+        "token": "2772638.985768115285758478",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "2772638.985768115285758478"
+    },
+    "0x968b874f708e424e4981afb6e79f6b534ee6acb0": {
+        "token": "2660130.397785184266176681",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "2660130.397785184266176681"
+    },
+    "0xf4355338fb4f839ea04d934a4526906039ad31ea": {
+        "token": "2565739.607431330976848023",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "2565739.607431330976848023"
+    },
+    "0x79a3dbfe4592592473621f2ea88c23a30d87e0e7": {
+        "token": "2345043.142210288000842418",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "2345043.142210288000842418"
+    },
+    "0x5acb3043da168b59b775ea28f3942597f45e9543": {
+        "token": "834035.435239494568026",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "834035.435239494568026"
+    },
+    "0xe0ff071e9c2f7ca021dbc7e4630a8e92a90c9242": {
+        "token": "407030.981095232501688729",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "407030.981095232501688729"
+    },
+    "0x6fba7ef29d51408078434f1b7299edd2bc96db85": {
+        "token": "233617.060629016643151614",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "233617.060629016643151614"
+    },
+    "0x943b71dd451daa8097bc2ad6d4afb7517cb4cf3f": {
+        "token": "231214.907591392048515261",
+        "lp": "0.0",
+        "staking": "601831.701780462057130958",
+        "farming": "17660.469047174528751083",
+        "stakingLaunchpad": "864890.710954452085671681",
+        "farmingLaunchpad": "0.0",
+        "total": "1715597.789373480720068983"
+    },
+    "0x119bc52765d94e023a31535965df1bb3af5ba8b2": {
+        "token": "142595.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "142595.0"
+    },
+    "0xbb7770befea11e40fbf47d1f8776f759ff3892b8": {
+        "token": "98414.491212191667492583",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "98414.491212191667492583"
+    },
+    "0x83083b32b9e158f0bc5d56b751c57fcbb326114d": {
+        "token": "55089.124869112731482839",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "55089.124869112731482839"
+    },
+    "0x4638d29fb5979fd74b59ab2461904b4ca1ecf083": {
+        "token": "44027.832500120649276578",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "44027.832500120649276578"
+    },
+    "0x95b9bbc3a8c0de0695d727c3b79b44f3721232c9": {
+        "token": "42751.780887666731625351",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "127637.753997538355637673",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "170389.534885205087263024"
+    },
+    "0x302f4d246fc1e283af3239311b8b84bd5a1c7736": {
+        "token": "37560.129618690804994067",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "37560.129618690804994067"
+    },
+    "0x5364107722a9f2b3f775f48e7e00c2fd569b5dd9": {
+        "token": "30087.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "30087.0"
+    },
+    "0xdf066cb9b07adfc563d66cae7d4308ff831c7e1a": {
+        "token": "30000.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "30000.0"
+    },
+    "0x3c09039e80add5bfce8d2050b22179bb1ec13fa9": {
+        "token": "29700.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "29700.0"
+    },
+    "0x6ec2cc0c92c1bc036f5410ee9e5fa32d097d4364": {
+        "token": "29000.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "29000.0"
+    },
+    "0xf9cb1dffc3d748b56ebccac7680bf6b0f3db4972": {
+        "token": "27205.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "27205.0"
+    },
+    "0xf9f9fa312c7052b7ff45ec8933bc7a743165f20f": {
+        "token": "26326.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "26326.0"
+    },
+    "0x943f393a589bbe39a4e55ab571ac1422de703063": {
+        "token": "22340.359495795612809309",
+        "lp": "0.0",
+        "staking": "23713.266273016172116977",
+        "farming": "129527.192645155488516744",
+        "stakingLaunchpad": "19017.353182401939516123",
+        "farmingLaunchpad": "2720.084233578546052192",
+        "total": "197318.255829947759011345"
+    },
+    "0x1d1b104cd940f16830b180eef2d207a18a897f12": {
+        "token": "19050.931041445195265454",
+        "lp": "0.0",
+        "staking": "267930.685792885784677722",
+        "farming": "707022.487834109570550247",
+        "stakingLaunchpad": "1327738.549233558698273229",
+        "farmingLaunchpad": "0.0",
+        "total": "2321742.653901999248766652"
+    },
+    "0x812700d2013f5b03be4dabd476bd4fbaa22d4bc7": {
+        "token": "18692.599956144145109056",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "18692.599956144145109056"
+    },
+    "0xc0b677cedaef53359aa553d83db3a8962b02bbee": {
+        "token": "16666.002319953271546022",
+        "lp": "0.0",
+        "staking": "4855.51532508089014178",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "21521.517645034161687802"
+    },
+    "0xcc01ac6541843df5ab91971b88f5cbd366ab6f03": {
+        "token": "16250.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "16250.0"
+    },
+    "0x68236485a0f5dc1af0181208fd24b7c9bef02710": {
+        "token": "15487.975484542550764316",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "15487.975484542550764316"
+    },
+    "0xa7498970f45a108334989343cef6fe09ef331971": {
+        "token": "15035.836836141503166284",
+        "lp": "0.0",
+        "staking": "3.435499300411746886",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "15039.27233544191491317"
+    },
+    "0x63bb872b4878324d5767767ede3f74717d9256c8": {
+        "token": "12368.820425720306908177",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "100602.779336659399887141",
+        "farmingLaunchpad": "149594.861720415135638897",
+        "total": "262566.461482794842434215"
+    },
+    "0x00e0e1be571c62aa8449514575a3705689026ac1": {
+        "token": "12346.911159649240102331",
+        "lp": "0.0",
+        "staking": "75.077689705766044752",
+        "farming": "0.0",
+        "stakingLaunchpad": "360.616196676919033308",
+        "farmingLaunchpad": "2865.852595822242434955",
+        "total": "15648.457641854167615346"
+    },
+    "0x508b0907701dfad406bc80e7833fd60e267e26bb": {
+        "token": "7845.430313945566908631",
+        "lp": "0.0",
+        "staking": "67201.265426434391801186",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "75046.695740379958709817"
+    },
+    "0x1df8eea1e7969d6a2f0d37388f47f476678a859d": {
+        "token": "7744.217988881398280552",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "19947.219943983324894068",
+        "stakingLaunchpad": "1095.005578281901935937",
+        "farmingLaunchpad": "0.0",
+        "total": "28786.443511146625110557"
+    },
+    "0xcaa67cb622475c328be6a77e034096c6a67c3cfb": {
+        "token": "6879.355957866064022706",
+        "lp": "0.0",
+        "staking": "304907.870160846364099267",
+        "farming": "0.0",
+        "stakingLaunchpad": "1486657.117094538699643385",
+        "farmingLaunchpad": "0.0",
+        "total": "1798444.343213251127765358"
+    },
+    "0x3c6beb309aaa750bcf61ff3f302d49051e529a32": {
+        "token": "6845.553780153762691982",
+        "lp": "0.0",
+        "staking": "93159.814599967420026992",
+        "farming": "21350.1589278265625252",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "121355.527307947745244174"
+    },
+    "0x6f0d7d31f8124621a91c7d27803f60dbf54e42bc": {
+        "token": "6358.071380490880080139",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "86398.950387484369556972",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "83414.62237688739066961",
+        "total": "176171.644144862640306721"
+    },
+    "0x55657fbd84d0f1a7036ffeef6980f0ace4b18aa2": {
+        "token": "5900.358479996349942661",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "20645.5000308262039971",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "26545.858510822553939761"
+    },
+    "0x4cfd4ccec4e22f063b2d2207c100dd750ba4ef91": {
+        "token": "3990.180443403670708573",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "36680.730128776570120736",
+        "total": "40670.910572180240829309"
+    },
+    "0x29210da70d9ee011148a4d6c09b1bfc630f4d6c9": {
+        "token": "3864.499109792048113016",
+        "lp": "0.0",
+        "staking": "64089.585793369235957759",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "67954.084903161284070775"
+    },
+    "0xcc6db5c95bce616f6a14ab67d0bbbf6d4237f1df": {
+        "token": "3713.688453508148933025",
+        "lp": "0.000052481347948917",
+        "staking": "13644.54069808624505837",
+        "farming": "58898.332035171551402304",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "8781.530699654378886972",
+        "total": "85038.091938901672229588"
+    },
+    "0x371bfe5093980a0d6bb435214e2b0886818b93af": {
+        "token": "3233.196872686282073064",
+        "lp": "0.0",
+        "staking": "44896.632404019889370241",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "48129.829276706171443305"
+    },
+    "0x8e2a4618d3602ac7d19c0106196383a026be49bd": {
+        "token": "2791.840545111559155062",
+        "lp": "0.0",
+        "staking": "15000.0",
+        "farming": "58713.615193738431521347",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "76505.455738849990676409"
+    },
+    "0xe4be496cf9307052e06ae0e999d5119327750329": {
+        "token": "2441.019054577662254798",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "95435.054058636413303716",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "47427.36780790678549538",
+        "total": "145303.440921120861053894"
+    },
+    "0xcaf7b35805b2e33ec82f1a8557e12cc69c371710": {
+        "token": "2367.940647330205122768",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "18214.786229417054154344",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "20582.726876747259277112"
+    },
+    "0x7f5e4fff700c617d77774296fdd4fc5dbd0e1a11": {
+        "token": "1754.118379083637986105",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "27891.043422830767111318",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "29645.161801914405097423"
+    },
+    "0x927fd041336fc3a71504c9db6b19be080203f674": {
+        "token": "1523.402741893054923582",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "32625.327157027971755751",
+        "stakingLaunchpad": "1500.0",
+        "farmingLaunchpad": "0.0",
+        "total": "35648.729898921026679333"
+    },
+    "0x596b1ff2c7fac2ea8e643096e50f99ae900f8088": {
+        "token": "1436.985862720283159293",
+        "lp": "0.0",
+        "staking": "92966.78786073883233269",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "94403.773723459115491983"
+    },
+    "0xbcac2fcf1b6dd87e2bcd40e35ee1ef99f8628fff": {
+        "token": "1286.716880515436896615",
+        "lp": "0.0",
+        "staking": "5960.283136604275443857",
+        "farming": "8286.110734057916423755",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "15533.110751177628764227"
+    },
+    "0x2922b9d11b699293c8dbf1a5c16c45ab4dce579d": {
+        "token": "1180.328281425592679512",
+        "lp": "0.0",
+        "staking": "331791.034200702725406812",
+        "farming": "0.0",
+        "stakingLaunchpad": "178189.530502035489077419",
+        "farmingLaunchpad": "0.0",
+        "total": "511160.892984163807163743"
+    },
+    "0x0fc43aac971813d095e83f9bccb1deb25f93a4fd": {
+        "token": "1096.535858390823989835",
+        "lp": "0.000000000000768144",
+        "staking": "14879.755404943092052986",
+        "farming": "4035.132349026501390504",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "20011.423612360418201469"
+    },
+    "0x5d16d9dd7ac6ec693bd8b39e0a8ccb29cbaa9d11": {
+        "token": "1011.562907933104920484",
+        "lp": "0.0",
+        "staking": "15001.745779604512811869",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "16013.308687537617732353"
+    },
+    "0x420093b072f402fcb1c54d72e73c78ff12245b58": {
+        "token": "901.630347990807182418",
+        "lp": "0.0",
+        "staking": "43426.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "44327.630347990807182418"
+    },
+    "0x75dddfb045c0f0ef72d940fe935bf36e773eb05b": {
+        "token": "860.418829407840888588",
+        "lp": "0.0",
+        "staking": "1022.211715856691714265",
+        "farming": "0.0",
+        "stakingLaunchpad": "2589.085181230220986738",
+        "farmingLaunchpad": "44464.571391666229396407",
+        "total": "48936.287118160982985998"
+    },
+    "0x9de6753359f57a0e9d43768d3b47bcd1a567c17a": {
+        "token": "571.981415109568146878",
+        "lp": "0.0",
+        "staking": "20632.379362234695670949",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "21204.360777344263817827"
+    },
+    "0x739ba4be0a3ced83add3f9883a79b7343b1ceae5": {
+        "token": "393.658610638800508955",
+        "lp": "0.0",
+        "staking": "300319.921807378234928625",
+        "farming": "0.0",
+        "stakingLaunchpad": "757725.360167774048768711",
+        "farmingLaunchpad": "510052.980144906834470519",
+        "total": "1568491.92073069791867681"
+    },
+    "0x6e931b3a9ae97e821c27382001889ef2079ec8c9": {
+        "token": "275.274120734596654045",
+        "lp": "0.0",
+        "staking": "160396.05933817740033248",
+        "farming": "150380.364078921144842889",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "311051.697537833141829414"
+    },
+    "0xdfc797ee53bd50e92eaf9a5a596172ca0aa4c4f0": {
+        "token": "269.102786696788967239",
+        "lp": "0.0",
+        "staking": "15000.59673802979169272",
+        "farming": "0.0",
+        "stakingLaunchpad": "4130.221557259896199563",
+        "farmingLaunchpad": "0.0",
+        "total": "19399.921081986476859522"
+    },
+    "0x98ce445037b7b622293c00289388d90f48a510ec": {
+        "token": "238.452274527901049685",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "66012.410987464947768186",
+        "farmingLaunchpad": "35589.230012806819719958",
+        "total": "101840.093274799668537829"
+    },
+    "0xdef2bc2ee6a98ff2f123cde06e2a9cfd9922c06c": {
+        "token": "231.047469808240393614",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "17671.993087485136969851",
+        "farmingLaunchpad": "0.0",
+        "total": "17903.040557293377363465"
+    },
+    "0x95e6f3bbcc48559d424e7b3140be3254033d0813": {
+        "token": "205.038248765552476571",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "15600.0",
+        "farmingLaunchpad": "0.0",
+        "total": "15805.038248765552476571"
+    },
+    "0xf830afd30822aed45a4eb867f3fdf16779d1b0cf": {
+        "token": "162.819537495529746868",
+        "lp": "0.0",
+        "staking": "28836.66890775787673102",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "28999.488445253406477888"
+    },
+    "0xe4622ec52177b48d2c748a95c3ce34a779840ae6": {
+        "token": "136.574388622955447161",
+        "lp": "0.0",
+        "staking": "177826.691230576410574303",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "177963.265619199366021464"
+    },
+    "0x970106514a8ec07017b3f957603eb0994050ed20": {
+        "token": "106.787872294088546874",
+        "lp": "0.0",
+        "staking": "81905.523285835911810919",
+        "farming": "0.0",
+        "stakingLaunchpad": "294793.261252613030100901",
+        "farmingLaunchpad": "129844.43948550486295306",
+        "total": "506650.011896247893411754"
+    },
+    "0xb5852bafe547e3a14e76e2d2ecb134fea8dd60d9": {
+        "token": "86.030680902347735615",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "52581.390494320245144431",
+        "stakingLaunchpad": "12535.039148640572648035",
+        "farmingLaunchpad": "0.0",
+        "total": "65202.460323863165528081"
+    },
+    "0xc33d3546f19977dccabe4b4fd7fb13d4f8478448": {
+        "token": "75.841903786584883955",
+        "lp": "0.0",
+        "staking": "18504.288720677764065836",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "18580.130624464348949791"
+    },
+    "0xa156730475e7266deb879d5041a3e48a3c87d8ed": {
+        "token": "66.225023373879494898",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "32445.452938711316766132",
+        "stakingLaunchpad": "0.002968989353966811",
+        "farmingLaunchpad": "13972.638226452373860035",
+        "total": "46484.319157526924087876"
+    },
+    "0x28d7f622e8f356023d59a30b6a744fc15acce1e5": {
+        "token": "50.998955343690052617",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "18654.226327270309376654",
+        "farmingLaunchpad": "12826.867318818939845199",
+        "total": "31532.09260143293927447"
+    },
+    "0xf2b9918ca2b8275d4ddeb6f7ceb5725fe7e9fe0c": {
+        "token": "48.328615400860495333",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "309.627120306132437327",
+        "stakingLaunchpad": "15383.652145279655808796",
+        "farmingLaunchpad": "636.253890750761482441",
+        "total": "16377.861771737410223897"
+    },
+    "0x83e299c6f9710f47d5318aa947f3cf67928b42e3": {
+        "token": "28.803516579361955639",
+        "lp": "0.0",
+        "staking": "14064.645396946878847524",
+        "farming": "14112.269460260904538372",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "28205.718373787145341535"
+    },
+    "0x1d6ff1b7c1f1274a2dbea1d1ea476b67e5348b32": {
+        "token": "22.284582123477382576",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "49053.348720843858675629",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "49075.633302967336058205"
+    },
+    "0xaba884287995177e20b93a71fa7b729aa55020c2": {
+        "token": "21.063213139470454655",
+        "lp": "0.0",
+        "staking": "15863.862753448583802652",
+        "farming": "0.0",
+        "stakingLaunchpad": "3939.476148671944570046",
+        "farmingLaunchpad": "0.0",
+        "total": "19824.402115259998827353"
+    },
+    "0x28d2c79eca7303d6472f57514252555df6503c51": {
+        "token": "11.657064795674793931",
+        "lp": "0.0",
+        "staking": "4345.411015493740942466",
+        "farming": "0.0",
+        "stakingLaunchpad": "350853.841023375882917706",
+        "farmingLaunchpad": "0.0",
+        "total": "355210.909103665298654103"
+    },
+    "0xca76e1ee51cf7ffb2ab79b745e96a79c11aa34e1": {
+        "token": "9.301616947750856539",
+        "lp": "0.0",
+        "staking": "39950.244261842427305855",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "39959.545878790178162394"
+    },
+    "0x47033ac48fbedfcf36f54a43ed3725256a1a7b29": {
+        "token": "7.528495605235030816",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "1004058.523873102243168558",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "1004066.052368707478199374"
+    },
+    "0xef6a5a06407c5e7af0b0b66107c119830a4e8fd0": {
+        "token": "5.65433345528485849",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "47093.16768204751742418",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "47098.82201550280228267"
+    },
+    "0x9e7685da4effbe6a35266989f4f3040dc39c36ed": {
+        "token": "5.391299269669753692",
+        "lp": "0.0",
+        "staking": "15484.834067321858884274",
+        "farming": "43372.410242559473414954",
+        "stakingLaunchpad": "69889.549046759795572656",
+        "farmingLaunchpad": "220416.488896355994063039",
+        "total": "349168.673552266791688615"
+    },
+    "0x9e4e098475a969e255fb8d4e6c8844662344259b": {
+        "token": "4.557923243181431609",
+        "lp": "0.0",
+        "staking": "7059.495297460490957599",
+        "farming": "34524.722664122667550035",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "41588.775884826339939243"
+    },
+    "0x1cdeae346233337605549993702ed929d24aed82": {
+        "token": "4.497819648995471896",
+        "lp": "0.0",
+        "staking": "16672.395149681333877694",
+        "farming": "206.925575105079992324",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "16883.818544435409341914"
+    },
+    "0x47049f7ae4fd42e3dbb60607e7c9603bd166e1e8": {
+        "token": "4.293618274606714265",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "199056.170524974581554146",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "199060.464143249188268411"
+    },
+    "0x7b7b25310f0b4bf9338a8adf9e2a5b17b86eda93": {
+        "token": "3.369675030418478779",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "19174.408339095952499596",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "19177.778014126370978375"
+    },
+    "0x2a960a9b4fabaca80b9624f7d18e33a9276cedb5": {
+        "token": "2.915711500445590827",
+        "lp": "0.0",
+        "staking": "1360732.368696456593453769",
+        "farming": "0.0",
+        "stakingLaunchpad": "633191.75454590689168951",
+        "farmingLaunchpad": "149604.632846820074552546",
+        "total": "2143531.671800684005286652"
+    },
+    "0xa8bb2b5b871d89628ac33c797162a995da7e4e93": {
+        "token": "2.770036179499096499",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "102015.456782973942620212",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "102015.456782973942620212",
+        "total": "204033.683602127384336923"
+    },
+    "0xfdfaf3922fe5f0d4bbbd6cbd265449dc02474df6": {
+        "token": "2.622232827003123693",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "68106.555278473176925721",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "68109.177511300180049414"
+    },
+    "0xc25c45237a0fa18d075074e7fcc717522d8cd1ec": {
+        "token": "1.945970583745944705",
+        "lp": "0.0",
+        "staking": "12454.939810975309966821",
+        "farming": "21092.195062734718484137",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "33549.080844293774395663"
+    },
+    "0x66e2495aebca70c141f3936cb6f6d2e6464a5d99": {
+        "token": "1.913161368621237875",
+        "lp": "0.0",
+        "staking": "12471.169116968736207118",
+        "farming": "2770.171173470488080153",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "5958.954424610374651422",
+        "total": "21202.207876418220176568"
+    },
+    "0x19c25732f9e4d7e18fb803bc473f79668a553933": {
+        "token": "1.846105467952073548",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "29282.538841615681786641",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "29284.384947083633860189"
+    },
+    "0xabcbb4f73e0fa9eace8b14e00558573e2ea954fa": {
+        "token": "1.698930864680372758",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "15032.158844485196636137",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "15033.857775349877008895"
+    },
+    "0xf019e72c0f3ea396f09acead38f9aac993067f1c": {
+        "token": "1.176634921268793004",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "1811.629043100075415663",
+        "farmingLaunchpad": "67493.933144488119687331",
+        "total": "69306.738822509463895998"
+    },
+    "0xf6cc7bf8a62bdcf9ece715fccb5babc062f69ef6": {
+        "token": "0.980604890822193249",
+        "lp": "0.0",
+        "staking": "0.559820738632228336",
+        "farming": "18373.413599193899887262",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "18374.954024823354308847"
+    },
+    "0x95be6f191bfb7effb39f0d03955c581cc94df8d9": {
+        "token": "0.71288134919396122",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "96639.979635844102178525",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "96640.692517193296139745"
+    },
+    "0x5f11864bb09acb465489cfc35ffa880edb40a882": {
+        "token": "0.694401673708351737",
+        "lp": "0.0",
+        "staking": "71779.049301665822661364",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "71779.743703339531013101"
+    },
+    "0x8b6fa5d5d313273b4c9355b60d36c908ff9f61cf": {
+        "token": "0.537916973223238877",
+        "lp": "0.0",
+        "staking": "4886.014346675845835121",
+        "farming": "2867.903769641448187954",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "9267.066342128008290506",
+        "total": "17021.522375418525552458"
+    },
+    "0x45c6e558c01b3685148750b7d8262032261febd9": {
+        "token": "0.310215522115139481",
+        "lp": "0.0",
+        "staking": "145268.399775902678178057",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "145268.709991424793317538"
+    },
+    "0xc11f14ef891f4c0394f9141ae8847c46fcf18eaf": {
+        "token": "0.264303531057176037",
+        "lp": "0.000000000000000001",
+        "staking": "173242.142350282209633798",
+        "farming": "259633.696572379186948695",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "432876.103226192453758531"
+    },
+    "0x9ae21712497825ddea48c9bd8c8218e6315da7cf": {
+        "token": "0.261916515722662027",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "28493.928117602199749498",
+        "total": "28494.190034117922411525"
+    },
+    "0xea3bb5e9ecd08eb183fe7e51d90f4f42606f7b85": {
+        "token": "0.235255576977429644",
+        "lp": "0.0",
+        "staking": "357094.606928645749226343",
+        "farming": "0.0",
+        "stakingLaunchpad": "194493.46795891974736859",
+        "farmingLaunchpad": "459487.981575020227701532",
+        "total": "1011076.291718162701726109"
+    },
+    "0x7d867806bb8388794bc02bce322ae199fb390fd9": {
+        "token": "0.21017837468274735",
+        "lp": "0.0",
+        "staking": "825252.086100928848048594",
+        "farming": "0.0",
+        "stakingLaunchpad": "446496.30195174729220127",
+        "farmingLaunchpad": "0.0",
+        "total": "1271748.598231050822997214"
+    },
+    "0x135907936537a44763817ac7fc30abaec9a81fab": {
+        "token": "0.201075910655549367",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "71664.276740277939577981",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "71664.477816188595127348"
+    },
+    "0x354f349547269a6c3df3300040ae908ac003490d": {
+        "token": "0.191897833686776781",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "51002.864572657684663112",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "47601.47408762456424976",
+        "total": "98604.530558115935689653"
+    },
+    "0x572695080ab4c012622773e0dad16cfee560ca78": {
+        "token": "0.160774276165876076",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "485403.225201012854514831",
+        "farmingLaunchpad": "0.0",
+        "total": "485403.385975289020390907"
+    },
+    "0x551258452f1ed5a15d0f08c0a442a54fb35cf87f": {
+        "token": "0.138131456217154768",
+        "lp": "0.0",
+        "staking": "203617.598376333134398753",
+        "farming": "67353.699725424786194866",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "270971.436233214137748387"
+    },
+    "0x85a80f9557261197a5e441e3c3c17bbed2615436": {
+        "token": "0.125887855089590683",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "18013.443816473146677936",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "18013.569704328236268619"
+    },
+    "0x6316b4a2fc13edfd36197248304ebfa6e5a4cae2": {
+        "token": "0.108027096883220341",
+        "lp": "0.000000000000373114",
+        "staking": "30366.64646885790166961",
+        "farming": "12436.679778000751796998",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "42803.434273955537060063"
+    },
+    "0x7e5f4b34d239097688267c696e3c5294e05800e2": {
+        "token": "0.098644503832557759",
+        "lp": "0.0",
+        "staking": "16659.766643657690427407",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "16659.865288161522985166"
+    },
+    "0xbc9cb4c9eb7ad827a982a2f5e4c884fbca33f17a": {
+        "token": "0.096115544474118781",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "4300.206920575072263859",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "41201.201667533413297616",
+        "total": "45501.504703652959680256"
+    },
+    "0x663b57ceca65b591880904d83eaba3fa0e9d1970": {
+        "token": "0.093652251977736453",
+        "lp": "0.0",
+        "staking": "968850.538067212105733712",
+        "farming": "72750.240020643451704489",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "1041600.871740107535174654"
+    },
+    "0xeb001d07abb2530f62e947568662b082161b7b04": {
+        "token": "0.074095898262325206",
+        "lp": "0.0",
+        "staking": "11299.566442719028610908",
+        "farming": "15306.997746439495518942",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "26606.638285056786455056"
+    },
+    "0xca253da32f1e7a4dbf4310616c7c7adef131e2f7": {
+        "token": "0.065491764814556955",
+        "lp": "0.0",
+        "staking": "77346.773465834092948621",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "77346.838957598907505576"
+    },
+    "0x5a48ba8856f4ac55c2a073175c500a4dc0b88ee2": {
+        "token": "0.060550250627818799",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "17569.520759848813548789",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "17569.581310099441367588"
+    },
+    "0x78a24006edb042ad81aa0153b4979b7662f136f9": {
+        "token": "0.057361012941697649",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "15499.130912511030893596",
+        "total": "15499.188273523972591245"
+    },
+    "0xc5e69a10dfcf6d2454366f2e8a3ba4bd20645a06": {
+        "token": "0.054443555475883159",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "29924.4809290495893233",
+        "farmingLaunchpad": "0.0",
+        "total": "29924.535372605065206459"
+    },
+    "0xe56815ddddfcc733b83cf4b9fd156b50cc4dd43d": {
+        "token": "0.05288217445838443",
+        "lp": "0.0",
+        "staking": "156472.77639347542948093",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "156472.82927564988786536"
+    },
+    "0xc33c5f3a3578e27f2374c8435f33d63e545a576c": {
+        "token": "0.049840144326259381",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "30680.5",
+        "farmingLaunchpad": "0.0",
+        "total": "30680.549840144326259381"
+    },
+    "0x5453b447f98680dd9139d448b6dadbfaf9021915": {
+        "token": "0.042111717248258816",
+        "lp": "0.000000000011697868",
+        "staking": "20319.226524450152220661",
+        "farming": "4624.551209718563272475",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "24943.81984588597544982"
+    },
+    "0xaba19f6bb8676f897adcbba7c9905fd536ef52aa": {
+        "token": "0.041518551221899763",
+        "lp": "0.0",
+        "staking": "19333.244999815515924695",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "19333.286518366737824458"
+    },
+    "0xa744c5c2f550f919bf4e7796ed9a36074ce33b2f": {
+        "token": "0.033166685576155356",
+        "lp": "0.0",
+        "staking": "138890.320027572469300467",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "138890.353194258045455823"
+    },
+    "0x5b2daa876cfbb4fe17a7b06795730423aa4717ca": {
+        "token": "0.03206527908500056",
+        "lp": "0.0",
+        "staking": "100010.551377766087996128",
+        "farming": "0.0",
+        "stakingLaunchpad": "66935.715990168245591649",
+        "farmingLaunchpad": "31120.876843985710737045",
+        "total": "198067.176277199129325382"
+    },
+    "0x4f51e30992b6b1260acde4e33f3ec2e97abe5f9b": {
+        "token": "0.03199307830307501",
+        "lp": "0.000000000000731601",
+        "staking": "75602.732709501622078917",
+        "farming": "771.878302962577500341",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "76374.643005542503385869"
+    },
+    "0x70cbac28d4977c29f7cb4f94e0fb57da93f0667d": {
+        "token": "0.031247233896532314",
+        "lp": "0.0",
+        "staking": "33394.397618353720831642",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "33394.428865587617363956"
+    },
+    "0x8d62b4cd343765524046f7297793f2693e79121e": {
+        "token": "0.029354402638031723",
+        "lp": "0.0",
+        "staking": "252174.414590563364631469",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "252174.443944966002663192"
+    },
+    "0xc0a3eb8b9ece9e8a26110474170c61653c534a4a": {
+        "token": "0.027400723109047256",
+        "lp": "0.0",
+        "staking": "46410.278100544738632466",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "46410.305501267847679722"
+    },
+    "0x351356843a8cfdb726c757014b47e1291315217f": {
+        "token": "0.020969327164517791",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "40689.028874524338677192",
+        "farmingLaunchpad": "54400.880817637913425567",
+        "total": "95089.93066148941662055"
+    },
+    "0x64f9c8144e8c8faf1743911ebe5f0ae0e3c8a3cd": {
+        "token": "0.020530308543940515",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "34740.732970227138348121",
+        "farmingLaunchpad": "0.0",
+        "total": "34740.753500535682288636"
+    },
+    "0x72435e2e3d9947bf04bf7c7feb33a3e81b063414": {
+        "token": "0.019975741155628521",
+        "lp": "0.0",
+        "staking": "17075.592362",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "17075.612337741155628521"
+    },
+    "0xa5945dc6972cf17c8abf0a6410a799b94b189bb8": {
+        "token": "0.019279774529328812",
+        "lp": "0.0",
+        "staking": "6409.879665793251420508",
+        "farming": "0.0",
+        "stakingLaunchpad": "22098.844454429114484903",
+        "farmingLaunchpad": "5935.334450473456613875",
+        "total": "34444.077850470351848098"
+    },
+    "0x870656e3f0e07545c398af6c7816cecc7c376c93": {
+        "token": "0.015689792588080036",
+        "lp": "0.000000000000129724",
+        "staking": "21358.564231268833167852",
+        "farming": "20401.298920499487535542",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "41759.878841560908913154"
+    },
+    "0x36d1906362a8e35f0b167ca82f869ed00fa019d0": {
+        "token": "0.011161194325023537",
+        "lp": "0.0",
+        "staking": "57370.614759620398342799",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "57370.625920814723366336"
+    },
+    "0x0f22a52d6ee30abec311fd67c998ab4b5e00382c": {
+        "token": "0.010994164628728315",
+        "lp": "0.000000000000214522",
+        "staking": "15771.133795414887994123",
+        "farming": "136.097782576562172281",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "15907.242572156079109241"
+    },
+    "0xd0eff53a38f9464d3e59756a1a68beb0a529408b": {
+        "token": "0.0106662648279799",
+        "lp": "0.0",
+        "staking": "17635.828840755984200162",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "17635.839507020812180062"
+    },
+    "0x14d67b42d0c4d596dac8ee6c934e7b17fb076913": {
+        "token": "0.009678147867899065",
+        "lp": "0.000000000000086572",
+        "staking": "20857.473220604479987892",
+        "farming": "10495.569119105976600008",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "31353.052017858324573537"
+    },
+    "0x7113fb96f23d061cb116b830e629c7e5bfc335ad": {
+        "token": "0.009301891205501068",
+        "lp": "0.0",
+        "staking": "48055.524483940916023784",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "48055.533785832121524852"
+    },
+    "0x402dc2e22e8bdd48cd94c6ec074ef2a290fcef42": {
+        "token": "0.00860672021816058",
+        "lp": "0.0",
+        "staking": "62535.803174632838944465",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "62535.811781353057105045"
+    },
+    "0xf75958a9fea122dde73809cde378504588093612": {
+        "token": "0.0084598669324802",
+        "lp": "0.0",
+        "staking": "15031.2067576438075515",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "15031.2152175107400317"
+    },
+    "0x0e889fe8d808493524421e894eed21add0797626": {
+        "token": "0.007317256395305926",
+        "lp": "0.0",
+        "staking": "23833.303863016295112173",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "23833.311180272690418099"
+    },
+    "0x17d8d510ac4a93b8e7fda4c7cd8f932bb685a4ba": {
+        "token": "0.00673967011873035",
+        "lp": "0.0",
+        "staking": "18401.752758192139326118",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "18401.759497862258056468"
+    },
+    "0x70b66a27923c8508bd68bd33387cbb43c1c9e701": {
+        "token": "0.006178311132028138",
+        "lp": "0.0",
+        "staking": "16977.136582350319398299",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "16977.142760661451426437"
+    },
+    "0x622a71d9609d8d4d077be34b452b5505d8690ee4": {
+        "token": "0.006136921851541995",
+        "lp": "0.000000000000602336",
+        "staking": "31088.661928577555983356",
+        "farming": "8217.840012057359418984",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "39306.508077556767546671"
+    },
+    "0x8493a941ad270a3324bf63a53422784a3c60efb4": {
+        "token": "0.005359816706174856",
+        "lp": "0.0",
+        "staking": "11659.556772326945300079",
+        "farming": "18897.843304280031732418",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "30557.405436423683207353"
+    },
+    "0x4bffbe39e1b77c242b5cc7d354b295587d9ec984": {
+        "token": "0.00486048577020912",
+        "lp": "0.0",
+        "staking": "22677.6470539056540133",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "22677.65191439142422242"
+    },
+    "0x94fca69bdca4076770f63e3d949912771846ea44": {
+        "token": "0.003561023931485647",
+        "lp": "0.0",
+        "staking": "18691.157520205810811601",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "18691.161081229742297248"
+    },
+    "0x39aa31f29cff6163f9f2f3bd70729a20ae02faf3": {
+        "token": "0.003065799220240004",
+        "lp": "0.0",
+        "staking": "16013.845846746191331831",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "16013.848912545411571835"
+    },
+    "0x13ae2dbcb498f0b3209b7cc09433d260992a1e7b": {
+        "token": "0.002999758557599966",
+        "lp": "0.0",
+        "staking": "18284.641168515453550785",
+        "farming": "22212.571103228181098063",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "40497.215271502192248814"
+    },
+    "0x114b8723f8fe69b508c561b9e94ee9b7bfef6825": {
+        "token": "0.002891785484315624",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "18865.393880447857359428",
+        "farmingLaunchpad": "0.0",
+        "total": "18865.396772233341675052"
+    },
+    "0xe8ae81a5a6ef3e81f2d1022be4cfbd8612f2b36a": {
+        "token": "0.002772090685434411",
+        "lp": "0.000000000000723579",
+        "staking": "8006.303582685034348055",
+        "farming": "13126.935085322122108244",
+        "stakingLaunchpad": "6521.853283750756103323",
+        "farmingLaunchpad": "0.0",
+        "total": "27655.094723848598717612"
+    },
+    "0x72d4f3bd845f96f99037873ebb1d0dc15c08ef0b": {
+        "token": "0.002256648351873719",
+        "lp": "0.000000000000554357",
+        "staking": "24394.729994126984036314",
+        "farming": "24758.880866909219943448",
+        "stakingLaunchpad": "11585.462296567983345711",
+        "farmingLaunchpad": "0.0",
+        "total": "60739.075414252539753549"
+    },
+    "0xbd4ed59887304e8750d22016bf46c7f361c17f44": {
+        "token": "0.000723873939767725",
+        "lp": "0.0",
+        "staking": "5555.39163",
+        "farming": "0.0",
+        "stakingLaunchpad": "3316.627931948983201439",
+        "farmingLaunchpad": "10940.866162797340029262",
+        "total": "19812.886448620262998426"
+    },
+    "0x9973bce10aafb32f6c438c2d88f694e897c81e03": {
+        "token": "0.000597003402711614",
+        "lp": "0.0",
+        "staking": "5000.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "15218.564862125187686455",
+        "total": "20218.565459128590398069"
+    },
+    "0x365f74427be173327de7b5961c2c6f2dc53fd6ba": {
+        "token": "0.0000000046071",
+        "lp": "0.0",
+        "staking": "150000.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "150000.0000000046071"
+    },
+    "0xee1a6eb55b47743544ffdb6d6ed77eda172fdacb": {
+        "token": "0.0",
+        "lp": "0.000000097409739415",
+        "staking": "0.0",
+        "farming": "132456.164819747047165512",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "132456.164819844456904927"
+    },
+    "0x482f853cf74da712e6c0c2caa7f23daa142eb903": {
+        "token": "0.0",
+        "lp": "0.000000000000277326",
+        "staking": "26852.660673608063982789",
+        "farming": "8667.211391861498627262",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "35519.872065469562887377"
+    },
+    "0xf41c241f72de0cca5fa24a94dfb85efb875d3ff6": {
+        "token": "0.0",
+        "lp": "0.000000000000195728",
+        "staking": "0.0",
+        "farming": "20915.016272922623577722",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "20915.01627292262377345"
+    },
+    "0xf09545d3d6424c40202d73620ce2a04cc35b300d": {
+        "token": "0.0",
+        "lp": "0.000000000000000001",
+        "staking": "4514.103676456855320051",
+        "farming": "26953.151707203840504587",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "31467.255383660695824639"
+    },
+    "0x129da0c07430eb2376de3458d83466a777aa3341": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "17100.840364960592882719",
+        "farming": "7722.773020462679558977",
+        "stakingLaunchpad": "1500.0",
+        "farmingLaunchpad": "0.0",
+        "total": "26323.613385423272441696"
+    },
+    "0x5f6d71cd8404e661cb4736e368564c01a7ff9852": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "6593.697867220667923751",
+        "farming": "140470.984387985936116968",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "178974.197615979778707928",
+        "total": "326038.879871186382748647"
+    },
+    "0xc515522fe7c71d5d14671bc19e7823392ce7797c": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "182.58216290587957336",
+        "farming": "49690.265680869589045766",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "49872.847843775468619126"
+    },
+    "0x06410ffda716b7c0951823f4194db32ae55d631e": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "170005.264598659178280381",
+        "stakingLaunchpad": "171987.180213848126032226",
+        "farmingLaunchpad": "304539.72988589377741702",
+        "total": "646532.174698401081729627"
+    },
+    "0xfc5723d6bc8da7cadde437fe7cea54219ce97a67": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "100797.985559601616300582",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "100797.985559601616300582"
+    },
+    "0x2b67050f6bcb7b137e732f94605d862a27c0e6a2": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "89899.679665947539269571",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "89899.679665947539269571"
+    },
+    "0x86411a95728a2e1b2e365923be43c2c525c1f292": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "63141.003421025774883416",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "63141.003421025774883416"
+    },
+    "0x784acbedb26a45964f70e05865b403992fd6b809": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "29636.704712518978539464",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "29636.704712518978539464"
+    },
+    "0x27823e16c50f0afb593253e8608ed2594b5f36ba": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "28628.573408833842098223",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "28628.573408833842098223"
+    },
+    "0x18f43a59d698ea7a4f5a0c11e7aa50973f5b396b": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "27961.400157174200160816",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "27961.400157174200160816"
+    },
+    "0x85e549313f9cfdbcc75cbfef355c0032b6cda287": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "26746.495805237114958149",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "26746.495805237114958149"
+    },
+    "0x274a264feee36f09b5900ff280087bacea4235be": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "21929.396941726393954159",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "21929.396941726393954159"
+    },
+    "0x7c37922f20b0810f473a3f467e41b5a4eb8d582d": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "17491.993475263781370931",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "17491.993475263781370931"
+    },
+    "0xf8f726dfd844b1d86c8da4ec731bc62d27f04fae": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "17470.23236663464087562",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "0.0",
+        "total": "17470.23236663464087562"
+    },
+    "0x6011c90ad69da2193cfe55fc8521aa4eb40a5ff4": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "7319.443157246261950027",
+        "stakingLaunchpad": "0.0",
+        "farmingLaunchpad": "29625.826856572410405098",
+        "total": "36945.270013818672355125"
+    },
+    "0xad5834a96b8c78a65b4e7a04d5f2b7799c0ce7f8": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "55990.719929260233023431",
+        "farmingLaunchpad": "0.0",
+        "total": "55990.719929260233023431"
+    },
+    "0x88f3395ea1cdca3026eafebbbf5a27a9774c67df": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "19641.695447082016214843",
+        "farmingLaunchpad": "0.0",
+        "total": "19641.695447082016214843"
+    },
+    "0x72c5a2bb630b82b40fdb6ba0f3302387532aa222": {
+        "token": "0.0",
+        "lp": "0.0",
+        "staking": "0.0",
+        "farming": "0.0",
+        "stakingLaunchpad": "17183.756254470989372088",
+        "farmingLaunchpad": "0.0",
+        "total": "17183.756254470989372088"
+    }
+}
