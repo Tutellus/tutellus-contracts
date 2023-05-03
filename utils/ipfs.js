@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { create: ipfsHttpClient, globSource } = require('ipfs-http-client');
 const axios = require('axios');
-const projectId = process.env.INFURA_IPFS_PROJECT_ID
-const projectSecret = process.env.INFURA_IPFS_PROJECT_SECRET
+const PROJECT_ID = process.env.INFURA_IPFS_PROJECT_ID
+const PROJECT_SECRET  = process.env.INFURA_IPFS_PROJECT_SECRET
 
 async function downloadJSON(uri) {
   try {
@@ -16,7 +16,12 @@ async function downloadJSON(uri) {
   }
 }
 
-async function uploadJSON(json, merkleRoot) {
+async function uploadJSON({
+  json,
+  merkleRoot,
+  projectId = PROJECT_ID,
+  projectSecret = PROJECT_SECRET,
+}) {
   const tmpFile = path.join(__dirname, `${merkleRoot}.json`);
   try {
     const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64');
