@@ -148,6 +148,7 @@ contract Supertutellians is
 
     function deposit(address account, uint256 amount) public returns (uint256 tokenId) {
         require(amount >= minDepositAmount(account), "");
+        if (minDepositAmounts[account] != 0) minDepositAmounts[account] = 0;
         tokenId = tokenIdCounter.current();
         supertutellians[tokenId] = Supertutellian({
             balance: amount,
