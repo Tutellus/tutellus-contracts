@@ -40,6 +40,7 @@ contract Supertutellians is
     }
 
     bytes32 internal constant _ST_ADMIN_ROLE = keccak256("ST_ADMIN_ROLE");
+    uint256 public constant LOCK_TIME = 365 days;
 
     CountersUpgradeable.Counter private tokenIdCounter;
     uint256 private _deployTimestamp;
@@ -90,7 +91,7 @@ contract Supertutellians is
         _deployTimestamp = block.timestamp; //solhint-disable-line not-rely-on-time
         general.lastUpdate = block.timestamp; //solhint-disable-line not-rely-on-time
         address _token = ITutellusManager(config).get(keccak256("TUT"));
-        address _vault = ITutellusManager(config).get(keccak256("ST_VAULT"));
+        address _vault = ITutellusManager(config).get(keccak256("SUPERTUTELLIANS_REWARDS"));
         token = IERC20Upgradeable(_token);
         vault = ITutellusRewardsVaultV2(_vault);
 
@@ -126,6 +127,10 @@ contract Supertutellians is
         return _pendingRewards(tokenId);
     }
 
+    function canWithdraw(uint256 tokenId) public view returns (bool) {
+        return _canWithdraw(tokenId);
+    }
+
     function minDepositAmount(address account) public view returns (uint256) {
         if (minDepositAmounts[account] != 0) return minDepositAmounts[account];
 
@@ -157,6 +162,7 @@ contract Supertutellians is
     }
 
     function withdraw(uint256 tokenId) public {
+        require(_canWithdraw(tokenId), "");
         address account = ownerOf(tokenId);
         claim(tokenId);
         uint256 amount = supertutellians[tokenId].balance;
@@ -174,6 +180,10 @@ contract Supertutellians is
         supertutellians[tokenId].rewardDebt = supertutellians[tokenId].balance * general.accRewardsPerShare / 1 ether;
 
         emit Claim(tokenId, ownerOf(tokenId), pending);
+    }
+
+    function _canWithdraw(uint256 tokenId) internal view returns (bool) {
+        return block.timestamp > LOCK_TIME + supertutellians[tokenId].mintDate; //solhint-disable-line not-rely-on-time
     }
 
     function _safeMint(address to) internal returns (uint256 tokenId) {
