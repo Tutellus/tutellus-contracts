@@ -40,13 +40,16 @@ contract Supertutellians is
     }
 
     bytes32 internal constant _ST_ADMIN_ROLE = keccak256("ST_ADMIN_ROLE");
-    uint256 public constant LOCK_TIME = 365 days;
 
     CountersUpgradeable.Counter private tokenIdCounter;
     uint256 private _deployTimestamp;
     ITutellusRewardsVaultV2 public vault;
     IERC20Upgradeable public token;
     General public general;
+    uint256 public lockTime;
+    uint256 public minDepositAmountRange;
+    uint256 public maxDepositAmountRange;
+    uint256 public minDepositAmountTimeRange;
 
     mapping(uint256 => Supertutellian) public supertutellians;
     mapping(address => uint256) public minDepositAmounts;
@@ -95,6 +98,11 @@ contract Supertutellians is
         token = IERC20Upgradeable(_token);
         vault = ITutellusRewardsVaultV2(_vault);
 
+        lockTime = 365 days;
+        minDepositAmountRange = 25000 ether;
+        maxDepositAmountRange = 60000 ether;
+        minDepositAmountTimeRange = 60 days;
+
         emit InitSupertutellian(_vault, _token);
     }
 
@@ -102,6 +110,13 @@ contract Supertutellians is
         uint256 amount = token.balanceOf(address(this)) - general.balance;
         token.safeTransfer(recipient, amount);
         emit SyncBalance(recipient, amount);
+    }
+
+    function updateConfig(uint256 lock, uint256 min, uint256 max, uint256 range) public onlyRole(_ST_ADMIN_ROLE) {
+        lockTime = lock;
+        minDepositAmountRange = min;
+        maxDepositAmountRange = max;
+        minDepositAmountTimeRange = range;
     }
 
     function setMinDepositAmounts(address[] calldata accounts, uint256[] calldata amounts)
@@ -135,14 +150,15 @@ contract Supertutellians is
         if (minDepositAmounts[account] != 0) return minDepositAmounts[account];
 
         uint256 blockTimestamp = block.timestamp; //solhint-disable-line not-rely-on-time
-        uint256 range = 60 days;
-        uint256 min = 25000 ether;
-        uint256 max = 60000 ether;
 
-        if (blockTimestamp < _deployTimestamp + range) {
-            return min + ((max - min) * (blockTimestamp - _deployTimestamp) / range);
+        if (blockTimestamp < _deployTimestamp + minDepositAmountTimeRange) {
+            return minDepositAmountRange
+                + (
+                    (maxDepositAmountRange - minDepositAmountRange) * (blockTimestamp - _deployTimestamp)
+                        / minDepositAmountTimeRange
+                );
         } else {
-            return max;
+            return maxDepositAmountRange;
         }
     }
 
@@ -185,7 +201,7 @@ contract Supertutellians is
     }
 
     function _canWithdraw(uint256 tokenId) internal view returns (bool) {
-        return block.timestamp > LOCK_TIME + supertutellians[tokenId].mintDate; //solhint-disable-line not-rely-on-time
+        return block.timestamp > lockTime + supertutellians[tokenId].mintDate; //solhint-disable-line not-rely-on-time
     }
 
     function _safeMint(address to) internal returns (uint256 tokenId) {

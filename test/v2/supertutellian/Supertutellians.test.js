@@ -144,7 +144,7 @@ describe.only("Supertutellians", function () {
         })
         it("can claim", async () => {
             const nftData = await mySupertutellians.supertutellians(tokenId)
-            const lockTime = await mySupertutellians.LOCK_TIME()
+            const lockTime = await mySupertutellians.lockTime()
             const claimDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
             await ethers.provider.send("evm_setNextBlockTimestamp", [claimDate])
             const pending = await mySupertutellians.pendingRewards(tokenId)
@@ -158,7 +158,7 @@ describe.only("Supertutellians", function () {
         })
         it("can claim after transfer", async () => {
             const nftData = await mySupertutellians.supertutellians(tokenId)
-            const lockTime = await mySupertutellians.LOCK_TIME()
+            const lockTime = await mySupertutellians.lockTime()
             const claimDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
             await ethers.provider.send("evm_setNextBlockTimestamp", [claimDate])
             const pending = await mySupertutellians.pendingRewards(tokenId)
@@ -180,7 +180,7 @@ describe.only("Supertutellians", function () {
         })
         it("can withdraw", async () => {
             const nftData = await mySupertutellians.supertutellians(tokenId)
-            const lockTime = await mySupertutellians.LOCK_TIME()
+            const lockTime = await mySupertutellians.lockTime()
             const withdrawDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
             await ethers.provider.send("evm_setNextBlockTimestamp", [withdrawDate])
             await mySupertutellians.connect(personSigner).claim(tokenId)
@@ -194,7 +194,7 @@ describe.only("Supertutellians", function () {
         })
         it("can withdraw after transfer", async () => {
             const nftData = await mySupertutellians.supertutellians(tokenId)
-            const lockTime = await mySupertutellians.LOCK_TIME()
+            const lockTime = await mySupertutellians.lockTime()
             const withdrawDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
             await ethers.provider.send("evm_setNextBlockTimestamp", [withdrawDate])
             await mySupertutellians.connect(personSigner).claim(tokenId)
