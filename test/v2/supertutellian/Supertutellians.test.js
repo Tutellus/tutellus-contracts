@@ -16,7 +16,7 @@ const HoldersVault = artifacts.require("TutellusHoldersVault")
 const SUPERTUTELLIANS = ethers.utils.id("SUPERTUTELLIANS")
 const ST_ADMIN_ROLE = ethers.utils.id("ST_ADMIN_ROLE")
 const UPGRADER_ROLE = ethers.utils.id('UPGRADER_ROLE')
-const TUT = ethers.utils.id('TUT')
+const ERC20 = ethers.utils.id('ERC20')
 const REWARDS_MANAGER_ROLE = ethers.utils.id('REWARDS_MANAGER_ROLE')
 const REWARDS_ID = ethers.utils.id('SUPERTUTELLIANS_REWARDS')
 
@@ -79,7 +79,7 @@ describe.only("Supertutellians", function () {
         const Manager = await ethers.getContractFactory("TutellusManager")
         myManager = await Manager.deploy()
         await myManager.initialize()
-        await myManager.setId(TUT, myToken.address)
+        await myManager.setId(ERC20, myToken.address)
 
         const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
         const initializeCalldata = RewardsVaultV2.interface.encodeFunctionData("initialize", [])
@@ -115,6 +115,52 @@ describe.only("Supertutellians", function () {
             expect(nftData.balance.toString()).to.equal(MAX_DEPOSIT_AMOUNT.toString())
             expect(nftData.minter).to.equal(person)
             expect(ownerOfToken).to.equal(person)
+        })
+    })
+    describe("Claim", () => {
+        const tokenId = "0"
+        beforeEach(async () => {
+            mySupertutellians = mySupertutellians.connect(personSigner)
+            myToken = myToken.connect(personSigner)
+            await myToken.approve(mySupertutellians.address, MAX_DEPOSIT_AMOUNT)
+            await mySupertutellians.deposit(person, MAX_DEPOSIT_AMOUNT)
+        })
+        it("can claim", async () => {
+            const nftData = await mySupertutellians.supertutellians(tokenId)
+            const lockTime = await mySupertutellians.LOCK_TIME()
+            const claimDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
+            await ethers.provider.send("evm_setNextBlockTimestamp", [claimDate])
+            const pending = await mySupertutellians.pendingRewards(tokenId)
+            const balancePre = await myToken.balanceOf(person)
+            await mySupertutellians.connect(personSigner).claim(tokenId)
+            const balancePost = await myToken.balanceOf(person)
+            const pendingBN = ethers.BigNumber.from(pending.toString())
+            const balancePreBN = ethers.BigNumber.from(balancePre.toString())
+            const balancePostBN = ethers.BigNumber.from(balancePost.toString())
+            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(balancePreBN.add(pendingBN))))
+        })
+    })
+    describe("Withdraw and burn", () => {
+        const tokenId = "0"
+        beforeEach(async () => {
+            mySupertutellians = mySupertutellians.connect(personSigner)
+            myToken = myToken.connect(personSigner)
+            await myToken.approve(mySupertutellians.address, MAX_DEPOSIT_AMOUNT)
+            await mySupertutellians.deposit(person, MAX_DEPOSIT_AMOUNT)
+        })
+        it("can withdraw", async () => {
+            const nftData = await mySupertutellians.supertutellians(tokenId)
+            const lockTime = await mySupertutellians.LOCK_TIME()
+            const withdrawDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
+            await ethers.provider.send("evm_setNextBlockTimestamp", [withdrawDate])
+            await mySupertutellians.connect(personSigner).claim(tokenId)
+            const balancePre = await myToken.balanceOf(person)
+            const balancePreBN = ethers.BigNumber.from(balancePre.toString())
+            await mySupertutellians.connect(personSigner).withdraw(tokenId)
+            const balancePost = await myToken.balanceOf(person)
+            const balancePostBN = ethers.BigNumber.from(balancePost.toString())
+            const depositedBN = ethers.BigNumber.from(nftData.balance.toString())
+            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(balancePreBN.add(depositedBN))))
         })
     })
 })
