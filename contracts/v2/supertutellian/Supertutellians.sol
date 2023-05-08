@@ -173,6 +173,7 @@ contract Supertutellians is
     }
 
     function claim(uint256 tokenId) public {
+        require(_canWithdraw(tokenId), "");
         _update();
         uint256 pending = _pendingRewards(tokenId);
         require(pending != 0, "Staking: 004");
