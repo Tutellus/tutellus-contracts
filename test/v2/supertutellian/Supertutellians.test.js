@@ -57,10 +57,10 @@ const setInstances = async (addresses) => {
 
 describe.only("Supertutellians", function () {
     before(async () => {
-        [ownerSigner, personSigner, receiverSigner] = await ethers.getSigners()
+        [ownerSigner, personSigner, supertutellianSigner] = await ethers.getSigners()
         owner = ownerSigner.address
         person = personSigner.address
-        receiver = receiverSigner.address
+        supertutellian = supertutellianSigner.address
     })
     beforeEach(async () => {
         const previous = await latestBlock()
@@ -116,6 +116,23 @@ describe.only("Supertutellians", function () {
             expect(nftData.minter).to.equal(person)
             expect(ownerOfToken).to.equal(person)
         })
+        it("can deposit and mint under minDepositAmount if whitelisted", async () => {
+            const minDepositAmount = parseEther("15000")
+            await myToken.connect(personSigner).transfer(supertutellian, minDepositAmount)
+            await mySupertutellians.setMinDepositAmounts([supertutellian], [minDepositAmount])
+            mySupertutellians = mySupertutellians.connect(supertutellianSigner)
+            myToken = myToken.connect(supertutellianSigner)
+            await myToken.approve(mySupertutellians.address, minDepositAmount)
+            await mySupertutellians.deposit(supertutellian, minDepositAmount)
+            const tokenId = "0"
+            const stakingBalance = await mySupertutellians.balance()
+            const nftData = await mySupertutellians.supertutellians(tokenId)
+            const ownerOfToken = await mySupertutellians.ownerOf(tokenId)
+            expect(stakingBalance.toString()).to.equal(minDepositAmount.toString())
+            expect(nftData.balance.toString()).to.equal(minDepositAmount.toString())
+            expect(nftData.minter).to.equal(supertutellian)
+            expect(ownerOfToken).to.equal(supertutellian)
+        })
     })
     describe("Claim", () => {
         const tokenId = "0"
@@ -139,6 +156,19 @@ describe.only("Supertutellians", function () {
             const balancePostBN = ethers.BigNumber.from(balancePost.toString())
             expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(balancePreBN.add(pendingBN))))
         })
+        it("can claim after transfer", async () => {
+            const nftData = await mySupertutellians.supertutellians(tokenId)
+            const lockTime = await mySupertutellians.LOCK_TIME()
+            const claimDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
+            await ethers.provider.send("evm_setNextBlockTimestamp", [claimDate])
+            const pending = await mySupertutellians.pendingRewards(tokenId)
+            await mySupertutellians.connect(personSigner).transferFrom(person, supertutellian, tokenId)
+            await mySupertutellians.connect(supertutellianSigner).claim(tokenId)
+            const balancePost = await myToken.balanceOf(supertutellian)
+            const pendingBN = ethers.BigNumber.from(pending.toString())
+            const balancePostBN = ethers.BigNumber.from(balancePost.toString())
+            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(pendingBN)))
+        })
     })
     describe("Withdraw and burn", () => {
         const tokenId = "0"
@@ -161,6 +191,19 @@ describe.only("Supertutellians", function () {
             const balancePostBN = ethers.BigNumber.from(balancePost.toString())
             const depositedBN = ethers.BigNumber.from(nftData.balance.toString())
             expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(balancePreBN.add(depositedBN))))
+        })
+        it("can withdraw after transfer", async () => {
+            const nftData = await mySupertutellians.supertutellians(tokenId)
+            const lockTime = await mySupertutellians.LOCK_TIME()
+            const withdrawDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
+            await ethers.provider.send("evm_setNextBlockTimestamp", [withdrawDate])
+            await mySupertutellians.connect(personSigner).claim(tokenId)
+            await mySupertutellians.connect(personSigner).transferFrom(person, supertutellian, tokenId)
+            await mySupertutellians.connect(supertutellianSigner).withdraw(tokenId)
+            const balancePost = await myToken.balanceOf(supertutellian)
+            const balancePostBN = ethers.BigNumber.from(balancePost.toString())
+            const depositedBN = ethers.BigNumber.from(nftData.balance.toString())
+            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(depositedBN)))
         })
     })
 })
