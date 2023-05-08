@@ -168,7 +168,7 @@ contract Supertutellians is
         claim(tokenId);
         uint256 amount = supertutellians[tokenId].balance;
         general.balance -= amount;
-        _burn(tokenId);
+        burn(tokenId);
         token.safeTransfer(account, amount);
         emit Withdraw(tokenId, account, amount);
     }
