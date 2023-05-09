@@ -16,7 +16,9 @@
     "concatAbi:v2:minimal": "node concatAbi.js --root=abi/contracts/v2 --minimal=true",
     "concatABI:v2:launchpad": "node concatABI.js --root=contracts/v2:launchpad",
     "updateClients": "npx hardhat run scripts/mainnet/clients/update.js --network polygon",
-    "resetClients": "npx hardhat run scripts/mainnet/clients/reset.js --network polygon"
+    "resetClients": "npx hardhat run scripts/mainnet/clients/reset.js --network polygon",
+    "supertutellianDeployRewards:anvil": "npx hardhat run scripts/testnet/supertutellian/0_deploy_rewardsVault.js --network anvil",
+    "supertutellianDeployRewards:goerli": "npx hardhat run scripts/testnet/supertutellian/0_deploy_rewardsVault.js --network goerli"
   },
   "keywords": [],
   "author": "",

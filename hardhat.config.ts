@@ -42,6 +42,16 @@ const config: HardhatUserConfig = {
     localhost: {
       chainId: 31337,
     },
+    anvil: {
+      chainId: parseInt(process.env.ANVIL_CHAIN_ID || '5'),
+      url: process.env.ANVIL_RPC || "http://localhost:8545",
+      
+      accounts:
+      {
+        mnemonic: process.env.MNEMONIC,
+      }
+      // process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     goerli: {
       url: process.env.GOERLI_RPC || "",
       accounts:
