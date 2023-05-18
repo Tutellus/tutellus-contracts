@@ -14,6 +14,7 @@ const GRAPH_URL_LAUNCHPAD =
 const GRAPH_URL =
     "https://api.thegraph.com/subgraphs/name/tutellus/tutellus";
 
+const QUERIES_BLOCK = 42851160
 let RESERVES_TUT, LP_TOTAL_SUPPLY;
 const SUPER_LIMIT = ethers.utils.parseEther("15000");
 
@@ -142,12 +143,12 @@ async function getHoldersTut() {
 
 async function getHoldersLp() {
     let skip = 0;
-    let query = '{ holders(orderBy:balanceLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{balanceLP_gt:0}) { id balanceLP } }'
+    let query = '{ holders(block:{number:' + QUERIES_BLOCK + '} orderBy:balanceLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{balanceLP_gt:0}) { id balanceLP } }'
     let response = (await querySubgraph(query, GRAPH_URL)).holders;
     let loopresponse = response;
     while (loopresponse.length >= 1000) {
         skip = response.length;
-        query = '{ holders(orderBy:balanceLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{balanceLP_gt:0}) { id balanceLP } }'
+        query = '{ holders(block:{number:' + QUERIES_BLOCK + '} holders(orderBy:balanceLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{balanceLP_gt:0}) { id balanceLP } }'
         loopresponse = (await querySubgraph(query, GRAPH_URL)).holders;
         response = response.concat(loopresponse);
     }
@@ -156,12 +157,12 @@ async function getHoldersLp() {
 
 async function getStakers() {
     let skip = 0;
-    let query = '{ stakers(orderBy:amountTUT, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountTUT_gt:0}) { id amountTUT } }'
+    let query = '{ stakers(block:{number:' + QUERIES_BLOCK + '} orderBy:amountTUT, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountTUT_gt:0}) { id amountTUT } }'
     let response = (await querySubgraph(query, GRAPH_URL)).stakers;
     let loopresponse = response;
     while (loopresponse.length >= 1000) {
         skip = response.length;
-        query = '{ stakers(orderBy:amountTUT, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountTUT_gt:0}) { id amountTUT } }'
+        query = '{ stakers(block:{number:' + QUERIES_BLOCK + '} orderBy:amountTUT, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountTUT_gt:0}) { id amountTUT } }'
         loopresponse = (await querySubgraph(query, GRAPH_URL)).stakers;
         response = response.concat(loopresponse);
     }
@@ -170,12 +171,12 @@ async function getStakers() {
 
 async function getFarmers() {
     let skip = 0;
-    let query = '{ farmers(orderBy:amountLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountLP_gt:0}) { id amountLP } }'
+    let query = '{ farmers(block:{number:' + QUERIES_BLOCK + '} orderBy:amountLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountLP_gt:0}) { id amountLP } }'
     let response = (await querySubgraph(query, GRAPH_URL)).farmers;
     let loopresponse = response;
     while (loopresponse.length >= 1000) {
         skip = response.length;
-        query = '{ farmers(orderBy:amountLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountLP_gt:0}) { id amountLP } }'
+        query = '{ farmers(block:{number:' + QUERIES_BLOCK + '} orderBy:amountLP, orderDirection:desc, first:1000, skip:' + skip + ', where:{amountLP_gt:0}) { id amountLP } }'
         loopresponse = (await querySubgraph(query, GRAPH_URL)).farmers;
         response = response.concat(loopresponse);
     }
@@ -184,12 +185,12 @@ async function getFarmers() {
 
 async function getStakersLaunchpad() {
     let skip = 0;
-    let query = '{ stakers(orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:1}) { account amount } }'
+    let query = '{ stakers(block:{number:' + QUERIES_BLOCK + '} orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:1}) { account amount } }'
     let response = (await querySubgraph(query, GRAPH_URL_LAUNCHPAD)).stakers;
     let loopresponse = response;
     while (loopresponse.length >= 1000) {
         skip = response.length;
-        query = '{ stakers(orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:1}) { account amount } }'
+        query = '{ stakers(block:{number:' + QUERIES_BLOCK + '} orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:1}) { account amount } }'
         loopresponse = (await querySubgraph(query, GRAPH_URL_LAUNCHPAD)).stakers;
         response = response.concat(loopresponse);
     }
@@ -198,12 +199,12 @@ async function getStakersLaunchpad() {
 
 async function getFarmersLaunchpad() {
     let skip = 0;
-    let query = '{ stakers(orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:2}) { account amount } }'
+    let query = '{ stakers(block:{number:' + QUERIES_BLOCK + '} orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:2}) { account amount } }'
     let response = (await querySubgraph(query, GRAPH_URL_LAUNCHPAD)).stakers;
     let loopresponse = response;
     while (loopresponse.length >= 1000) {
         skip = response.length;
-        query = '{ stakers(orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:2}) { account amount } }'
+        query = '{ stakers(block:{number:' + QUERIES_BLOCK + '} orderBy:amount, orderDirection:desc, first:1000, skip:' + skip + ', where:{amount_gt:0, type:2}) { account amount } }'
         loopresponse = (await querySubgraph(query, GRAPH_URL_LAUNCHPAD)).stakers;
         response = response.concat(loopresponse);
     }
@@ -244,7 +245,7 @@ function transformLpToTut(lpAmount) {
 }
 
 async function getReservesSubgraph() {
-    const query = '{ liquidity (id:"0x0000000000000000000000000000000000000000") { liquidityTUT } lptoken (id:"0x5d9ac8993b714df01d079d1b5b0b592e579ca099") { totalSupplyLP } }'
+    const query = '{ liquidity (block:{number:' + QUERIES_BLOCK + '} id:"0x0000000000000000000000000000000000000000") { liquidityTUT } lptoken (id:"0x5d9ac8993b714df01d079d1b5b0b592e579ca099") { totalSupplyLP } }'
     const data = await querySubgraph(query, GRAPH_URL);
     RESERVES_TUT = ethers.BigNumber.from(data.liquidity.liquidityTUT)
     LP_TOTAL_SUPPLY = ethers.BigNumber.from(data.lptoken.totalSupplyLP)
