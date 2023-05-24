@@ -14,7 +14,7 @@ const GRAPH_URL_LAUNCHPAD =
 const GRAPH_URL =
     "https://api.thegraph.com/subgraphs/name/tutellus/tutellus";
 
-const QUERIES_BLOCK = 42851160
+const QUERIES_BLOCK = 42897272
 let RESERVES_TUT, LP_TOTAL_SUPPLY;
 const SUPER_LIMIT = ethers.utils.parseEther("15000");
 
