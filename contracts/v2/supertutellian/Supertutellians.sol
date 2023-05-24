@@ -46,7 +46,9 @@ contract Supertutellians is
     ITutellusRewardsVaultV2 public vault;
     IERC20Upgradeable public token;
     General public general;
+    bool public transferable;
     uint256 public lockTime;
+    uint256 public fee; //Basis Points (bps)
     uint256 public minDepositAmountRange;
     uint256 public maxDepositAmountRange;
     uint256 public minDepositAmountTimeRange;
@@ -86,7 +88,7 @@ contract Supertutellians is
 
     function initialize() public initializer {
         __AccessControlProxyPausable_init(msg.sender);
-        __ERC721_init("Supertutellians", "STUT");
+        __ERC721_init("SuperTutelliano", "STUT");
         __ERC721Enumerable_init();
         __ERC721URIStorage_init();
         __ERC721Burnable_init();
@@ -99,8 +101,9 @@ contract Supertutellians is
         vault = ITutellusRewardsVaultV2(_vault);
 
         lockTime = 365 days;
-        minDepositAmountRange = 25000 ether;
-        maxDepositAmountRange = 60000 ether;
+        fee = 2_00; //2%
+        minDepositAmountRange = 25_000 ether;
+        maxDepositAmountRange = 60_000 ether;
         minDepositAmountTimeRange = 60 days;
 
         emit InitSupertutellian(_vault, _token);
@@ -112,8 +115,13 @@ contract Supertutellians is
         emit SyncBalance(recipient, amount);
     }
 
-    function updateConfig(uint256 lock, uint256 min, uint256 max, uint256 range) public onlyRole(_ST_ADMIN_ROLE) {
+    function updateConfig(bool isTransferable, uint256 lock, uint256 newFee, uint256 min, uint256 max, uint256 range)
+        public
+        onlyRole(_ST_ADMIN_ROLE)
+    {
+        transferable = isTransferable;
         lockTime = lock;
+        fee = newFee;
         minDepositAmountRange = min;
         maxDepositAmountRange = max;
         minDepositAmountTimeRange = range;
@@ -123,7 +131,7 @@ contract Supertutellians is
         public
         onlyRole(_ST_ADMIN_ROLE)
     {
-        require(accounts.length == amounts.length, "");
+        require(accounts.length == amounts.length, "ST: length");
         uint256 len = accounts.length;
         for (uint256 i; i < len; ++i) {
             minDepositAmounts[accounts[i]] = amounts[i];
@@ -131,7 +139,7 @@ contract Supertutellians is
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "";
+        return "https://backend.tutellus.io/api/supertutellian/";
     }
 
     function balance() public view returns (uint256) {
@@ -140,6 +148,10 @@ contract Supertutellians is
 
     function pendingRewards(uint256 tokenId) public view returns (uint256) {
         return _pendingRewards(tokenId);
+    }
+
+    function getFee(uint256 tokenId) public view returns (uint256) {
+        return _getFee(tokenId);
     }
 
     function canWithdraw(uint256 tokenId) public view returns (bool) {
@@ -162,8 +174,12 @@ contract Supertutellians is
         }
     }
 
+    function feeReceiver() public view returns (address) {
+        return ITutellusManager(config).get(keccak256("ST_FEE_RECEIVER"));
+    }
+
     function deposit(address account, uint256 amount) public returns (uint256 tokenId) {
-        require(amount >= minDepositAmount(account), "");
+        require(amount >= minDepositAmount(account), "ST: < minDepositAmount");
         if (minDepositAmounts[account] != 0) minDepositAmounts[account] = 0;
         tokenId = tokenIdCounter.current();
         supertutellians[tokenId] = Supertutellian({
@@ -179,21 +195,23 @@ contract Supertutellians is
     }
 
     function withdraw(uint256 tokenId) public {
-        require(_canWithdraw(tokenId), "");
+        require(_canWithdraw(tokenId), "ST: cannot withdraw");
         address account = ownerOf(tokenId);
         claim(tokenId);
         uint256 amount = supertutellians[tokenId].balance;
+        uint256 fee_ = _getFee(tokenId);
         general.balance -= amount;
         burn(tokenId);
-        token.safeTransfer(account, amount);
+        if (fee_ != 0) token.safeTransfer(feeReceiver(), fee_);
+        token.safeTransfer(account, (amount - fee_));
         emit Withdraw(tokenId, account, amount);
     }
 
     function claim(uint256 tokenId) public {
-        require(_canWithdraw(tokenId), "");
+        require(_canWithdraw(tokenId), "ST: cannot claim");
         _update();
         uint256 pending = _pendingRewards(tokenId);
-        require(pending != 0, "Staking: 004");
+        require(pending != 0, "ST: 0 pending");
         _reward(tokenId);
         supertutellians[tokenId].rewardDebt = supertutellians[tokenId].balance * general.accRewardsPerShare / 1 ether;
 
@@ -219,6 +237,11 @@ contract Supertutellians is
             _accRewardsPerShare = _accRewardsPerShare + (_released * 1 ether / _balance);
         }
         return (supertutellians[tokenId].balance * _accRewardsPerShare / 1 ether) - supertutellians[tokenId].rewardDebt;
+    }
+
+    function _getFee(uint256 tokenId) internal view returns (uint256) {
+        uint256 amount = supertutellians[tokenId].balance;
+        return amount * fee / 100_00;
     }
 
     function _update() internal {
@@ -265,6 +288,7 @@ contract Supertutellians is
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
         whenNotPaused
     {
+        require(from == address(0) || to == address(0) || transferable, "ST: transferable");
         super._beforeTokenTransfer(from, to, tokenId);
     }
 

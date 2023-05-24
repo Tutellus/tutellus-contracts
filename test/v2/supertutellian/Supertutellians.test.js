@@ -15,6 +15,7 @@ const HoldersVault = artifacts.require("TutellusHoldersVault")
 
 const SUPERTUTELLIANS = ethers.utils.id("SUPERTUTELLIANS")
 const ST_ADMIN_ROLE = ethers.utils.id("ST_ADMIN_ROLE")
+const ST_FEE_RECEIVER = ethers.utils.id("ST_FEE_RECEIVER")
 const UPGRADER_ROLE = ethers.utils.id('UPGRADER_ROLE')
 const ERC20 = ethers.utils.id('ERC20')
 const REWARDS_MANAGER_ROLE = ethers.utils.id('REWARDS_MANAGER_ROLE')
@@ -80,6 +81,7 @@ describe.only("Supertutellians", function () {
         myManager = await Manager.deploy()
         await myManager.initialize()
         await myManager.setId(ERC20, myToken.address)
+        await myManager.setId(ST_FEE_RECEIVER, owner)
 
         const RewardsVaultV2 = await ethers.getContractFactory('TutellusRewardsVaultV2')
         const initializeCalldata = RewardsVaultV2.interface.encodeFunctionData("initialize", [])
@@ -157,6 +159,14 @@ describe.only("Supertutellians", function () {
             expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(balancePreBN.add(pendingBN))))
         })
         it("can claim after transfer", async () => {
+            await mySupertutellians.connect(ownerSigner).updateConfig(
+                true,
+                (await mySupertutellians.lockTime()),
+                (await mySupertutellians.fee()),
+                (await mySupertutellians.minDepositAmountRange()),
+                (await mySupertutellians.maxDepositAmountRange()),
+                (await mySupertutellians.minDepositAmountTimeRange())
+            )
             const nftData = await mySupertutellians.supertutellians(tokenId)
             const lockTime = await mySupertutellians.lockTime()
             const claimDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
@@ -183,6 +193,7 @@ describe.only("Supertutellians", function () {
             const lockTime = await mySupertutellians.lockTime()
             const withdrawDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
             await ethers.provider.send("evm_setNextBlockTimestamp", [withdrawDate])
+            const fee = await mySupertutellians.getFee(tokenId)
             await mySupertutellians.connect(personSigner).claim(tokenId)
             const balancePre = await myToken.balanceOf(person)
             const balancePreBN = ethers.BigNumber.from(balancePre.toString())
@@ -190,20 +201,29 @@ describe.only("Supertutellians", function () {
             const balancePost = await myToken.balanceOf(person)
             const balancePostBN = ethers.BigNumber.from(balancePost.toString())
             const depositedBN = ethers.BigNumber.from(nftData.balance.toString())
-            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(balancePreBN.add(depositedBN))))
+            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(balancePreBN.add(depositedBN).sub(fee))))
         })
         it("can withdraw after transfer", async () => {
+            await mySupertutellians.connect(ownerSigner).updateConfig(
+                true,
+                (await mySupertutellians.lockTime()),
+                (await mySupertutellians.fee()),
+                (await mySupertutellians.minDepositAmountRange()),
+                (await mySupertutellians.maxDepositAmountRange()),
+                (await mySupertutellians.minDepositAmountTimeRange())
+            )
             const nftData = await mySupertutellians.supertutellians(tokenId)
             const lockTime = await mySupertutellians.lockTime()
             const withdrawDate = parseInt(nftData.mintDate) + parseInt(lockTime) + 1
             await ethers.provider.send("evm_setNextBlockTimestamp", [withdrawDate])
+            const fee = await mySupertutellians.getFee(tokenId)
             await mySupertutellians.connect(personSigner).claim(tokenId)
             await mySupertutellians.connect(personSigner).transferFrom(person, supertutellian, tokenId)
             await mySupertutellians.connect(supertutellianSigner).withdraw(tokenId)
             const balancePost = await myToken.balanceOf(supertutellian)
             const balancePostBN = ethers.BigNumber.from(balancePost.toString())
             const depositedBN = ethers.BigNumber.from(nftData.balance.toString())
-            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(depositedBN)))
+            expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(depositedBN.sub(fee))))
         })
     })
 })
