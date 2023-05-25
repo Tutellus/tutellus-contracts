@@ -76,6 +76,15 @@ contract Supertutellians is
     /// @notice Event emitted when the staking contract is updated
     event Update(uint256 accRewardsPerShare, uint256 released, uint256 lastUpdate);
 
+    event UpdateConfig(
+        bool transferable,
+        uint256 lockTime,
+        uint256 fee,
+        uint256 minDepositAmountRange,
+        uint256 maxDepositAmountRange,
+        uint256 minDepositAmountTimeRange
+    );
+
     modifier onEachAction(uint256 tokenId) {
         _onEachAction(tokenId);
         _;
@@ -125,6 +134,9 @@ contract Supertutellians is
         minDepositAmountRange = min;
         maxDepositAmountRange = max;
         minDepositAmountTimeRange = range;
+        emit UpdateConfig(
+            transferable, lockTime, fee, minDepositAmountRange, maxDepositAmountRange, minDepositAmountTimeRange
+        );
     }
 
     function setMinDepositAmounts(address[] calldata accounts, uint256[] calldata amounts)
