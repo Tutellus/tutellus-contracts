@@ -105,7 +105,7 @@ contract Supertutellians is
         _deployTimestamp = block.timestamp; //solhint-disable-line not-rely-on-time
         general.lastUpdate = block.timestamp; //solhint-disable-line not-rely-on-time
         address _token = ITutellusManager(config).get(keccak256("ERC20"));
-        address _vault = ITutellusManager(config).get(keccak256("SUPERTUTELLIANS_REWARDS"));
+        address _vault = ITutellusManager(config).get(keccak256("TUT_IP1_RECIPIENT"));
         token = IERC20Upgradeable(_token);
         vault = ITutellusRewardsVaultV2(_vault);
 
