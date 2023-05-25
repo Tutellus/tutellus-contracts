@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.9;
 
-import "contracts/interfaces/ITutellusERC20.sol";
 import "contracts/interfaces/ITutellusManager.sol";
 import "contracts/interfaces/ITutellusRewardsVaultV2.sol";
+import "contracts/interfaces/ITutellusRewardsVault.sol";
 import "contracts/utils/UUPSUpgradeableByRole.sol";
 
 contract TutellusRewardsVaultV2_1 is ITutellusRewardsVaultV2, UUPSUpgradeableByRole {
@@ -92,8 +92,9 @@ contract TutellusRewardsVaultV2_1 is ITutellusRewardsVaultV2, UUPSUpgradeableByR
     function distribute(address account, uint256 amount) public {
         require(amount <= available(msg.sender), "TutellusRewardsVaultV2: amount exceeds available");
         distributed[msg.sender] += amount;
-        ITutellusERC20 tokenInterface = ITutellusERC20(ITutellusManager(config).get(keccak256("ERC20")));
-        tokenInterface.transfer(account, amount);
+        address vault = ITutellusManager(config).get(keccak256("REWARDS_VAULT"));
+        ITutellusRewardsVault rewardsInterface = ITutellusRewardsVault(vault);
+        rewardsInterface.distributeTokens(account, amount);
         emit NewDistribution(msg.sender, account, amount);
     }
 }
