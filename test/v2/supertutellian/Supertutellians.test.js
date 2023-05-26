@@ -19,10 +19,11 @@ const ST_FEE_RECEIVER = ethers.utils.id("ST_FEE_RECEIVER")
 const UPGRADER_ROLE = ethers.utils.id('UPGRADER_ROLE')
 const ERC20 = ethers.utils.id('ERC20')
 const REWARDS_MANAGER_ROLE = ethers.utils.id('REWARDS_MANAGER_ROLE')
-const REWARDS_ID = ethers.utils.id('SUPERTUTELLIANS_REWARDS')
+const REWARDS_ID = ethers.utils.id('TUT_IP1_RECIPIENT')
 
 const MIN_DEPOSIT_AMOUNT = parseEther("25000")
 const MAX_DEPOSIT_AMOUNT = parseEther("60000")
+const ONE_ETH = parseEther("1")
 
 let myDeployer
 let myManager
@@ -224,6 +225,33 @@ describe.only("Supertutellians", function () {
             const balancePostBN = ethers.BigNumber.from(balancePost.toString())
             const depositedBN = ethers.BigNumber.from(nftData.balance.toString())
             expect(parseFloat(ethers.utils.formatEther(balancePostBN))).to.be.greaterThanOrEqual(parseFloat(ethers.utils.formatEther(depositedBN.sub(fee))))
+        })
+    })
+    describe("minDepositAmount", () => {
+        it("minDepositAmount before range ends", async () => {
+            const whitelistAmount = ethers.utils.parseEther("7")
+            await mySupertutellians.setMinDepositAmounts([supertutellian], [whitelistAmount])
+            expect((await mySupertutellians.minDepositAmount(supertutellian))).to.be.equal(whitelistAmount.toString())
+            const min = await mySupertutellians.minDepositAmount(person)
+            expect(parseFloat(ethers.utils.formatEther(min))).to.be.lessThanOrEqual(parseFloat(ethers.utils.formatEther(MIN_DEPOSIT_AMOUNT.add(ONE_ETH))))
+        })
+        it("minDepositAmount after one week", async () => {
+            const now = parseInt(await time.latest())
+            const nextDate = now + 604800
+            await ethers.provider.send("evm_setNextBlockTimestamp", [nextDate])
+            const whitelistAmount = ethers.utils.parseEther("7")
+            await mySupertutellians.setMinDepositAmounts([supertutellian], [whitelistAmount])
+            const whitelisted = await mySupertutellians.minDepositAmount(supertutellian)
+            expect(parseFloat(ethers.utils.formatEther(whitelisted))).to.be.greaterThan(parseFloat(ethers.utils.formatEther(whitelistAmount)))
+        })
+        it("minDepositAmount after range ends", async () => {
+            const now = parseInt(await time.latest())
+            const nextDate = now + 5184000
+            await ethers.provider.send("evm_setNextBlockTimestamp", [nextDate])
+            const whitelistAmount = ethers.utils.parseEther("7")
+            await mySupertutellians.setMinDepositAmounts([supertutellian], [whitelistAmount])
+            expect((await mySupertutellians.minDepositAmount(supertutellian))).to.be.equal(MAX_DEPOSIT_AMOUNT.toString())
+            expect((await mySupertutellians.minDepositAmount(person))).to.be.equal(MAX_DEPOSIT_AMOUNT.toString())
         })
     })
 })

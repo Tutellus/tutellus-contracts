@@ -171,7 +171,9 @@ contract Supertutellians is
     }
 
     function minDepositAmount(address account) public view returns (uint256) {
-        if (minDepositAmounts[account] != 0) return minDepositAmounts[account];
+        if (minDepositAmounts[account] != 0 && block.timestamp < _deployTimestamp + 7 days) {
+            return minDepositAmounts[account];
+        }
 
         uint256 blockTimestamp = block.timestamp; //solhint-disable-line not-rely-on-time
 
