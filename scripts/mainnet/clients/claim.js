@@ -3,7 +3,7 @@ const { ethers } = hre;
 const { downloadJSON } = require('../../../utils/ipfs');
 const { getBalanceTree } = require('../../../utils/balanceTree');
 
-const ADDRESS = "0xd1306d5A2A074C3F33E94346d8d3DB05c624EB24";
+const ADDRESS = "0x5ACB3043da168b59b775eA28F3942597F45e9543";
 
 const main = async () => {
     await hre.run('compile');

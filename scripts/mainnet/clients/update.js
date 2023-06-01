@@ -7,19 +7,16 @@ const { getBalanceTree, concatJson, extractJson, compareJson } = require('../../
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
 const json1 = {
-    "0x9ae21712497825Ddea48c9BD8C8218E6315da7CF": parseEther("200").toString(),
-    "0xb2Cd14f4f505161bC79f9F28571993721C564132": parseEther("16600").toString(),
-    "0x0888682F937d65695CdBC1e3139B5B68e0CC45Ed": parseEther("200").toString(),
-    "0x1820408BF7100b5808687C05BA60F71223129b76": parseEther("200").toString(),
-    "0x9de6753359f57a0e9d43768d3b47bcd1a567c17a": parseEther("100").toString(),
-    "0x5338A2A2E1b3AB3C759F27337198562A44Fec977": parseEther("100").toString(),
-    "0x56a57433010adA66A4a01B1FF86F35a07A5f7F3e": parseEther("11067").toString(),
-    "0xBcE483aC9a7EFb94F084bEA2CC7c03fd1b236dfc": parseEther("1850").toString(),
-    "0x44493D8Db718c2636A9670469270397c65D67955": parseEther("1850").toString(),
-    "0x8c04702673f8453d9Bb08142557C8E937498c350": parseEther("8333").toString(),
-    "0x6f173eFbFF72c7b30c64fC38fDaB81C34Ad32b43": parseEther("8333").toString(),
-    "0x2b2aBa926A94221c5602dC82065610440102D613": parseEther("11000").toString(),
-    "0x9e7685Da4EFfbe6a35266989f4F3040dc39C36eD": parseEther("5553").toString(),
+    "0x6f173eFbFF72c7b30c64fC38fDaB81C34Ad32b43": parseEther("9090").toString(),
+    "0x8c04702673f8453d9Bb08142557C8E937498c350": parseEther("12727").toString(),
+    "0x135907936537a44763817AC7Fc30abaec9a81Fab": parseEther("100").toString(),
+    "0x00964BB483a3bf16CEC8001f1D26408E04b8bee5": parseEther("100").toString(),
+    "0xB04A9baEac8400ab2F841feA9aefdE9030e8F706": parseEther("100").toString(),
+    "0x4483326668c7e63116b51BCd282c230706EbeDc2": parseEther("100").toString(),
+    "0x5F6D71CD8404E661Cb4736e368564C01A7Ff9852": parseEther("100").toString(),
+    "0xcD650C9bE67Dcf3aA10DeBbefC4E3Be1D89F83cA": parseEther("100").toString(),
+    "0xF50a7C4eA595eE4Eb81BCbEd3Ea6929d8D5B69a7": parseEther("100").toString(),
+    "0x5ACB3043da168b59b775eA28F3942597F45e9543": parseEther("300000").toString(),
 }
 
 const checkWallets = (json) => {

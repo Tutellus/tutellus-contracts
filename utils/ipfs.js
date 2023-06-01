@@ -5,15 +5,26 @@ const axios = require('axios');
 const PROJECT_ID = process.env.INFURA_IPFS_PROJECT_ID
 const PROJECT_SECRET  = process.env.INFURA_IPFS_PROJECT_SECRET
 
+const RETRIES = 3;
+
 async function downloadJSON(uri) {
-  try {
-    return await axios({
-      url: uri,
-      method: 'GET',
-    }).then((response) => response.data);
-  } catch (error) {
-    throw error;
+  let response = null;
+  for (let i = 0; i < RETRIES; i++) {
+    try {
+      response = await axios({
+        url: uri,
+        method: 'GET',
+      });
+      break;
+    } catch (error) {
+      if (i === RETRIES - 1) {
+        throw error;
+      }
+      // delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
   }
+  return response?.data;
 }
 
 async function uploadJSON({
