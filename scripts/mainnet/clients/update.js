@@ -7,16 +7,20 @@ const { getBalanceTree, concatJson, extractJson, compareJson } = require('../../
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
 const json1 = {
-    "0x6f173eFbFF72c7b30c64fC38fDaB81C34Ad32b43": parseEther("9090").toString(),
-    "0x8c04702673f8453d9Bb08142557C8E937498c350": parseEther("12727").toString(),
-    "0x135907936537a44763817AC7Fc30abaec9a81Fab": parseEther("100").toString(),
-    "0x00964BB483a3bf16CEC8001f1D26408E04b8bee5": parseEther("100").toString(),
-    "0xB04A9baEac8400ab2F841feA9aefdE9030e8F706": parseEther("100").toString(),
-    "0x4483326668c7e63116b51BCd282c230706EbeDc2": parseEther("100").toString(),
-    "0x5F6D71CD8404E661Cb4736e368564C01A7Ff9852": parseEther("100").toString(),
-    "0xcD650C9bE67Dcf3aA10DeBbefC4E3Be1D89F83cA": parseEther("100").toString(),
-    "0xF50a7C4eA595eE4Eb81BCbEd3Ea6929d8D5B69a7": parseEther("100").toString(),
-    "0x5ACB3043da168b59b775eA28F3942597F45e9543": parseEther("300000").toString(),
+    "0x5ACB3043da168b59b775eA28F3942597F45e9543": parseEther("200000").toString(),
+    "0x45D88d81bB0D18158744db80F3082eE34CbB15ad": parseEther("100").toString(),
+    "0x927fD041336fC3A71504C9db6b19be080203f674": parseEther("100").toString(),
+    "0x4cFD4cCeC4e22f063B2d2207C100dd750bA4EF91": parseEther("100").toString(),
+    "0x35C6886a0Ea454A7f38E2AAeDD9B199F5B53301A": parseEther("50").toString(),
+    "0xDC1f6f50f9b42C8a10462712Fe12914A2f625720": parseEther("50").toString(),
+    "0x45E6BDE9014D944D790d9f289eA50325e10cBc42": parseEther("50").toString(),
+    "0x44493D8Db718c2636A9670469270397c65D67955": parseEther("38960").toString(),
+    "0x5F6D71CD8404E661Cb4736e368564C01A7Ff9852": parseEther("9730").toString(),
+    "0x8c04702673f8453d9Bb08142557C8E937498c350": parseEther("8930").toString(),
+    "0x6f173eFbFF72c7b30c64fC38fDaB81C34Ad32b43": parseEther("8930").toString(),
+    "0x2b2aBa926A94221c5602dC82065610440102D613": parseEther("5840").toString(),
+    "0xc5dfdc9cf523a84c0d1c38D5A5FFC20e10a13331": parseEther("100").toString(),
+    "0x55868d006Cb227F1265DEfC96bD020509802bb6e": parseEther("100").toString(),
 }
 
 const checkWallets = (json) => {
@@ -25,7 +29,7 @@ const checkWallets = (json) => {
         if (isAddress(wallet)) {
             return;
         } else {
-            throw new Error(`Invalid wallet address: ${wallet}`);
+            throw new Error(`Invalid wallet address": ${wallet}`);
         }
     })
 }

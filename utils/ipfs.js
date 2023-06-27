@@ -49,9 +49,9 @@ async function uploadJSON({
     const file = await ipfs.add(gs);
     const cid = file.cid.toString();
     const result = `https://ipfs.io/ipfs/${cid}`;
+    fs.unlinkSync(tmpFile);
     return result;
   } catch (error) {
-    fs.unlinkSync(tmpFile);
     throw error;
   }
 }
