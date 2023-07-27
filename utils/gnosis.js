@@ -44,7 +44,7 @@ const getNetworkKey = (chainId) => {
   }
 };
 
-const getUrl = (chainId) => `https://safe-transaction.${getNetworkKey(chainId)}gnosis.io/api/v1`;
+const getUrl = (chainId) => `https://safe-transaction-${getNetworkKey(chainId)}safe.global/api/v1`;
 
 // const getSafeData = async (chainId, safe) => {
 //   const baseUrl = getUrl(chainId);
