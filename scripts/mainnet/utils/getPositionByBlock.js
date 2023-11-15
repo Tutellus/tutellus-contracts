@@ -9,7 +9,8 @@ const ZERO_BN = new ethers.BigNumber.from("0")
 const ONE_ETH = ethers.utils.parseEther("1")
 // const ACCOUNT = "0x6d2aea076b1e1deb491df73e20546c21f8a3d458";
 const ACCOUNT = "0x5acb3043da168b59b775ea28f3942597f45e9543";
-const BLOCK = "37520355"
+// const BLOCK = "23201013" //31dic2021
+const BLOCK = "37520355" //31dic2022
 
 async function main() {
     const position = await getPosition();
@@ -28,6 +29,7 @@ async function main() {
     const totalUsd = balanceTokenUsd.add(balanceLpUsd).add(stakedTokenUsd).add(farmedLpUsd)
 
     const result = {
+        block: BLOCK,
         account: ACCOUNT,
         priceToken: ethers.utils.formatEther(priceToken),
         priceLp: ethers.utils.formatEther(priceLp),
