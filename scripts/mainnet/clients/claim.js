@@ -17,7 +17,10 @@ const main = async () => {
     console.log('Getting current uri...')
     const uri0 = await myClientsVault.uri();
     console.log('Downloading current JSON...')
-    const json = await downloadJSON(uri0);
+    const uriArray = uri0.split('/');
+    const cid = uriArray[uriArray.length - 1];
+    console.log('CID:', cid)
+    const json = await downloadJSON(cid);
     console.log('Concatenating JSONs...')
     const tree = getBalanceTree(json).toJSON();
 

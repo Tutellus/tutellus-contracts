@@ -7,7 +7,7 @@ const { getBalanceTree, concatJson, extractJson, compareJson } = require('../../
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
 const json1 = {
-    "0x5ACB3043da168b59b775eA28F3942597F45e9543": parseEther("900000").toString()
+    "0x5ACB3043da168b59b775eA28F3942597F45e9543": parseEther("300000").toString()
 }
 
 const checkWallets = (json) => {
@@ -16,7 +16,7 @@ const checkWallets = (json) => {
         if (isAddress(wallet)) {
             return;
         } else {
-            throw new Error(`Invalid wallet address": parseEther("175").toString(), ${wallet}`);
+            throw new Error(`Invalid wallet address: ${wallet}`);
         }
     })
 }
