@@ -7,7 +7,7 @@ const { getBalanceTree, concatJson, extractJson, compareJson } = require('../../
 const { createTx, sendTx } = require('../../../utils/gnosis');
 
 const json1 = {
-    "0x5ACB3043da168b59b775eA28F3942597F45e9543": parseEther("400000").toString()
+    "0x5ACB3043da168b59b775eA28F3942597F45e9543": parseEther("1000000").toString()
 }
 
 const checkWallets = (json) => {
