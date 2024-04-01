@@ -26,13 +26,14 @@ const main = async () => {
 
     const claimData = tree.claims[ADDRESS];
 
-    console.log('Claiming...')
+    console.log('Claiming...', JSON.stringify(claimData))
     const tx = await myClientsVault.claim(
         claimData.index,
         ADDRESS,
         claimData.amount,
         claimData.proof,
     );
+    console.log('TX:', tx.hash)
     await tx.wait();
     console.log('Claimed!')
 
