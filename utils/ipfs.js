@@ -7,12 +7,12 @@ const PROJECT_SECRET  = process.env.INFURA_IPFS_PROJECT_SECRET
 
 const RETRIES = 3;
 
-async function downloadJSON(uri) {
+async function downloadJSON(cid) {
   let response = null;
   for (let i = 0; i < RETRIES; i++) {
     try {
       response = await axios({
-        url: uri,
+        url: 'https://gateway.pinata.cloud/ipfs/'.concat(cid),
         method: 'GET',
       });
       break;
@@ -48,9 +48,12 @@ async function uploadJSON({
     const gs = globSource(tmpFile, { recursive: true });
     const file = await ipfs.add(gs);
     const cid = file.cid.toString();
-    const result = `https://ipfs.io/ipfs/${cid}`;
+    const uri = `ipfs://${cid}`;
     fs.unlinkSync(tmpFile);
-    return result;
+    return {
+      uri,
+      cid,
+    };
   } catch (error) {
     throw error;
   }
