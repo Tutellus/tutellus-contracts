@@ -45,7 +45,7 @@ const config: HardhatUserConfig = {
     anvil: {
       chainId: parseInt(process.env.ANVIL_CHAIN_ID || '5'),
       url: process.env.ANVIL_RPC || "http://localhost:8545",
-      
+
       accounts:
       {
         mnemonic: process.env.MNEMONIC,
@@ -67,6 +67,12 @@ const config: HardhatUserConfig = {
     },
     mainnet: {
       url: process.env.ETH_MAINNET_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    sepolia: {
+      url: process.env.ETH_TESTNET_URL || "",
+      chainId: 11155111,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
@@ -160,6 +166,7 @@ const config: HardhatUserConfig = {
       // For Mainnet, Ropsten, Rinkeby, Goerli, Kovan, Sepolia
       mainnet: process.env.ETHERSCAN_API_KEY || "",
       goerli: process.env.ETHERSCAN_API_KEY || "",
+      sepolia: process.env.ETHERSCAN_API_KEY || "",
       // For BSC testnet & mainnet
       bsc: process.env.BSC_API_KEY || "",
       bscTestnet: process.env.BSC_API_KEY || "",

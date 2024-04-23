@@ -1,5 +1,5 @@
 {
-    "current": "5",
+    "current": "11155111",
     "url": {
         "1": "https://api.etherscan.io/api",
         "4": "https://api-rinkeby.etherscan.io/api",
@@ -7,7 +7,8 @@
         "56": "https://api.bscscan.com/api",
         "97": "https://api-testnet.bscscan.com/api",
         "137": "https://api.polygonscan.com/api",
-        "80001": "https://api-testnet.polygonscan.com/api"
+        "80001": "https://api-testnet.polygonscan.com/api",
+        "11155111": "https://rpc.tenderly.co/fork/0dcbd501-b83b-4052-950f-0b19ac2006a6"
     },
     "apikey": {
         "1": "9IKRN66FXBYZZETKF9MSTV5SP46MPH7IU3",
@@ -16,6 +17,7 @@
         "56": "SEAZASBV3QF4AYSJW1SP4DABHPE4GIR9WI",
         "97": "SEAZASBV3QF4AYSJW1SP4DABHPE4GIR9WI",
         "137": "PMJKYWY72ZWBGP2YVU2KGE72WSK3TB8ERU",
-        "80001": "PMJKYWY72ZWBGP2YVU2KGE72WSK3TB8ERU"
+        "80001": "PMJKYWY72ZWBGP2YVU2KGE72WSK3TB8ERU",
+        "11155111": "9IKRN66FXBYZZETKF9MSTV5SP46MPH7IU3"
     }
 }

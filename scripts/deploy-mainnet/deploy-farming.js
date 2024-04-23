@@ -7,22 +7,22 @@ const {
 } = require('@openzeppelin/test-helpers')
 const fs = require('fs')
 const scanners = require('../../scanners.json')
-const { networks } = require('../../hardhat.config')
+const config = require('../../hardhat.config')
 // const { BigNumber } = require('@ethersproject/bignumber')
 
 const scannerSet = () => {
-  const chainId = networks[bre.network.name].chainId
+  const chainId = config.default.networks[bre.network.name].chainId
   scanners.current = chainId.toString()
 
   fs.writeFileSync('./scanners.json', JSON.stringify(scanners, null, 4))
 }
 
-async function main () {
+async function main() {
   await bre.run('compile')
   scannerSet()
-  const PAIR = '0x5d9AC8993B714df01D079d1B5b0b592e579Ca099'
-  const myDeployer = await Deployer.at('0xF33dCE7f829157500a5351475384D54E45C7AFF6')
-  const myRewardsVault = await RewardsVault.at('0xc7963fB87C365f67247F97D329D50B9eC5a374B8')
+  const PAIR = '0xc3E197b66616CB2D90Fb339978FeFb9C4B424867'
+  const myDeployer = await Deployer.at('0xCd56729889092b259B9b87B7cE15528F6CbDB078')
+  const myRewardsVault = await RewardsVault.at('0x65fc353280E25c960Af62Ee0752b29c48F9A9C9f')
   const [token, rolemanager, rewardsVault] = await Promise.all([
     myDeployer.token(),
     myDeployer.rolemanager(),

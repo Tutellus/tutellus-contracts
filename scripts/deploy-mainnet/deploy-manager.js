@@ -4,9 +4,11 @@ const Manager = bre.artifacts.require('TutellusManager')
 const ACPP = bre.artifacts.require('AccessControlProxyPausable')
 const ids = require('../../examples/mainnet/ids.json')
 
-async function main () {
+async function main() {
   bre.run('compile')
   const myManager = await Manager.new()
+
+  await myManager.initialize()
 
   const keys = Object.keys(ids)
 

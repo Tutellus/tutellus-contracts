@@ -9,40 +9,41 @@ const {
 } = require('@openzeppelin/test-helpers')
 const fs = require('fs')
 const scanners = require('../../scanners.json')
-const { networks } = require('../../hardhat.config')
+const config = require('../../hardhat.config')
 const { BigNumber } = require('@ethersproject/bignumber')
 const holdersJson = require('../../holders.json')
 const teamJson = require('../../team.json')
 
 const scannerSet = () => {
-  const chainId = networks[bre.network.name].chainId
+  const chainId = config.default.networks[bre.network.name].chainId
   scanners.current = chainId.toString()
 
   fs.writeFileSync('./scanners.json', JSON.stringify(scanners, null, 4))
 }
 
-async function main () {
+async function main() {
   await bre.run('compile')
   scannerSet()
   const currentBlock = await time.latestBlock()
   const blocksBehind = BigNumber.from('1296000') // 1 mes
   const STARTBLOCK = currentBlock - blocksBehind
-  const TREASURY = '0x5ACB3043da168b59b775eA28F3942597F45e9543'
-  const ADMIN = '0x943B71Dd451dAA8097bC2aD6d4afb7517cB4Cf3f'
+  const TREASURY = '0x46121e79942deF3008b1823cf990c262dad5b393'
+  const ADMIN = '0xCD7669AAFffB7F683995E6eD9b53d1E5FE72c142'
 
   /// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   console.log('Deploying Tutellus Infrastructure (by TutellusDeployer)...')
   const myDeployer = await Deployer.new(TREASURY, STARTBLOCK)
   console.log('! Tutellus Infrastructure deployed')
 
-  const [token, rolemanager, rewardsVault, holdersVault, clientsVault, treasuryVault, teamVault] = await Promise.all([
+  const [token, rolemanager, rewardsVault, holdersVault, clientsVault, treasuryVault, teamVault, pair] = await Promise.all([
     myDeployer.token(),
     myDeployer.rolemanager(),
     myDeployer.rewardsVault(),
     myDeployer.holdersVault(),
     myDeployer.clientsVault(),
     myDeployer.treasuryVault(),
-    myDeployer.teamVault()
+    myDeployer.teamVault(),
+    myDeployer.pair()
   ])
 
   console.log(`Granting admin role to ${ADMIN} and ${TREASURY}...`)
@@ -83,6 +84,7 @@ async function main () {
   console.log(
     'Deployer:', myDeployer.address,
     '\nToken:', token,
+    '\nPair:', pair,
     '\nRoleManager:', rolemanager,
     '\nRewardsVault:', rewardsVault,
     '\nHoldersVault:', holdersVault,
