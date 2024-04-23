@@ -20,9 +20,9 @@ const scannerSet = () => {
 async function main() {
   await bre.run('compile')
   scannerSet()
-  const PAIR = '0xc3E197b66616CB2D90Fb339978FeFb9C4B424867'
-  const myDeployer = await Deployer.at('0xCd56729889092b259B9b87B7cE15528F6CbDB078')
-  const myRewardsVault = await RewardsVault.at('0x65fc353280E25c960Af62Ee0752b29c48F9A9C9f')
+  const PAIR = '0x8d34F5E8B953A01099a30f59dBB42AD2F6FdD619'
+  const myDeployer = await Deployer.at('0x52b9f4F70f372836D00aBB191EB90301576acd8E')
+  const myRewardsVault = await RewardsVault.at('0xa3b7f9c6b75D4eeDe2aa6f594B55c4b97783c5C9')
   const [token, rolemanager, rewardsVault] = await Promise.all([
     myDeployer.token(),
     myDeployer.rolemanager(),
