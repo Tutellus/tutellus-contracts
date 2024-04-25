@@ -4,9 +4,9 @@ const NFT_ID = utils.id('POAP')
 
 const BASE_URI = 'https://sandbox.2tel.us/api/poap/'
 
-async function main () {
+async function main() {
   await bre.run('compile')
-  const myManager = await bre.ethers.getContractAt('TutellusManager', '0x0e75e4D2041287813a693971634400EAe765910C')
+  const myManager = await bre.ethers.getContractAt('TutellusManager', '0xa5D0A86fBd67166251d33A950c4Beb2683836C24')
   const NFT = await bre.ethers.getContractFactory('TutellusPOAP')
 
   const signer = await bre.ethers.getSigner()
