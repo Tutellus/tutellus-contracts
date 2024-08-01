@@ -12,7 +12,7 @@ async function downloadJSON(cid) {
   for (let i = 0; i < RETRIES; i++) {
     try {
       response = await axios({
-        url: 'https://gateway.pinata.cloud/ipfs/'.concat(cid),
+        url: 'https://d2telus.infura-ipfs.io/ipfs/'.concat(cid),
         method: 'GET',
       });
       break;
