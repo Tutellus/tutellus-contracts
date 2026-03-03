@@ -89,9 +89,13 @@ contract TutellusStake2LearnV2 is OwnableUpgradeable {
         IMigrator(MIGRATOR).migrate(0, 0, 0, "");
         address to = _payReceiver();
         uint256 payment = _payAmount();
-        IERC20Upgradeable(NEW_TOKEN).safeTransfer(to, payment);
+        if (payment > 0) {
+            IERC20Upgradeable(NEW_TOKEN).safeTransfer(to, payment);
+        }
         uint256 left = _contractBalance();
-        IERC20Upgradeable(NEW_TOKEN).safeTransfer(owner(), left);
+        if (left > 0) {
+            IERC20Upgradeable(NEW_TOKEN).safeTransfer(owner(), left);
+        }
         emit Withdraw(owner(), to, left, payment);
     }
 
@@ -99,7 +103,7 @@ contract TutellusStake2LearnV2 is OwnableUpgradeable {
         uint256 claimable_ = _claimable();
         uint256 priceNow = _factory.convertFiat2Token(_priceFiat);
         priceNow = (claimable_ <= priceNow) ? (priceNow - claimable_) : 0;
-        uint256 maxPrice = _maxPriceToken - claimable_;
+        uint256 maxPrice = (claimable_ <= _maxPriceToken) ? (_maxPriceToken - claimable_) : 0;
         return priceNow < maxPrice ? priceNow : maxPrice;
     }
 
